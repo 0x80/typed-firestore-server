@@ -16,117 +16,130 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 
 type ProcessQueryOptions<T extends Record<string, unknown>> = {
-  query: Query<T>;
-  handler: (document: FsMutableDocument<T>) => Promise<unknown>;
   select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
   throttleSecs?: number;
 };
 
-type ProcessQueryByChunkOptions<T extends Record<string, unknown>> = {
-  query: Query<T>;
-  handler: (documents: FsMutableDocument<T>[]) => Promise<unknown>;
-  select?: (keyof T)[];
-  batchSize?: number;
-  limitToFirstBatch?: boolean;
-  throttleSecs?: number;
-};
+export function processQuery<
+  T extends Record<string, unknown>,
+  K extends keyof T = keyof T,
+>(collectionRef: CollectionReference<T>) {
+  return async <S extends K[] | undefined = undefined>(
+    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    handler: (
+      document: FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>
+    ) => Promise<unknown>,
+    options: ProcessQueryOptions<T> & { select?: S } = {}
+  ) => {
+    const {
+      throttleSecs = 0,
+      limitToFirstBatch = false,
+      batchSize = DEFAULT_BATCH_SIZE,
+    } = options;
 
-export async function processQuery<T extends Record<string, unknown>>(
-  collectionRef: CollectionReference<T>,
-  options: ProcessQueryOptions<T>
-) {
-  const {
-    throttleSecs = 0,
-    limitToFirstBatch = false,
-    batchSize = DEFAULT_BATCH_SIZE,
-  } = options;
+    const query = options.select
+      ? (queryFn(collectionRef).select(
+          ...(options.select as string[])
+        ) as Query<Pick<T, K>>)
+      : (queryFn(collectionRef) as Query<Pick<T, K>>);
+    let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
+    let count = 0;
 
-  let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
-  let count = 0;
+    const errors: { id: string; message: string }[] = [];
 
-  const errors: { id: string; message: string }[] = [];
+    do {
+      verboseCount("Processing chunk");
 
-  do {
-    verboseCount("Processing chunk");
+      const [documents, _lastDocumentSnapshot] = await getSomeDocuments<
+        Pick<T, K>
+      >(query, lastDocumentSnapshot, batchSize, limitToFirstBatch);
 
-    const [documents, _lastDocumentSnapshot] = await getSomeDocuments<T>(
-      options.query,
-      lastDocumentSnapshot,
-      batchSize,
-      limitToFirstBatch
-    );
+      await Promise.all([
+        ...documents.map((doc) =>
+          handler(
+            doc as FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>
+          ).catch((err) => {
+            errors.push({ id: doc.id, message: getErrorMessage(err) });
+          })
+        ),
+        makeWait(throttleSecs),
+      ]);
 
-    await Promise.all([
-      ...documents.map((doc) =>
-        options.handler(doc).catch((err) => {
-          errors.push({ id: doc.id, message: getErrorMessage(err) });
-        })
-      ),
-      makeWait(throttleSecs),
-    ]);
+      count += documents.length;
 
-    count += documents.length;
+      lastDocumentSnapshot = _lastDocumentSnapshot;
+    } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
 
-    lastDocumentSnapshot = _lastDocumentSnapshot;
-  } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
+    verboseLog(`Processed ${count} documents`);
 
-  verboseLog(`Processed ${count} documents`);
-
-  if (errors.length > 0) {
-    errors.forEach(({ id, message }) => {
-      console.error(`${id}: ${message}`);
-    });
-  }
+    if (errors.length > 0) {
+      errors.forEach(({ id, message }) => {
+        console.error(`${id}: ${message}`);
+      });
+    }
+  };
 }
 
-export async function processQueryByChunk<T extends Record<string, unknown>>(
-  collectionRef: CollectionReference<T>,
-  options: ProcessQueryByChunkOptions<T>
-) {
-  const {
-    throttleSecs = 0,
-    limitToFirstBatch = false,
-    batchSize = DEFAULT_BATCH_SIZE,
-  } = options;
+export function processQueryByChunk<
+  T extends Record<string, unknown>,
+  K extends keyof T = keyof T,
+>(collectionRef: CollectionReference<T>) {
+  return async <S extends K[] | undefined = undefined>(
+    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    handler: (
+      documents: FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>[]
+    ) => Promise<unknown>,
+    options: ProcessQueryOptions<T> & { select?: S } = {}
+  ) => {
+    const {
+      throttleSecs = 0,
+      limitToFirstBatch = false,
+      batchSize = DEFAULT_BATCH_SIZE,
+    } = options;
 
-  let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
-  let count = 0;
+    const query = options.select
+      ? (queryFn(collectionRef).select(
+          ...(options.select as string[])
+        ) as Query<Pick<T, K>>)
+      : (queryFn(collectionRef) as Query<Pick<T, K>>);
+    let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
+    let count = 0;
 
-  const errors: string[] = [];
+    const errors: string[] = [];
 
-  do {
-    verboseCount("Processing chunk");
+    do {
+      verboseCount("Processing chunk");
 
-    const [documents, _lastDocumentSnapshot] = await getSomeDocuments<T>(
-      options.query,
-      lastDocumentSnapshot,
-      batchSize,
-      limitToFirstBatch
-    );
+      const [documents, _lastDocumentSnapshot] = await getSomeDocuments<
+        Pick<T, K>
+      >(query, lastDocumentSnapshot, batchSize, limitToFirstBatch);
 
-    if (isEmpty(documents)) {
-      continue;
+      if (isEmpty(documents)) {
+        continue;
+      }
+
+      await Promise.all([
+        handler(
+          documents as FsMutableDocument<
+            S extends K[] ? Pick<T, S[number]> : T
+          >[]
+        ).catch((err) => errors.push(getErrorMessage(err))),
+        makeWait(throttleSecs),
+      ]);
+
+      count += documents.length;
+
+      lastDocumentSnapshot = _lastDocumentSnapshot;
+    } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
+
+    verboseLog(`Processed ${count} documents`);
+
+    if (errors.length > 0) {
+      errors.forEach((message) => {
+        console.error(message);
+      });
     }
-
-    await Promise.all([
-      options
-        .handler(documents)
-        .catch((err) => errors.push(getErrorMessage(err))),
-      makeWait(throttleSecs),
-    ]);
-
-    count += documents.length;
-
-    lastDocumentSnapshot = _lastDocumentSnapshot;
-  } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
-
-  verboseLog("Processed", count);
-
-  if (errors.length > 0) {
-    errors.forEach((message) => {
-      console.error(message);
-    });
-  }
+  };
 }

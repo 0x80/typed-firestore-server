@@ -43,10 +43,10 @@ export const refs = {
 
 ```ts
 import { refs } from "./db-refs";
-import { getDocument, processQuery } from "@codecompose/typed-firestore";
+import { getDocument, processQuery } from "@typed-firestore/server";
 
 /** Get a document, the result will be typed to FsMutableDocument<User> */
-const user = await getDocument(refs.users, "123");
+const user = await getDocument(refs.users, "id123");
 
 /** The returned document has a typed update function */
 await user.update({
@@ -54,6 +54,22 @@ await user.update({
   is_active: true,
   /** Field values are allowed to be passed for any of the defined properties */
   modified_at: FieldValue.serverTimestamp(),
+});
+
+await runTransaction(async (tx) => {
+  /** Get a document as part of a transaction */
+  const user = await getDocumentFromTransaction(tx, refs.users, "id123");
+
+  /**
+   * In this case, the typed update function uses the transaction, and is
+   * therefore not async.
+   */
+  user.update({
+    /** Properties here will be restricted to what is available in the User type */
+    is_active: true,
+    /** Field values are allowed to be passed for any of the defined properties */
+    modified_at: FieldValue.serverTimestamp(),
+  });
 });
 
 /**

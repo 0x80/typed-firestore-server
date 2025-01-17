@@ -16,6 +16,7 @@ export function makeMutableDocument<T extends Record<string, unknown>>(
     data: doc.data() as T,
     ref: doc.ref,
     update: (data: UpdateData<T>) => doc.ref.update(data),
+    updateWithPartial: (data: Partial<T>) => doc.ref.update(data),
   };
 }
 
@@ -30,5 +31,7 @@ export function makeMutableDocumentFromTransaction<
     data: doc.data() as T,
     ref: doc.ref,
     update: (data: UpdateData<T>) => transaction.update(doc.ref, data),
+    updateWithPartial: (data: Partial<T>) =>
+      transaction.update(doc.ref, data as UpdateData<T>),
   };
 }

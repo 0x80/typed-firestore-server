@@ -10,13 +10,11 @@ type JsonObject = {
 };
 
 /**
- * Make a firestore document more human readable when exporting to json. Useful
- * for debugging purposes.
- *
- * - Converts all Timestamps to strings
- * - Sorts object keys alphabetically
+ * Make a human-readable Firestore document for exporting to JSON. Useful for
+ * debugging. It converts all Timestamps to strings and sorts object keys
+ * alphabetically.
  */
-export function makeDocumentDataReadable(
+export function makeHumanReadableDocument(
   documentData: FirebaseFirestore.DocumentData
 ) {
   return sortObjectKeysRecursive(convertTimestampsRecursive(documentData));

@@ -9,12 +9,11 @@ which greatly reduces boilerplate code as well as the risk of mistakes.
 
 For client-side check out
 [firestore-hooks](https://github.com/0x80/firestore-hooks) which provides
-similar abstractions.
+similar abstractions, but doesn't have the same .
 
 ## Installation
 
-`pnpm i @codecompose/typed-firestore`, or the equivalent for your package
-manager.
+`pnpm i @typed-firestore/server`, or the equivalent for your package manager.
 
 ## Usage
 
@@ -116,9 +115,12 @@ mutable version also provides a strongly-typed `update` function and the raw
 
 ### Collection Query
 
-| Function              | Description                                                                      |
-| --------------------- | -------------------------------------------------------------------------------- |
-| `getDocuments`        | Fetch a number of documents or a full collection (no limit available)            |
-| `getFirstDocument`    | Fetch a single document using a query                                            |
-| `processQuery`        | Query a collection and process the results using a handler for a single document |
-| `processQueryByChunk` | Query a collection and process the results using a handler for each chunk        |
+| Function                      | Description                                                             |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`                | Fetch documents using a query                                           |
+| `getDocumentsFromTransaction` | Fetch documents using a query as part of a transaction                  |
+| `getFirstDocument`            | Fetch the first document from a query                                   |
+| `processCollection`           | Process an entire collection using a handler per document               |
+| `processCollectionByChunk`    | Process an entire collection using a handler per chunk                  |
+| `processQuery`                | Query a collection and process the results using a handler per document |
+| `processQueryByChunk`         | Query a collection and process the results using a handler per chunk    |

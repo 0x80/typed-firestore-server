@@ -3,7 +3,10 @@ import type {
   Transaction,
 } from "firebase-admin/firestore";
 import { invariant } from "~/utils";
-import { makeMutableDocument } from "./make-mutable-document";
+import {
+  makeMutableDocument,
+  makeMutableDocumentFromTransaction,
+} from "./make-mutable-document";
 
 export async function getDocument<T extends Record<string, unknown>>(
   collectionRef: CollectionReference<T>,
@@ -46,7 +49,7 @@ export async function getDocumentFromTransaction<
     `No document available at ${collectionRef.path}/${documentId}`
   );
 
-  return makeMutableDocument<T>(doc);
+  return makeMutableDocumentFromTransaction<T>(doc, transaction);
 }
 
 export async function getDocumentFromTransactionMaybe<
@@ -64,5 +67,5 @@ export async function getDocumentFromTransactionMaybe<
     return;
   }
 
-  return makeMutableDocument<T>(doc);
+  return makeMutableDocumentFromTransaction<T>(doc, transaction);
 }

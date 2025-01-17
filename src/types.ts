@@ -1,5 +1,6 @@
 import type {
   DocumentReference,
+  Transaction,
   UpdateData,
   WriteResult,
 } from "firebase-admin/firestore";
@@ -18,4 +19,9 @@ export type FsDocument<T> = {
 export type FsMutableDocument<T> = {
   readonly ref: DocumentReference<T>;
   readonly update: (data: UpdateData<T>) => Promise<WriteResult>;
+} & FsDocument<T>;
+
+export type FsMutableDocumentFromTransaction<T> = {
+  readonly ref: DocumentReference<T>;
+  readonly update: (data: UpdateData<T>) => Transaction;
 } & FsDocument<T>;

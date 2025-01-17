@@ -1,10 +1,10 @@
 {
-  "name": "@codecompose/firestore-typed",
-  "version": "1.0.0",
-  "description": "Elegant, typed, zero-dependency abstractions for Firestore in server environments",
+  "name": "@typed-firestore/server",
+  "version": "0.0.0",
+  "description": "Elegant, strongly-typed abstractions for Firestore in server environments",
   "repository": {
     "type": "git",
-    "url": "https://github.com/0x80/firestore-typed"
+    "url": "https://github.com/0x80/typed-firestore"
   },
   "keywords": [
     "firestore",
@@ -38,7 +38,9 @@
     "build": "tsup-node && tsc --emitDeclarationOnly && tsc-alias --verbose",
     "clean": "del-cli dist tsconfig.tsbuildinfo",
     "test": "echo \"No test specified\"",
-    "prepare": "pnpm clean && pnpm build"
+    "prepare": "pnpm clean && pnpm build",
+    "prettier:format": "prettier --write .",
+    "prettier:check": "prettier --check ."
   },
   "author": "Thijs Koerselman",
   "license": "MIT",

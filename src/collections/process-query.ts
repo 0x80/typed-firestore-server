@@ -22,14 +22,20 @@ type ProcessQueryOptions<T extends Record<string, unknown>> = {
   throttleSecs?: number;
 };
 
+type SelectedDocument<
+  T,
+  K extends keyof T,
+  S extends K[] | undefined,
+> = S extends K[] ? Pick<T, S[number]> : T;
+
 export function processQuery<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    queryFn: (collection: CollectionReference) => Query,
     handler: (
-      document: FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>
+      document: FsMutableDocument<SelectedDocument<T, K, S>>
     ) => Promise<unknown>,
     options: ProcessQueryOptions<T> & { select?: S } = {}
   ) => {
@@ -40,11 +46,12 @@ export function processQuery<
     } = options;
 
     const query = options.select
-      ? (queryFn(collectionRef).select(
-          ...(options.select as string[])
-        ) as Query<Pick<T, K>>)
-      : (queryFn(collectionRef) as Query<Pick<T, K>>);
-    let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef);
+
+    let lastDocumentSnapshot:
+      | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+      | undefined;
     let count = 0;
 
     const errors: { id: string; message: string }[] = [];
@@ -52,17 +59,20 @@ export function processQuery<
     do {
       verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getSomeDocuments<
-        Pick<T, K>
-      >(query, lastDocumentSnapshot, batchSize, limitToFirstBatch);
+      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+        query,
+        lastDocumentSnapshot,
+        batchSize,
+        limitToFirstBatch
+      );
 
       await Promise.all([
         ...documents.map((doc) =>
-          handler(
-            doc as FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>
-          ).catch((err) => {
-            errors.push({ id: doc.id, message: getErrorMessage(err) });
-          })
+          handler(doc as FsMutableDocument<SelectedDocument<T, K, S>>).catch(
+            (err) => {
+              errors.push({ id: doc.id, message: getErrorMessage(err) });
+            }
+          )
         ),
         makeWait(throttleSecs),
       ]);
@@ -89,7 +99,7 @@ export function processQueryByChunk<
   return async <S extends K[] | undefined = undefined>(
     queryFn: (collection: CollectionReference<T>) => Query<T>,
     handler: (
-      documents: FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>[]
+      documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
     ) => Promise<unknown>,
     options: ProcessQueryOptions<T> & { select?: S } = {}
   ) => {
@@ -102,9 +112,12 @@ export function processQueryByChunk<
     const query = options.select
       ? (queryFn(collectionRef).select(
           ...(options.select as string[])
-        ) as Query<Pick<T, K>>)
-      : (queryFn(collectionRef) as Query<Pick<T, K>>);
-    let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
+        ) as Query<S extends K[] ? Pick<T, S[number]> : T>)
+      : (queryFn(collectionRef) as Query<T>);
+
+    let lastDocumentSnapshot:
+      | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+      | undefined;
     let count = 0;
 
     const errors: string[] = [];
@@ -112,20 +125,19 @@ export function processQueryByChunk<
     do {
       verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getSomeDocuments<
-        Pick<T, K>
-      >(query, lastDocumentSnapshot, batchSize, limitToFirstBatch);
+      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+        query,
+        lastDocumentSnapshot,
+        batchSize,
+        limitToFirstBatch
+      );
 
       if (isEmpty(documents)) {
         continue;
       }
 
       await Promise.all([
-        handler(
-          documents as FsMutableDocument<
-            S extends K[] ? Pick<T, S[number]> : T
-          >[]
-        ).catch((err) => errors.push(getErrorMessage(err))),
+        handler(documents).catch((err) => errors.push(getErrorMessage(err))),
         makeWait(throttleSecs),
       ]);
 

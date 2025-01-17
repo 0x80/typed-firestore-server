@@ -1,4 +1,9 @@
-import type { Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
+import type {
+  CollectionReference,
+  Query,
+  QueryDocumentSnapshot,
+  Transaction,
+} from "firebase-admin/firestore";
 import { makeDocument, makeMutableDocument } from "~/documents";
 import type { FsMutableDocument } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "./constants";
@@ -18,9 +23,10 @@ export type GetDocumentsOptions<
 export function getDocuments<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T,
->(query: Query<T>) {
+>(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    options: GetDocumentsOptions<T> & { select?: S } = {}
+    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    options: Omit<GetDocumentsOptions<T>, "select"> & { select?: S } = {}
   ): Promise<FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>[]> => {
     const {
       disableBatching = false,
@@ -29,8 +35,10 @@ export function getDocuments<
     } = options;
 
     const finalQuery = options.select
-      ? (query.select(...(options.select as string[])) as Query<Pick<T, K>>)
-      : (query as Query<Pick<T, K>>);
+      ? (queryFn(collectionRef).select(
+          ...(options.select as string[])
+        ) as Query<Pick<T, K>>)
+      : (queryFn(collectionRef) as Query<Pick<T, K>>);
 
     if (disableBatching) {
       return (await finalQuery.get()).docs.map((doc) =>
@@ -51,16 +59,16 @@ export function getDocuments<
 export function getDocumentsFromTransaction<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T,
->(transaction: FirebaseFirestore.Transaction) {
+>(transaction: Transaction, collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    query: FirebaseFirestore.Query<T>,
+    queryFn: (collection: CollectionReference<T>) => Query<T>,
     options: { select?: S } = {}
   ) => {
     const finalQuery = options.select
-      ? (query.select(
+      ? (queryFn(collectionRef).select(
           ...(options.select as string[])
-        ) as FirebaseFirestore.Query<Pick<T, K>>)
-      : (query as FirebaseFirestore.Query<Pick<T, K>>);
+        ) as Query<Pick<T, K>>)
+      : (queryFn(collectionRef) as Query<Pick<T, K>>);
 
     const snapshot = await transaction.get(finalQuery);
     if (snapshot.empty) return [];

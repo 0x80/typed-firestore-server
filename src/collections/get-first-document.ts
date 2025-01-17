@@ -1,22 +1,37 @@
-import type { Query } from "firebase-admin/firestore";
+import type {
+  CollectionReference,
+  Query,
+  QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
+import type { FsMutableDocument } from "~/types";
 
-/**
- * Because getDocuments overwrites any query limit with the batchSize, this
- * function is useful for when you just want to get the first document from a
- * sorted query.
- *
- * Alternatively, you can use getDocuments with options `{ disableBatching: true
- * }`, which would preserve the limit you set on the query.
- */
-export async function getFirstDocument<T extends Record<string, unknown>>(
-  query: Query<T>
-) {
-  const snapshot = await query.limit(1).get();
+export function getFirstDocument<
+  T extends Record<string, unknown>,
+  K extends keyof T = keyof T,
+>(collectionRef: CollectionReference<T>) {
+  return async <S extends K[] | undefined = undefined>(
+    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    options: { select?: S } = {}
+  ): Promise<
+    FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T> | undefined
+  > => {
+    const finalQuery = options.select
+      ? (queryFn(collectionRef).select(
+          ...(options.select as string[])
+        ) as Query<Pick<T, K>>)
+      : (queryFn(collectionRef) as Query<Pick<T, K>>);
 
-  if (snapshot.empty) {
-    return;
-  }
+    const snapshot = await finalQuery.limit(1).get();
 
-  return makeMutableDocument<T>(snapshot.docs[0]!);
+    if (snapshot.empty) {
+      return;
+    }
+
+    return makeMutableDocument<S extends K[] ? Pick<T, S[number]> : T>(
+      snapshot.docs[0]! as QueryDocumentSnapshot<
+        S extends K[] ? Pick<T, S[number]> : T
+      >
+    );
+  };
 }

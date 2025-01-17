@@ -1,4 +1,8 @@
-import type { Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
+import type {
+  DocumentSnapshot,
+  Query,
+  QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
 import type { FsMutableDocument } from "~/types";
 import { last } from "~/utils";
@@ -8,8 +12,8 @@ import { last } from "~/utils";
  * can be passed in as the "startAfter" argument.
  */
 export async function getSomeDocuments<T extends Record<string, unknown>>(
-  query: Query<T>,
-  startAfterSnapshot: QueryDocumentSnapshot | undefined,
+  query: Query,
+  startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,
   batchSize: number,
   limitToFirstBatch?: boolean
 ): Promise<[FsMutableDocument<T>[], QueryDocumentSnapshot<T> | undefined]> {
@@ -25,11 +29,18 @@ export async function getSomeDocuments<T extends Record<string, unknown>>(
     return [[], undefined];
   }
 
-  const documents = snapshot.docs.map(makeMutableDocument<T>);
+  const documents = snapshot.docs.map((doc) =>
+    makeMutableDocument(doc as DocumentSnapshot<T>)
+  );
 
   /** Do not return the last snapshot if this batch was the last batch */
   const lastDocumentSnapshot =
     documents.length === batchSize ? last(snapshot.docs) : undefined;
 
-  return [documents, limitToFirstBatch ? undefined : lastDocumentSnapshot];
+  return [
+    documents,
+    limitToFirstBatch
+      ? undefined
+      : (lastDocumentSnapshot as QueryDocumentSnapshot<T> | undefined),
+  ];
 }

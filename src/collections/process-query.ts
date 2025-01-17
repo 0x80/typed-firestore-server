@@ -15,10 +15,7 @@ import {
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ACTUAL_ANY = any;
-
-type ProcessQueryOptions<T extends ACTUAL_ANY> = {
+type ProcessQueryOptions<T extends Record<string, unknown>> = {
   query: Query<T>;
   handler: (document: FsMutableDocument<T>) => Promise<unknown>;
   select?: (keyof T)[];
@@ -27,7 +24,7 @@ type ProcessQueryOptions<T extends ACTUAL_ANY> = {
   throttleSecs?: number;
 };
 
-type ProcessQueryByChunkOptions<T extends ACTUAL_ANY> = {
+type ProcessQueryByChunkOptions<T extends Record<string, unknown>> = {
   query: Query<T>;
   handler: (documents: FsMutableDocument<T>[]) => Promise<unknown>;
   select?: (keyof T)[];

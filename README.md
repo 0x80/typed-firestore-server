@@ -9,7 +9,8 @@ which greatly reduces boilerplate code as well as the risk of mistakes.
 
 For client-side check out
 [firestore-hooks](https://github.com/0x80/firestore-hooks) which provides
-similar abstractions, but doesn't have the same .
+similar abstractions, but doesn't have the same level of strict typing yet. See
+also the [Roadmap](#roadmap).
 
 ## Installation
 
@@ -111,10 +112,12 @@ pretty self-explanatory.
 
 ## Document Types
 
-All functions return `FsDocument<T>` or `FsMutableDocument<T>`. These types
-conveniently combine the data and id together with the document reference. The
-mutable version also provides a strongly-typed `update` function and the raw
-`ref` in case you want to call any of the other native Firestore functions.
+All functions return a form of `FsDocument<T>` conveniently combine the data and
+id together.
+
+or `FsMutableDocument<T>`. These types with the document reference. The mutable
+version also provides a strongly-typed `update` function and the raw `ref` in
+case you want to call any of the other native Firestore functions.
 
 ### Single Document
 
@@ -128,8 +131,10 @@ mutable version also provides a strongly-typed `update` function and the raw
 | `getDocumentDataFromTransaction`      | Fetch only the data part of a document as part of a transaction                      |
 | `getDocumentFromTransactionMaybe`     | Fetch a document that might not exist as part of a transaction                       |
 | `getDocumentDataFromTransactionMaybe` | Fetch only the data part of a document that might not exist as part of a transaction |
+| `getSpecificDocument`                 | Fetch a document using a typed document ref instead of a collection ref              |
+| `getSpecificDocumentFromTransaction`  | Fetch a document using a typed document ref as part of a transaction                 |
 
-### Collection Query
+### Collections and Queries
 
 | Function                      | Description                                                             |
 | ----------------------------- | ----------------------------------------------------------------------- |
@@ -140,3 +145,11 @@ mutable version also provides a strongly-typed `update` function and the raw
 | `processCollectionByChunk`    | Process an entire collection using a handler per chunk                  |
 | `processQuery`                | Query a collection and process the results using a handler per document |
 | `processQueryByChunk`         | Query a collection and process the results using a handler per chunk    |
+
+## Roadmap
+
+- [ ] Turn this into a monorepo
+- [ ] Add `@typed-firestore/react-hooks`: Client-side react hooks that treat
+      documents as immutable.
+- [ ] Add `@typed-firestore/client`: Generic client-side abstractions for use
+      with things like ReactQuery

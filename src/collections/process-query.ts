@@ -1,5 +1,8 @@
-import type { Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
-import { DEFAULT_CHUNK_SIZE } from "~/constants";
+import type {
+  CollectionReference,
+  Query,
+  QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 import type { FsMutableDocument } from "~/types";
 import {
   getErrorMessage,
@@ -9,30 +12,40 @@ import {
   verboseCount,
   verboseLog,
 } from "~/utils";
-import { getSomeDocuments } from "./documents";
+import { DEFAULT_CHUNK_SIZE } from "./constants";
+import { getSomeDocuments } from "./helpers";
 
-type QueryAndProcessOptions = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ACTUAL_ANY = any;
+
+type ProcessQueryOptions<T extends ACTUAL_ANY> = {
+  query: Query<T>;
+  handler: (document: FsMutableDocument<T>) => Promise<unknown>;
+  select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
   throttleSecs?: number;
 };
 
-const optionsDefaults: Required<QueryAndProcessOptions> = {
-  batchSize: DEFAULT_CHUNK_SIZE,
-  limitToFirstBatch: false,
-  throttleSecs: 0,
+type ProcessQueryByChunkOptions<T extends ACTUAL_ANY> = {
+  query: Query<T>;
+  handler: (documents: FsMutableDocument<T>[]) => Promise<unknown>;
+  select?: (keyof T)[];
+  batchSize?: number;
+  limitToFirstBatch?: boolean;
+  throttleSecs?: number;
 };
 
-export async function queryAndProcess<T extends Record<string, unknown>>(
-  query: Query<T>,
-  callback: (document: FsMutableDocument<T>) => Promise<unknown>,
-  options: QueryAndProcessOptions = {}
+export async function processQuery<T extends Record<string, unknown>>(
+  collectionRef: CollectionReference<T>,
+  options: ProcessQueryOptions<T>
 ) {
-  const { throttleSecs, limitToFirstBatch } = Object.assign(
-    {},
-    optionsDefaults,
-    options
-  );
+  const {
+    throttleSecs = 0,
+    limitToFirstBatch = false,
+    batchSize = DEFAULT_CHUNK_SIZE,
+  } = options;
+
   let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
   let count = 0;
 
@@ -42,14 +55,15 @@ export async function queryAndProcess<T extends Record<string, unknown>>(
     verboseCount("Processing chunk");
 
     const [documents, _lastDocumentSnapshot] = await getSomeDocuments<T>(
-      query,
+      options.query,
       lastDocumentSnapshot,
-      options
+      batchSize,
+      limitToFirstBatch
     );
 
     await Promise.all([
       ...documents.map((doc) =>
-        callback(doc).catch((err) => {
+        options.handler(doc).catch((err) => {
           errors.push({ id: doc.id, message: getErrorMessage(err) });
         })
       ),
@@ -70,16 +84,15 @@ export async function queryAndProcess<T extends Record<string, unknown>>(
   }
 }
 
-export async function queryAndProcessByChunk<T extends Record<string, unknown>>(
-  query: Query<T>,
-  callback: (documents: FsMutableDocument<T>[]) => Promise<unknown>,
-  options: QueryAndProcessOptions = {}
+export async function processQueryByChunk<T extends Record<string, unknown>>(
+  collectionRef: CollectionReference<T>,
+  options: ProcessQueryByChunkOptions<T>
 ) {
-  const { throttleSecs, limitToFirstBatch } = Object.assign(
-    {},
-    optionsDefaults,
-    options
-  );
+  const {
+    throttleSecs = 0,
+    limitToFirstBatch = false,
+    batchSize = DEFAULT_CHUNK_SIZE,
+  } = options;
 
   let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
   let count = 0;
@@ -90,9 +103,10 @@ export async function queryAndProcessByChunk<T extends Record<string, unknown>>(
     verboseCount("Processing chunk");
 
     const [documents, _lastDocumentSnapshot] = await getSomeDocuments<T>(
-      query,
+      options.query,
       lastDocumentSnapshot,
-      options
+      batchSize,
+      limitToFirstBatch
     );
 
     if (isEmpty(documents)) {
@@ -100,7 +114,9 @@ export async function queryAndProcessByChunk<T extends Record<string, unknown>>(
     }
 
     await Promise.all([
-      callback(documents).catch((err) => errors.push(getErrorMessage(err))),
+      options
+        .handler(documents)
+        .catch((err) => errors.push(getErrorMessage(err))),
       makeWait(throttleSecs),
     ]);
 

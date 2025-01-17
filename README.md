@@ -44,7 +44,7 @@ export const refs = {
 
 ```ts
 import { refs } from "./db-refs";
-import { getDocument, queryAndProcess } from "@codecompose/typed-firestore";
+import { getDocument, processQuery } from "@codecompose/typed-firestore";
 
 /** Get a document, the result will be typed to FsMutableDocument<User> */
 const user = await getDocument(refs.users, "123");
@@ -116,9 +116,9 @@ mutable version also provides a strongly-typed `update` function and the raw
 
 ### Collection Query
 
-| Function                 | Description                                                                      |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `getDocuments`           | Fetch a number of documents or a full collection (no limit available)            |
-| `getFirstDocument`       | Fetch a single document using a query                                            |
-| `queryAndProcess`        | Query a collection and process the results using a handler for a single document |
-| `queryAndProcessByChunk` | Query a collection and process the results using a handler for each chunk        |
+| Function              | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- |
+| `getDocuments`        | Fetch a number of documents or a full collection (no limit available)            |
+| `getFirstDocument`    | Fetch a single document using a query                                            |
+| `processQuery`        | Query a collection and process the results using a handler for a single document |
+| `processQueryByChunk` | Query a collection and process the results using a handler for each chunk        |

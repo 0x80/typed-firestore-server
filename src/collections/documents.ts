@@ -5,9 +5,10 @@ import type {
   Transaction,
 } from "firebase-admin/firestore";
 import { makeDocument, makeMutableDocument } from "~/documents";
-import type { FsMutableDocument } from "~/types";
+import type { FsDocument, FsMutableDocument } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
+import type { SelectedDocument } from "./types";
 
 export type GetDocumentsOptions<
   T extends Record<string, unknown>,
@@ -15,6 +16,12 @@ export type GetDocumentsOptions<
   S extends K[] | undefined = undefined,
 > = {
   select?: S;
+  /**
+   * Normally a limit clause on the query is ignored because of the batching
+   * mechanism. By disabling batching you fetch whatever limit is set on the
+   * query (or unlimited), all in one go. This would problematic for large
+   * collections.
+   */
   disableBatching?: boolean;
   batchSize?: number;
   limitToFirstBatch?: boolean;
@@ -25,33 +32,32 @@ export function getDocuments<
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference<T>) => Query<T>,
-    options: Omit<GetDocumentsOptions<T>, "select"> & { select?: S } = {}
-  ): Promise<FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T>[]> => {
+    queryFn: ((collection: CollectionReference) => Query) | null,
+    options: GetDocumentsOptions<T, K, S> = {}
+  ): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> => {
     const {
-      disableBatching = false,
+      disableBatching: useQueryLimit = false,
       batchSize = DEFAULT_BATCH_SIZE,
       limitToFirstBatch = false,
     } = options;
 
-    const finalQuery = options.select
-      ? (queryFn(collectionRef).select(
-          ...(options.select as string[])
-        ) as Query<Pick<T, K>>)
-      : (queryFn(collectionRef) as Query<Pick<T, K>>);
+    const finalQuery = queryFn
+      ? options.select
+        ? queryFn(collectionRef).select(...(options.select as string[]))
+        : queryFn(collectionRef)
+      : collectionRef;
 
-    if (disableBatching) {
+    if (useQueryLimit) {
       return (await finalQuery.get()).docs.map((doc) =>
-        makeMutableDocument<S extends K[] ? Pick<T, S[number]> : T>(
-          doc as QueryDocumentSnapshot<S extends K[] ? Pick<T, S[number]> : T>
+        makeMutableDocument(
+          doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
         )
       );
     } else {
       const limitedQuery = finalQuery.limit(batchSize);
-      return getDocumentsBatch<S extends K[] ? Pick<T, S[number]> : T>(
-        limitedQuery as Query<S extends K[] ? Pick<T, S[number]> : T>,
-        { limitToFirstBatch }
-      );
+      return getDocumentsBatch<SelectedDocument<T, K, S>>(limitedQuery, {
+        limitToFirstBatch,
+      });
     }
   };
 }
@@ -61,22 +67,20 @@ export function getDocumentsFromTransaction<
   K extends keyof T = keyof T,
 >(transaction: Transaction, collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    queryFn: ((collection: CollectionReference<T>) => Query<T>) | null,
     options: { select?: S } = {}
-  ) => {
-    const finalQuery = options.select
-      ? (queryFn(collectionRef).select(
-          ...(options.select as string[])
-        ) as Query<Pick<T, K>>)
-      : (queryFn(collectionRef) as Query<Pick<T, K>>);
+  ): Promise<FsDocument<SelectedDocument<T, K, S>>[]> => {
+    const finalQuery = queryFn
+      ? options.select
+        ? queryFn(collectionRef).select(...(options.select as string[]))
+        : queryFn(collectionRef)
+      : collectionRef;
 
     const snapshot = await transaction.get(finalQuery);
     if (snapshot.empty) return [];
 
     return snapshot.docs.map((doc) =>
-      makeDocument<S extends K[] ? Pick<T, S[number]> : T>(
-        doc as QueryDocumentSnapshot<S extends K[] ? Pick<T, S[number]> : T>
-      )
+      makeDocument(doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>)
     );
   };
 }

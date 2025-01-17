@@ -14,6 +14,7 @@ import {
 } from "~/utils";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
+import type { SelectedDocument } from "./types";
 
 type ProcessQueryOptions<T extends Record<string, unknown>> = {
   select?: (keyof T)[];
@@ -21,12 +22,6 @@ type ProcessQueryOptions<T extends Record<string, unknown>> = {
   limitToFirstBatch?: boolean;
   throttleSecs?: number;
 };
-
-type SelectedDocument<
-  T,
-  K extends keyof T,
-  S extends K[] | undefined,
-> = S extends K[] ? Pick<T, S[number]> : T;
 
 export function processQuery<
   T extends Record<string, unknown>,
@@ -68,11 +63,9 @@ export function processQuery<
 
       await Promise.all([
         ...documents.map((doc) =>
-          handler(doc as FsMutableDocument<SelectedDocument<T, K, S>>).catch(
-            (err) => {
-              errors.push({ id: doc.id, message: getErrorMessage(err) });
-            }
-          )
+          handler(doc).catch((err) => {
+            errors.push({ id: doc.id, message: getErrorMessage(err) });
+          })
         ),
         makeWait(throttleSecs),
       ]);
@@ -110,10 +103,8 @@ export function processQueryByChunk<
     } = options;
 
     const query = options.select
-      ? (queryFn(collectionRef).select(
-          ...(options.select as string[])
-        ) as Query<S extends K[] ? Pick<T, S[number]> : T>)
-      : (queryFn(collectionRef) as Query<T>);
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef);
 
     let lastDocumentSnapshot:
       | QueryDocumentSnapshot<SelectedDocument<T, K, S>>

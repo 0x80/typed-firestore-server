@@ -5,22 +5,19 @@ import type {
 } from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
 import type { FsMutableDocument } from "~/types";
+import type { SelectedDocument } from "./types";
 
 export function getFirstDocument<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    queryFn: (collection: CollectionReference) => Query,
     options: { select?: S } = {}
-  ): Promise<
-    FsMutableDocument<S extends K[] ? Pick<T, S[number]> : T> | undefined
-  > => {
+  ): Promise<FsMutableDocument<SelectedDocument<T, K, S>> | undefined> => {
     const finalQuery = options.select
-      ? (queryFn(collectionRef).select(
-          ...(options.select as string[])
-        ) as Query<Pick<T, K>>)
-      : (queryFn(collectionRef) as Query<Pick<T, K>>);
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef);
 
     const snapshot = await finalQuery.limit(1).get();
 
@@ -28,10 +25,8 @@ export function getFirstDocument<
       return;
     }
 
-    return makeMutableDocument<S extends K[] ? Pick<T, S[number]> : T>(
-      snapshot.docs[0]! as QueryDocumentSnapshot<
-        S extends K[] ? Pick<T, S[number]> : T
-      >
+    return makeMutableDocument(
+      snapshot.docs[0]! as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
     );
   };
 }

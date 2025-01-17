@@ -1,21 +1,22 @@
 # Typed Firestore
 
-Strongly-typed, zero-dependency abstractions for handling Firestore documents in
-server environments.
-
-For client-side see [firestore-hooks](https://github.com/0x80/firestore-hooks)
-which provides similar abstractions.
+Elegant, strongly-typed, zero-dependency abstractions for Firestore in server
+environments.
 
 All functions are designed to take a re-usable typed collection reference as
 their first argument. The various functions can infer their return type from it,
-which can greatly reduces boilerplate as well as the risk of mistakes.
+which greatly reduces boilerplate code as well as the risk of mistakes.
+
+For client-side check out
+[firestore-hooks](https://github.com/0x80/firestore-hooks) which provides
+similar abstractions.
 
 ## Installation
 
 `pnpm i @codecompose/typed-firestore`, or the equivalent for your package
 manager.
 
-## Example Usage
+## Usage
 
 Create a file in which you define refs for all of your database collections, and
 map each to the appropriate type, as shown below.
@@ -24,52 +25,81 @@ map each to the appropriate type, as shown below.
 // db-refs.ts
 import { CollectionReference } from "firebase-admin/firestore";
 import { db } from "./firestore";
-import { User, UserEvent } from "./types";
+import { User, WishlistItem, Book } from "./types";
 
 export const refs = {
   /** For top-level collections it's easy */
   users: db.collection("users") as CollectionReference<User>,
+  books: db.collection("books") as CollectionReference<Book>,
   /** For sub-collections you could use a function that returns the reference. */
-  userEvents: (userId: string) =>
+  userWishlist: (userId: string) =>
     db
       .collection("users")
       .doc(userId)
-      .collection("events") as CollectionReference<UserEvent>,
+      .collection("wishlist") as CollectionReference<WishlistItem>,
+
   /** This object never needs to change */
 } as const;
 ```
-
-The various functions in this library will be able to infer the type from the
-collection reference.
 
 ```ts
 import { refs } from "./db-refs";
 import { getDocument, queryAndProcess } from "@codecompose/typed-firestore";
 
-/** User will be typed to FsMutableDocument<User> here */
+/** Get a document, the result will be typed to FsMutableDocument<User> */
 const user = await getDocument(refs.users, "123");
 
+/** The returned document has a typed update function */
+await user.update({
+  /** Properties here will be restricted to what is available in the User type */
+  is_active: true,
+  /** Field values are allowed to be passed for any of the defined properties */
+  modified_at: FieldValue.serverTimestamp(),
+});
+
 /**
- * This fetches and processes a query in batches, and userEvent will be typed to
- * FsMutableDocument<UserEvent> here
+ * Process an entire collection, without a query or property selection. This is
+ * typically useful if you need to migrate data after the document type
+ * changes.
  */
-await queryAndProcess(
-  refs.userEvents(user.id).where("type", "==", "like"),
-  async (userEvent) => {
+await processCollection(refs.userWishlist(user.id), {
+  handler: async (item) => {
     /** The returned document has a typed update function */
-    await userEvent.update({
+    await item.update({
       /** Properties here will be restricted to what is available in the type */
-      is_processed: true,
+      is_archived: false,
+      /** Field values are allowed to be passed for any of the defined properties */
+      modified_at: FieldValue.serverTimestamp(),
     });
-  }
-);
+  },
+});
+
+/** Process the results of a query, including a strongly-typed select */
+await processQuery(refs.books, {
+  query: (book) => book.where("is_published", "==", true),
+  /**
+   * Select is defined separately from the query, otherwise we can't type the
+   * result.
+   */
+  select: ["author", "title"],
+  handler: async (book) => {
+    /** Only title and is_published are available here, because we selected them. */
+    console.log(book.author, book.title);
+  },
+});
 ```
 
 ## API
 
+More detailed documentation will follow, but I think the function signatures are
+pretty self-explanatory.
+
+## Document Types
+
 All functions return `FsDocument<T>` or `FsMutableDocument<T>`. These types
 conveniently combine the data and id together with the document reference. The
-mutable version also provides the `ref` and a typed `update` function.
+mutable version also provides a strongly-typed `update` function and the raw
+`ref` in case you want to call any of the other native Firestore functions.
 
 ### Single Document
 
@@ -92,6 +122,3 @@ mutable version also provides the `ref` and a typed `update` function.
 | `getFirstDocument`       | Fetch a single document using a query                                            |
 | `queryAndProcess`        | Query a collection and process the results using a handler for a single document |
 | `queryAndProcessByChunk` | Query a collection and process the results using a handler for each chunk        |
-
-More detailed documentation will follow, but I think the function signatures are
-pretty self-explanatory.

@@ -1,8 +1,8 @@
 import type { Query, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import { MAX_BATCH_SIZE } from "~/constants";
 import { makeMutableDocument } from "~/documents";
 import type { FsMutableDocument } from "~/types";
 import { get, last, verboseLog } from "~/utils";
+import { DEFAULT_BATCH_SIZE } from "../constants";
 
 export async function getDocumentsBatch<T extends Record<string, unknown>>(
   query: Query<T>,
@@ -41,7 +41,7 @@ export async function getDocumentsBatch<T extends Record<string, unknown>>(
 
   verboseLog(`Read ${numRead} records, until ${lastPageLog ?? lastDoc.id}`);
 
-  if (numRead < MAX_BATCH_SIZE || limitToFirstBatch === true) {
+  if (numRead < DEFAULT_BATCH_SIZE || limitToFirstBatch === true) {
     return results;
   } else {
     const pagedQuery = query.startAfter(lastDoc);

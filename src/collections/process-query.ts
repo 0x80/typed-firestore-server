@@ -12,7 +12,7 @@ import {
   verboseCount,
   verboseLog,
 } from "~/utils";
-import { DEFAULT_CHUNK_SIZE } from "./constants";
+import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +43,7 @@ export async function processQuery<T extends Record<string, unknown>>(
   const {
     throttleSecs = 0,
     limitToFirstBatch = false,
-    batchSize = DEFAULT_CHUNK_SIZE,
+    batchSize = DEFAULT_BATCH_SIZE,
   } = options;
 
   let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;
@@ -91,7 +91,7 @@ export async function processQueryByChunk<T extends Record<string, unknown>>(
   const {
     throttleSecs = 0,
     limitToFirstBatch = false,
-    batchSize = DEFAULT_CHUNK_SIZE,
+    batchSize = DEFAULT_BATCH_SIZE,
   } = options;
 
   let lastDocumentSnapshot: QueryDocumentSnapshot | undefined;

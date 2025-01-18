@@ -15,7 +15,7 @@ export async function getDocumentData<T extends Record<string, unknown>>(
     `No document available at ${collectionRef.path}/${documentId}`
   );
 
-  return doc.data() as T;
+  return doc.data()!;
 }
 
 export async function getDocumentDataMaybe<T extends Record<string, unknown>>(
@@ -28,7 +28,7 @@ export async function getDocumentDataMaybe<T extends Record<string, unknown>>(
 
   if (!doc.exists) return;
 
-  return doc.data() as T;
+  return doc.data()!;
 }
 
 export async function getDocumentDataFromTransaction<
@@ -45,7 +45,7 @@ export async function getDocumentDataFromTransaction<
     `No document available at ${collectionRef.path}/${documentId}`
   );
 
-  return doc.data() as T;
+  return doc.data()!;
 }
 
 export async function getDocumentDataFromTransactionMaybe<
@@ -63,5 +63,5 @@ export async function getDocumentDataFromTransactionMaybe<
     return;
   }
 
-  return doc.data() as T;
+  return doc.data()!;
 }

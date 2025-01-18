@@ -26,7 +26,7 @@ export function getFirstDocument<
     }
 
     return makeMutableDocument(
-      snapshot.docs[0]! as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+      snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
     );
   };
 }

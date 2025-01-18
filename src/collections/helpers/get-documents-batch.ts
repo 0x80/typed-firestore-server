@@ -18,7 +18,7 @@ export async function getDocumentsBatch<T extends Record<string, unknown>>(
       options.limitToFirstBatch
     );
 
-    documents.push(...(chunk as FsMutableDocument<T>[]));
+    documents.push(...(chunk));
     lastDocumentSnapshot = _lastDocumentSnapshot;
   } while (lastDocumentSnapshot);
 

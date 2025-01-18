@@ -5,7 +5,6 @@ import type {
 } from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
 import type { FsMutableDocument } from "~/types";
-import { last } from "~/utils";
 
 /**
  * Returns [documents, lastDocumentSnapshot], so that the last document snapshot
@@ -35,7 +34,7 @@ export async function getSomeDocuments<T extends Record<string, unknown>>(
 
   /** Do not return the last snapshot if this batch was the last batch */
   const lastDocumentSnapshot =
-    documents.length === batchSize ? last(snapshot.docs) : undefined;
+    documents.length === batchSize ? snapshot.docs.at(-1) : undefined;
 
   return [
     documents,

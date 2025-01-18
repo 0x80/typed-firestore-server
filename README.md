@@ -1,4 +1,4 @@
-# Typed Firestore
+# Typed Firestore - Server
 
 Elegant, strongly-typed, abstractions for Firestore in server environments.
 
@@ -150,7 +150,6 @@ native Firestore functions.
 
 ## Roadmap
 
-- [ ] Turn this into a monorepo
 - [ ] Add `@typed-firestore/react-hooks`: Client-side react hooks that treat
       documents as immutable.
 - [ ] Add `@typed-firestore/client`: Generic client-side abstractions for use

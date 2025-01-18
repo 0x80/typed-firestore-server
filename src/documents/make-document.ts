@@ -6,6 +6,6 @@ export function makeDocument<T extends Record<string, unknown>>(
 ): FsDocument<T> {
   return {
     id: doc.id,
-    data: doc.data() as T,
+    data: doc.data()!,
   };
 }

@@ -12,7 +12,7 @@ export function chunk<T>(array: T[], size: number): T[][] {
 
   let index = 0;
   let resIndex = 0;
-  const result = new Array(Math.ceil(length / size));
+  const result: T[][] = Array.from({ length: Math.ceil(length / size) });
 
   while (index < length) {
     result[resIndex++] = array.slice(index, (index += size));

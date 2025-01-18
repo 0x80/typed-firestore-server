@@ -10,11 +10,11 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
 import type { SelectedDocument } from "./types";
 
-export type GetDocumentsOptions<
+export interface GetDocumentsOptions<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
-> = {
+> {
   select?: S;
   /**
    * Normally a limit clause on the query is ignored because of the batching
@@ -25,7 +25,7 @@ export type GetDocumentsOptions<
   disableBatching?: boolean;
   batchSize?: number;
   limitToFirstBatch?: boolean;
-};
+}
 
 export function getDocuments<
   T extends Record<string, unknown>,

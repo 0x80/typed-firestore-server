@@ -13,7 +13,7 @@ export function makeMutableDocument<T extends Record<string, unknown>>(
 ): FsMutableDocument<T> {
   return {
     id: doc.id,
-    data: doc.data() as T,
+    data: doc.data()!,
     ref: doc.ref,
     update: (data: UpdateData<T>) => doc.ref.update(data),
     updateWithPartial: (data: Partial<T>) => doc.ref.update(data),
@@ -28,7 +28,7 @@ export function makeMutableDocumentFromTransaction<
 ): FsMutableDocumentFromTransaction<T> {
   return {
     id: doc.id,
-    data: doc.data() as T,
+    data: doc.data()!,
     ref: doc.ref,
     update: (data: UpdateData<T>) => transaction.update(doc.ref, data),
     updateWithPartial: (data: Partial<T>) =>

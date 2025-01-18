@@ -16,12 +16,12 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 import type { SelectedDocument } from "./types";
 
-type ProcessQueryOptions<T extends Record<string, unknown>> = {
+interface ProcessQueryOptions<T extends Record<string, unknown>> {
   select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
   throttleSeconds?: number;
-};
+}
 
 export function processQuery<
   T extends Record<string, unknown>,
@@ -77,7 +77,7 @@ export function processQuery<
       lastDocumentSnapshot = _lastDocumentSnapshot;
     } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
 
-    verboseLog(`Processed ${count} documents`);
+    verboseLog(`Processed ${String(count)} documents`);
 
     if (errors.length > 0) {
       errors.forEach(({ id, message }) => {
@@ -145,7 +145,7 @@ export function processQueryByChunk<
       lastDocumentSnapshot = _lastDocumentSnapshot;
     } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
 
-    verboseLog(`Processed ${count} documents`);
+    verboseLog(`Processed ${String(count)} documents`);
 
     if (errors.length > 0) {
       errors.forEach((message) => {

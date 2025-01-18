@@ -3,12 +3,12 @@ import type {
   Query,
   QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
+import { processInChunks, processInChunksByChunk } from "process-in-chunks";
 import type { FsMutableDocument } from "~/types";
 import {
   getErrorMessage,
   isDefined,
   isEmpty,
-  makeWait,
   verboseCount,
   verboseLog,
 } from "~/utils";
@@ -20,7 +20,7 @@ type ProcessQueryOptions<T extends Record<string, unknown>> = {
   select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
-  throttleSecs?: number;
+  throttleSeconds?: number;
 };
 
 export function processQuery<
@@ -35,7 +35,7 @@ export function processQuery<
     options: ProcessQueryOptions<T> & { select?: S } = {}
   ) => {
     const {
-      throttleSecs = 0,
+      throttleSeconds = 0,
       limitToFirstBatch = false,
       batchSize = DEFAULT_BATCH_SIZE,
     } = options;
@@ -61,17 +61,19 @@ export function processQuery<
         limitToFirstBatch
       );
 
-      await Promise.all([
-        ...documents.map((doc) =>
-          handler(doc).catch((err) => {
+      await processInChunks(
+        documents,
+        async (doc) => {
+          try {
+            await handler(doc);
+          } catch (err) {
             errors.push({ id: doc.id, message: getErrorMessage(err) });
-          })
-        ),
-        makeWait(throttleSecs),
-      ]);
+          }
+        },
+        { throttleSeconds }
+      );
 
       count += documents.length;
-
       lastDocumentSnapshot = _lastDocumentSnapshot;
     } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
 
@@ -97,7 +99,7 @@ export function processQueryByChunk<
     options: ProcessQueryOptions<T> & { select?: S } = {}
   ) => {
     const {
-      throttleSecs = 0,
+      throttleSeconds = 0,
       limitToFirstBatch = false,
       batchSize = DEFAULT_BATCH_SIZE,
     } = options;
@@ -127,13 +129,19 @@ export function processQueryByChunk<
         continue;
       }
 
-      await Promise.all([
-        handler(documents).catch((err) => errors.push(getErrorMessage(err))),
-        makeWait(throttleSecs),
-      ]);
+      try {
+        await processInChunksByChunk(
+          documents,
+          async (docs) => {
+            await handler(docs);
+          },
+          { throttleSeconds }
+        );
+      } catch (err) {
+        errors.push(getErrorMessage(err));
+      }
 
       count += documents.length;
-
       lastDocumentSnapshot = _lastDocumentSnapshot;
     } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
 

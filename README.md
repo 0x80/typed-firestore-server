@@ -1,7 +1,6 @@
 # Typed Firestore
 
-Elegant, strongly-typed, zero-dependency abstractions for Firestore in server
-environments.
+Elegant, strongly-typed, abstractions for Firestore in server environments.
 
 All functions are designed to take a re-usable typed collection reference as
 their first argument. The various functions can infer their return type from it,
@@ -14,7 +13,7 @@ also the [Roadmap](#roadmap).
 
 ## Installation
 
-`pnpm i @typed-firestore/server`, or the equivalent for your package manager.
+`pnpm add @typed-firestore/server`, or the equivalent for your package manager.
 
 ## Usage
 
@@ -57,13 +56,14 @@ await user.update({
   modified_at: FieldValue.serverTimestamp(),
 });
 
+/** Helps with writing transactions */
 await runTransaction(async (tx) => {
   /** Get a document as part of a transaction */
   const user = await getDocumentFromTransaction(tx, refs.users, "id123");
 
   /**
-   * In this case, the typed update function uses the transaction, and is
-   * therefore not async.
+   * In this case, the typed update function calls the transaction, and is
+   * therefore not async. It will execute when the transaction is committed.
    */
   user.update({
     /** Properties here will be restricted to what is available in the User type */
@@ -74,9 +74,8 @@ await runTransaction(async (tx) => {
 });
 
 /**
- * Process an entire collection, without a query or property selection. This is
- * typically useful if you need to migrate data after the document type
- * changes.
+ * Process an entire collection, without a query. This is typically useful if
+ * you need to migrate data after the document type changes.
  */
 await processCollection(refs.userWishlist(user.id), {
   handler: async (item) => {
@@ -90,16 +89,19 @@ await processCollection(refs.userWishlist(user.id), {
   },
 });
 
-/** Process the results of a query, including a strongly-typed select */
+/**
+ * Process the results of a query, including an optional strongly-typed select
+ * statement.
+ */
 await processQuery(refs.books, {
   query: (book) => book.where("is_published", "==", true),
   /**
-   * Select is defined separately from the query, otherwise we can't type the
-   * result.
+   * Select is defined separately from the query, because otherwise we can't
+   * enforce typing on the result.
    */
   select: ["author", "title"],
   handler: async (book) => {
-    /** Only title and is_published are available here, because we selected them. */
+    /** Only title and is_published are available here, because we selected them! */
     console.log(book.author, book.title);
   },
 });
@@ -107,17 +109,17 @@ await processQuery(refs.books, {
 
 ## API
 
-More detailed documentation will follow, but I think the function signatures are
-pretty self-explanatory.
+@TODO Add more documentation. In the meantime, please look at the function
+signatures. I think they are pretty self-explanatory.
 
 ## Document Types
 
 All functions return a form of `FsDocument<T>` conveniently combine the data and
-id together.
+id.
 
-or `FsMutableDocument<T>`. These types with the document reference. The mutable
-version also provides a strongly-typed `update` function and the raw `ref` in
-case you want to call any of the other native Firestore functions.
+The mutable version `FsMutableDocument<T>` also provides a strongly-typed
+`update` function and the original `ref` in case you need to call any other
+native Firestore functions.
 
 ### Single Document
 
@@ -153,3 +155,5 @@ case you want to call any of the other native Firestore functions.
       documents as immutable.
 - [ ] Add `@typed-firestore/client`: Generic client-side abstractions for use
       with things like ReactQuery
+- [ ] Add support for more mutation operations like `set`. In the meantime you
+      can just use the exposed `ref`.

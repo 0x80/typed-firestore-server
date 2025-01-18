@@ -44,7 +44,9 @@
   },
   "author": "Thijs Koerselman",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "process-in-chunks": "1.0.0-1"
+  },
   "devDependencies": {
     "@codecompose/typescript-config": "^1.2.0",
     "del-cli": "^6.0.0",

@@ -11,6 +11,9 @@ importers:
       firebase-admin:
         specifier: '>=10.0'
         version: 12.6.0
+      process-in-chunks:
+        specifier: 1.0.0-1
+        version: 1.0.0-1
     devDependencies:
       '@codecompose/typescript-config':
         specifier: ^1.2.0
@@ -1515,6 +1518,10 @@ packages:
     resolution: {integrity: sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==}
     engines: {node: '>=14'}
     hasBin: true
+
+  process-in-chunks@1.0.0-1:
+    resolution: {integrity: sha512-7c6gASr88UNq+RUrWy18RietQp4/i7jCrNgWrjDuuo3kpdYNw22aSXfe4xbbhLZI/FFmc4QMeYCPmZ1VhjpfFA==}
+    engines: {node: '>=20'}
 
   proto3-json-serializer@2.0.2:
     resolution: {integrity: sha512-SAzp/O4Yh02jGdRc+uIrGoe87dkN/XtwxfZ4ZyafJHymd79ozp5VG5nyZ7ygqPM5+cpLDjjGnYFUkngonyDPOQ==}
@@ -3465,6 +3472,8 @@ snapshots:
       - supports-color
 
   prettier@3.4.2: {}
+
+  process-in-chunks@1.0.0-1: {}
 
   proto3-json-serializer@2.0.2:
     dependencies:

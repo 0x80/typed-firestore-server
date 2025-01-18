@@ -1,9 +1,9 @@
 import type { Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
-import type { FsMutableDocument } from "~/types";
+import type { FsMutableDocument, UnknownObject } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "../constants";
 import { getSomeDocuments } from "./get-some-documents";
 
-export async function getDocumentsBatch<T extends Record<string, unknown>>(
+export async function getDocumentsBatch<T extends UnknownObject>(
   query: Query,
   options: { limitToFirstBatch?: boolean } = {}
 ): Promise<FsMutableDocument<T>[]> {
@@ -18,7 +18,7 @@ export async function getDocumentsBatch<T extends Record<string, unknown>>(
       options.limitToFirstBatch
     );
 
-    documents.push(...(chunk));
+    documents.push(...chunk);
     lastDocumentSnapshot = _lastDocumentSnapshot;
   } while (lastDocumentSnapshot);
 

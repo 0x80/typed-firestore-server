@@ -6,9 +6,10 @@ import type {
 import type {
   FsMutableDocument,
   FsMutableDocumentFromTransaction,
+  UnknownObject,
 } from "~/types";
 
-export function makeMutableDocument<T extends Record<string, unknown>>(
+export function makeMutableDocument<T extends UnknownObject>(
   doc: DocumentSnapshot<T>
 ): FsMutableDocument<T> {
   return {
@@ -20,9 +21,7 @@ export function makeMutableDocument<T extends Record<string, unknown>>(
   };
 }
 
-export function makeMutableDocumentFromTransaction<
-  T extends Record<string, unknown>,
->(
+export function makeMutableDocumentFromTransaction<T extends UnknownObject>(
   doc: DocumentSnapshot<T>,
   transaction: Transaction
 ): FsMutableDocumentFromTransaction<T> {

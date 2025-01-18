@@ -5,13 +5,13 @@ import type {
   Transaction,
 } from "firebase-admin/firestore";
 import { makeDocument, makeMutableDocument } from "~/documents";
-import type { FsDocument, FsMutableDocument } from "~/types";
+import type { FsDocument, FsMutableDocument, UnknownObject } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
 import type { SelectedDocument } from "./types";
 
 export interface GetDocumentsOptions<
-  T extends Record<string, unknown>,
+  T extends UnknownObject,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 > {
@@ -28,7 +28,7 @@ export interface GetDocumentsOptions<
 }
 
 export function getDocuments<
-  T extends Record<string, unknown>,
+  T extends UnknownObject,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
@@ -63,7 +63,7 @@ export function getDocuments<
 }
 
 export function getDocumentsFromTransaction<
-  T extends Record<string, unknown>,
+  T extends UnknownObject,
   K extends keyof T = keyof T,
 >(transaction: Transaction, collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(

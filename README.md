@@ -93,18 +93,18 @@ await processCollection(refs.userWishlist(user.id), {
  * Process the results of a query, including an optional strongly-typed select
  * statement.
  */
-await processQuery(refs.books, {
-  query: (book) => book.where("is_published", "==", true),
+await processQuery(refs.books)(
+  (book) => book.where("is_published", "==", true),
+  async (book) => {
+    /** Only title and is_published are available here, because we selected them! */
+    console.log(book.author, book.title);
+  },
   /**
    * Select is defined separately from the query, because otherwise we can't
    * enforce typing on the result.
    */
-  select: ["author", "title"],
-  handler: async (book) => {
-    /** Only title and is_published are available here, because we selected them! */
-    console.log(book.author, book.title);
-  },
-});
+  { select: ["author", "title"] }
+);
 ```
 
 ## API

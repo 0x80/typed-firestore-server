@@ -6,10 +6,9 @@ All functions are designed to take a re-usable typed collection reference as
 their first argument. The various functions can infer their return type from it,
 which greatly reduces boilerplate code as well as the risk of mistakes.
 
-For client-side check out
-[firestore-hooks](https://github.com/0x80/firestore-hooks) which provides
-similar abstractions, but doesn't have the same level of strict typing yet. See
-also the [Roadmap](#roadmap).
+For React applications check out
+[@typed-firestore/react](https://github.com/0x80/typed-firestore-react) which
+uses similar abstractions.
 
 ## Installation
 
@@ -147,12 +146,3 @@ native Firestore functions.
 | `processCollectionByChunk`    | Process an entire collection using a handler per chunk                  |
 | `processQuery`                | Query a collection and process the results using a handler per document |
 | `processQueryByChunk`         | Query a collection and process the results using a handler per chunk    |
-
-## Roadmap
-
-- [ ] Add `@typed-firestore/react-hooks`: Client-side react hooks that treat
-      documents as immutable.
-- [ ] Add `@typed-firestore/client`: Generic client-side abstractions for use
-      with things like ReactQuery
-- [ ] Add support for more mutation operations like `set`. In the meantime you
-      can just use the exposed `ref`.

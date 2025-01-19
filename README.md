@@ -46,7 +46,7 @@ export const refs = {
 
 ```ts
 import { refs } from "./db-refs";
-import { getDocument } from "@typed-firestore/server";
+import { getDocument } from "@typed-firestore/server/documents";
 
 /** Get a document, the result will be typed to FsMutableDocument<User> */
 const user = await getDocument(refs.users, "id123");
@@ -91,7 +91,7 @@ a few key things to note:
 
 ```ts
 import { refs } from "./db-refs";
-import { processQuery } from "@typed-firestore/server";
+import { processQuery } from "@typed-firestore/server/collections";
 
 /**
  * Process the results of a query, including an optional strongly-typed select

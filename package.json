@@ -24,18 +24,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./collections": {
-      "types": "./dist/collections/index.d.ts",
-      "default": "./dist/collections/index.js"
-    },
-    "./documents": {
-      "types": "./dist/documents/index.d.ts",
-      "default": "./dist/documents/index.js"
-    },
-    "./functions": {
-      "types": "./dist/functions/index.d.ts",
-      "default": "./dist/functions/index.js"
     }
   },
   "publishConfig": {

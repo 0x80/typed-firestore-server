@@ -9,13 +9,15 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ["*.js", "tsup.config.ts", "eslint.config.js"],
+        },
         tsconfigRootDir: import.meta.dirname,
-        allowDefaultProject: true,
       },
     },
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
     },
   }
 );

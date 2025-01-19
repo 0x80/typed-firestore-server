@@ -16,19 +16,23 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 import type { SelectedDocument } from "./types";
 
-interface ProcessQueryOptions<T extends UnknownObject> {
+type ProcessQueryOptions<T extends UnknownObject> = {
   select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
   throttleSeconds?: number;
-}
+};
 
+/**
+ * Process a collection using a query. If the query is null, the entire
+ * collection is retrieved. An optional select statement can narrow the data.
+ */
 export function processQuery<
   T extends UnknownObject,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference) => Query,
+    queryFn: ((collection: CollectionReference) => Query) | null,
     handler: (
       document: FsMutableDocument<SelectedDocument<T, K, S>>
     ) => Promise<unknown>,
@@ -40,9 +44,11 @@ export function processQuery<
       batchSize = DEFAULT_BATCH_SIZE,
     } = options;
 
-    const query = options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef);
+    const query = queryFn
+      ? options.select
+        ? queryFn(collectionRef).select(...(options.select as string[]))
+        : queryFn(collectionRef)
+      : collectionRef;
 
     let lastDocumentSnapshot:
       | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
@@ -87,12 +93,17 @@ export function processQuery<
   };
 }
 
+/**
+ * Process a collection using a query, and handle the results per chunk. If the
+ * query is null, the entire collection is retrieved. An optional select
+ * statement can narrow the data.
+ */
 export function processQueryByChunk<
   T extends UnknownObject,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference<T>) => Query<T>,
+    queryFn: ((collection: CollectionReference<T>) => Query<T>) | null,
     handler: (
       documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
     ) => Promise<unknown>,
@@ -104,9 +115,11 @@ export function processQueryByChunk<
       batchSize = DEFAULT_BATCH_SIZE,
     } = options;
 
-    const query = options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef);
+    const query = queryFn
+      ? options.select
+        ? queryFn(collectionRef).select(...(options.select as string[]))
+        : queryFn(collectionRef)
+      : collectionRef;
 
     let lastDocumentSnapshot:
       | QueryDocumentSnapshot<SelectedDocument<T, K, S>>

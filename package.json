@@ -24,6 +24,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./collections": {
+      "types": "./dist/collections/index.d.ts",
+      "default": "./dist/collections/index.js"
+    },
+    "./documents": {
+      "types": "./dist/documents/index.d.ts",
+      "default": "./dist/documents/index.js"
+    },
+    "./functions": {
+      "types": "./dist/functions/index.d.ts",
+      "default": "./dist/functions/index.js"
     }
   },
   "publishConfig": {
@@ -51,6 +63,7 @@
   "devDependencies": {
     "@codecompose/typescript-config": "^1.2.0",
     "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.7",
     "del-cli": "^6.0.0",
     "eslint": "^9.18.0",
     "prettier": "^3.4.2",
@@ -61,6 +74,7 @@
     "typescript-eslint": "^8.20.0"
   },
   "peerDependencies": {
-    "firebase-admin": ">=10.0"
+    "firebase-admin": ">=12.0",
+    "firebase-functions": ">=5.0"
   }
 }

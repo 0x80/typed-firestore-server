@@ -1,6 +1,6 @@
 {
   "name": "@typed-firestore/server",
-  "version": "1.0.0-1",
+  "version": "1.0.0-2",
   "description": "Elegant, strongly-typed abstractions for Firestore in server environments",
   "repository": {
     "type": "git",

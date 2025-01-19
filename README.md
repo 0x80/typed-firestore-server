@@ -4,7 +4,7 @@ Elegant, strongly-typed, abstractions for Firestore in server environments.
 
 All functions are designed to take a re-usable typed collection reference as
 their first argument. The various functions can infer their return type from it,
-which greatly reduces boilerplate code as well as the risk of mistakes.
+which greatly reduces boilerplate code as well as the risk of making mistakes.
 
 For React applications check out
 [@typed-firestore/react](https://github.com/0x80/typed-firestore-react) which
@@ -46,7 +46,7 @@ export const refs = {
 
 ```ts
 import { refs } from "./db-refs";
-import { getDocument } from "@typed-firestore/server/documents";
+import { getDocument } from "@typed-firestore/server";
 
 /** Get a document, the result will be typed to FsMutableDocument<User> */
 const user = await getDocument(refs.users, "id123");
@@ -79,19 +79,19 @@ await runTransaction(async (tx) => {
 
 ### Handling Collections and Queries
 
-The functions that process collections should look very familiar, but there are
-a few key things to note:
+The functions below that query collections should look familiar, but there are a
+few key things to note:
 
 1. The functions take only a collection reference, and then return a function
    that is typed to take the query and handler. This is necessary for the
    handler to be typed correctly.
 2. The optional select statement should be defined separately from the query. In
-   theory you can still pass it on the query but your data will not be typed
+   theory you can still also set it on the query but your data will not be typed
    properly and it can lead to serious mistakes, so be mindful of that.
 
 ```ts
 import { refs } from "./db-refs";
-import { processQuery } from "@typed-firestore/server/collections";
+import { processQuery } from "@typed-firestore/server";
 
 /**
  * Process the results of a query, including an optional strongly-typed select
@@ -143,7 +143,7 @@ The mutable version `FsMutableDocument<T>` also provides a strongly-typed
 `update` function and the original `ref` in case you need to call any other
 native Firestore functions.
 
-### Single Document
+### Single Documents
 
 | Function                              | Description                                                                          |
 | ------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -170,21 +170,34 @@ native Firestore functions.
 | `processQuery`                | Query a collection and process the results using a handler per document |
 | `processQueryByChunk`         | Query a collection and process the results using a handler per chunk    |
 
-## The Thing That is Not Typed
+### Cloud Functions
+
+| Function                     | Description                                                |
+| ---------------------------- | ---------------------------------------------------------- |
+| `getDataOnWritten`           | Get the data from a document write event                   |
+| `getDataOnUpdated`           | Get the data from a document update event                  |
+| `getBeforeAndAfterOnWritten` | Get the before and after data from a document write event  |
+| `getBeforeAndAfterOnUpdated` | Get the before and after data from a document update event |
+
+## Where Typing Was Ignored
 
 You might notice that the query `where()` function is still the regular untyped
-Firestore API. It should be difficult to type that and the API would be so
-different that I think it becomes too intrusive.
+Firestore API, and that is deliberate. I think this part would be difficult to
+type, and the API shape would be very different from the official API.
 
-The goal of this library was to make something that is strongly-typed, but also
-easy to use and looks familiar.
+Besides having strong typing, I also wanted to make this library non intrusive
+and thus easy to adopt.
 
-One could also argue that the `where()` function is the least critical part to
-have typed anyway. If you make a mistake in a query, you typically do not ruin
-anything and you will find out during development.
+I would argue that the `where()` clause is the least critical part anyway. If
+you make a mistake there, there is little chance to ruin things and you will
+likely find out during development.
 
-However, if you were to use a `select()` untyped, or send wrong data to
-`update()` you could easily ruin the data in your database, which might be very
-risky if you write database migration scripts.
+In my experience, if you use a `select()` without matching typing, or send the
+wrong data to `update()` you could easily mess things up in a way that is risky
+or time consuming to fix, especially when writing database migration scripts.
 
-I think the trade-off for simplicity is worth it, and I hope you do too.
+So I think the trade-off for simplicity is worth it.
+
+It might be possible to create a clean fully-typed API for queries with some
+type gymnastics, but that is not something I am willing to spend lots of time
+on.

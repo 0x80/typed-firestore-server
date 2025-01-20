@@ -1,6 +1,6 @@
 # Typed Firestore - Server
 
-Elegant, strongly-typed, abstractions for Firestore in server environments.
+Elegant, typed abstractions for Firestore in server environments.
 
 All functions are designed to take a re-usable typed collection reference as
 their first argument. The various functions can infer their return type from it,
@@ -94,7 +94,7 @@ import { refs } from "./db-refs";
 import { processDocuments } from "@typed-firestore/server";
 
 /**
- * Process the results of a query, including an optional strongly-typed select
+ * Process the results of a query, including an optional typed select
  * statement.
  */
 await processDocuments(refs.books)(
@@ -198,9 +198,9 @@ signatures. I think they are pretty self-explanatory.
 All functions return a form of `FsDocument<T>` conveniently combine the data and
 id.
 
-The mutable version `FsMutableDocument<T>` also provides a strongly-typed
-`update` function and the original `ref` in case you need to call any other
-native Firestore functions.
+The mutable version `FsMutableDocument<T>` also provides a typed `update`
+function and the original `ref` in case you need to call any other native
+Firestore functions.
 
 ### Single Documents
 

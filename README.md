@@ -82,15 +82,13 @@ await runTransaction(async (tx) => {
 
 ### Handling Collections and Queries
 
-The functions below that query collections should look familiar, but there are a
-few key things to note:
+The functions that work with collections should look familiar, but there is one
+things to always keep in mind:
 
-1. The functions take a collection reference, and then return another function
-   that takes the query builder and handler. This is necessary for the handler
-   to be typed correctly.
-2. The optional `select` statement should be defined separately from the query.
-   In theory you can still set it on the query directly, but your data will not
-   be typed correctly and it can lead to serious mistakes, so keep that in mind.
+The optional `select` statement should **ALWAYS** be defined separately from the
+query. You can still set it on the query directly, because that part is still
+the official Firestore API, but then your data will **not be typed correctly**
+and it can lead to **painful mistakes**, so keep that in mind.
 
 ```ts
 import { refs } from "./db-refs";
@@ -100,8 +98,8 @@ import { processDocuments } from "@typed-firestore/server";
  * Process the results of a query, including an optional typed select
  * statement.
  */
-await processDocuments(refs.books)(
-  (book) => book.where("is_published", "==", true),
+await processDocuments(refs.books,
+  (query) => query.where("is_published", "==", true),
   async (book) => {
     /** Only title and is_published are available here, because we selected them! */
     console.log(book.author, book.title);
@@ -117,7 +115,7 @@ await processDocuments(refs.books)(
  * Process an entire collection by setting the query to null. This is typically
  * useful if you need to migrate data after the document type changes.
  */
-await processDocuments(refs.userWishlist(user.id))(null, {
+await processDocuments(refs.userWishlist(user.id), null, {
   handler: async (item) => {
     /** The returned document has a typed update function */
     await item.update({
@@ -132,10 +130,8 @@ await processDocuments(refs.userWishlist(user.id))(null, {
 });
 ```
 
-Fetching documents from a collection is very similar to processing a query. You
-first pass the typed collection reference, and then pass an optional query and
-select statement to the returned function. Without a query, you will fetch the
-full collection.
+Fetching documents from a collection is very similar to processing documents.
+The query part is optional and without it you will fetch the full collection.
 
 Only in this case, instead of passing null for the query, you can also not pass
 anything.
@@ -145,10 +141,10 @@ anything.
  * Fetch an entire collection, where allBooks is typed to
  * FsMutableDocument<Book>[]
  */
-const allBooks = await getDocuments(refs.books)();
+const allBooks = await getDocuments(refs.books);
 
 /** Fetch documents using a query */
-const publishedBooks = await getDocuments(refs.books)((query) =>
+const publishedBooks = await getDocuments(refs.books, (query) =>
   query.where("is_published", "==", true)
 );
 
@@ -159,9 +155,27 @@ const publishedBooks = await getDocuments(refs.books)((query) =>
  *
  * | "title">>[]
  */
-const narrowPublishedBooks = await getDocuments(refs.books)(
+const narrowPublishedBooks = await getDocuments(
+  refs.books,
   (query) => query.where("is_published", "==", true),
   { select: ["author", "title"] }
+);
+```
+
+All functions also support collection groups. You simply pass in a typed
+CollectionGroup instead of a typed CollectionReference.
+
+```ts
+/**
+ * If you use this regularly, place the ref in the db-refs.ts file together with
+ * the others.
+ */
+const groupRef = db.collectionGroup(
+  "wishlist"
+) as CollectionGroup<WishlistItem>;
+
+const allWishlistItems = await getDocuments(groupRef, (query) =>
+  query.where("is_archived", "==", false)
 );
 ```
 
@@ -198,8 +212,8 @@ signatures. I think they are pretty self-explanatory.
 
 ## Document Types
 
-All functions return a form of `FsDocument<T>` conveniently combine the data and
-id.
+All functions return a form of `FsDocument<T>`, which conveniently combines the
+data and id.
 
 The mutable version `FsMutableDocument<T>` also provides a typed `update`
 function and the original `ref` in case you need to call any other native
@@ -229,6 +243,8 @@ Firestore functions.
 | `getFirstDocument`            | Fetch the first document from a query                                   |
 | `processDocuments`            | Query a collection and process the results using a handler per document |
 | `processDocumentsByChunk`     | Query a collection and process the results using a handler per chunk    |
+
+The same functions for with collection groups also.
 
 ### Cloud Functions
 

@@ -30,57 +30,63 @@ export type GetDocumentsOptions<
 export function getDocuments<
   T extends UnknownObject,
   K extends keyof T = keyof T,
->(collectionRef: CollectionReference<T>) {
-  return async <S extends K[] | undefined = undefined>(
-    queryFn?: ((collection: CollectionReference) => Query) | null,
-    options: GetDocumentsOptions<T, K, S> = {}
-  ): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> => {
-    const {
-      disableBatching: useQueryLimit = false,
-      batchSize = DEFAULT_BATCH_SIZE,
-      limitToFirstBatch = false,
-    } = options;
+  S extends K[] | undefined = undefined,
+>(
+  collectionRef: CollectionReference<T>,
+  queryFn?: ((collection: CollectionReference) => Query) | null,
+  options: GetDocumentsOptions<T, K, S> = {}
+): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> {
+  const {
+    disableBatching: useQueryLimit = false,
+    batchSize = DEFAULT_BATCH_SIZE,
+    limitToFirstBatch = false,
+  } = options;
 
-    const finalQuery = queryFn
-      ? options.select
-        ? queryFn(collectionRef).select(...(options.select as string[]))
-        : queryFn(collectionRef)
-      : collectionRef;
+  const finalQuery = queryFn
+    ? options.select
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef)
+    : collectionRef;
 
-    if (useQueryLimit) {
-      return (await finalQuery.get()).docs.map((doc) =>
+  if (useQueryLimit) {
+    return (async () => {
+      const snapshot = await finalQuery.get();
+      return snapshot.docs.map((doc) =>
         makeMutableDocument(
           doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
         )
       );
-    } else {
-      const limitedQuery = finalQuery.limit(batchSize);
-      return getDocumentsBatch<SelectedDocument<T, K, S>>(limitedQuery, {
-        limitToFirstBatch,
-      });
-    }
-  };
+    })();
+  } else {
+    const limitedQuery = finalQuery.limit(batchSize);
+    return getDocumentsBatch<SelectedDocument<T, K, S>>(limitedQuery, {
+      limitToFirstBatch,
+    });
+  }
 }
 
 export function getDocumentsFromTransaction<
   T extends UnknownObject,
   K extends keyof T = keyof T,
->(transaction: Transaction, collectionRef: CollectionReference<T>) {
-  return async <S extends K[] | undefined = undefined>(
-    queryFn?: ((collection: CollectionReference<T>) => Query<T>) | null,
-    options: { select?: S } = {}
-  ): Promise<FsDocument<SelectedDocument<T, K, S>>[]> => {
-    const finalQuery = queryFn
-      ? options.select
-        ? queryFn(collectionRef).select(...(options.select as string[]))
-        : queryFn(collectionRef)
-      : collectionRef;
+  S extends K[] | undefined = undefined,
+>(
+  transaction: Transaction,
+  collectionRef: CollectionReference<T>,
+  queryFn?: ((collection: CollectionReference) => Query) | null,
+  options: { select?: S } = {}
+): Promise<FsDocument<SelectedDocument<T, K, S>>[]> {
+  const finalQuery = queryFn
+    ? options.select
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef)
+    : collectionRef;
 
+  return (async () => {
     const snapshot = await transaction.get(finalQuery);
     if (snapshot.empty) return [];
 
     return snapshot.docs.map((doc) =>
       makeDocument(doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>)
     );
-  };
+  })();
 }

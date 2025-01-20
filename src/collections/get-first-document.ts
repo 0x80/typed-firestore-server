@@ -10,15 +10,17 @@ import type { SelectedDocument } from "./types";
 export function getFirstDocument<
   T extends UnknownObject,
   K extends keyof T = keyof T,
->(collectionRef: CollectionReference<T>) {
-  return async <S extends K[] | undefined = undefined>(
-    queryFn: (collection: CollectionReference) => Query,
-    options: { select?: S } = {}
-  ): Promise<FsMutableDocument<SelectedDocument<T, K, S>> | undefined> => {
-    const finalQuery = options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef);
+  S extends K[] | undefined = undefined,
+>(
+  collectionRef: CollectionReference<T>,
+  queryFn: (collection: CollectionReference) => Query,
+  options: { select?: S } = {}
+): Promise<FsMutableDocument<SelectedDocument<T, K, S>> | undefined> {
+  const finalQuery = options.select
+    ? queryFn(collectionRef).select(...(options.select as string[]))
+    : queryFn(collectionRef);
 
+  return (async () => {
     const snapshot = await finalQuery.limit(1).get();
 
     if (snapshot.empty) {
@@ -28,5 +30,5 @@ export function getFirstDocument<
     return makeMutableDocument(
       snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
     );
-  };
+  })();
 }

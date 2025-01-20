@@ -2,6 +2,9 @@
 
 Elegant, typed abstractions for Firestore in server environments.
 
+> This library is still experimental. I am in the process of finalizing the 1.0
+> API in the coming days.
+
 All functions are designed to take a re-usable typed collection reference as
 their first argument. The various functions can infer their return type from it,
 which greatly reduces boilerplate code as well as the risk of making mistakes.

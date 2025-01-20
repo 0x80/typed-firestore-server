@@ -10,9 +10,11 @@ import type {
 } from "~/types";
 
 export function makeMutableDocument<
-  T extends UnknownObject,
-  TFull extends UnknownObject,
->(doc: DocumentSnapshot<T>): FsMutableDocument<T, TFull> {
+  TNarrowOrFull extends UnknownObject,
+  TFull extends UnknownObject = TNarrowOrFull,
+>(
+  doc: DocumentSnapshot<TNarrowOrFull>
+): FsMutableDocument<TNarrowOrFull, TFull> {
   return {
     id: doc.id,
     data: doc.data()!,
@@ -23,12 +25,12 @@ export function makeMutableDocument<
 }
 
 export function makeMutableDocumentFromTransaction<
-  T extends UnknownObject,
-  TFull extends UnknownObject,
+  TNarrowOrFull extends UnknownObject,
+  TFull extends UnknownObject = TNarrowOrFull,
 >(
-  doc: DocumentSnapshot<T>,
+  doc: DocumentSnapshot<TNarrowOrFull>,
   transaction: Transaction
-): FsMutableDocumentFromTransaction<T, TFull> {
+): FsMutableDocumentFromTransaction<TNarrowOrFull, TFull> {
   return {
     id: doc.id,
     data: doc.data()!,

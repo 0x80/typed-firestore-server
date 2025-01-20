@@ -1,7 +1,7 @@
 import type {
   CollectionReference,
+  DocumentSnapshot,
   Query,
-  QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
 import type { FsMutableDocument, UnknownObject } from "~/types";
@@ -27,8 +27,8 @@ export function getFirstDocument<
       return;
     }
 
-    return makeMutableDocument(
-      snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+    return makeMutableDocument<SelectedDocument<T, K, S>, T>(
+      snapshot.docs[0] as DocumentSnapshot<SelectedDocument<T, K, S>>
     );
   })();
 }

@@ -16,7 +16,7 @@ export type FsDocument<T> = Readonly<{
   data: T;
 }>;
 
-export type FsMutableDocument<TReturned, TFull> = Readonly<{
+export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
   ref: DocumentReference;
   update: (data: UpdateData<TFull>) => Promise<WriteResult>;
   /**
@@ -26,9 +26,12 @@ export type FsMutableDocument<TReturned, TFull> = Readonly<{
    */
   updatePartial: (data: Partial<TFull>) => Promise<WriteResult>;
 }> &
-  FsDocument<TReturned>;
+  FsDocument<TNarrowOrFull>;
 
-export type FsMutableDocumentFromTransaction<TReturned, TFull> = Readonly<{
+export type FsMutableDocumentFromTransaction<
+  TNarrowOrFull,
+  TFull = TNarrowOrFull,
+> = Readonly<{
   ref: DocumentReference;
   update: (data: UpdateData<TFull>) => Transaction;
   /**
@@ -38,4 +41,4 @@ export type FsMutableDocumentFromTransaction<TReturned, TFull> = Readonly<{
    */
   updatePartial: (data: Partial<TFull>) => Transaction;
 }> &
-  FsDocument<TReturned>;
+  FsDocument<TNarrowOrFull>;

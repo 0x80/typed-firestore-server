@@ -17,7 +17,7 @@ export async function getSpecificDocument<T extends UnknownObject>(
 
   invariant(doc.exists, `No document available at ${documentRef.path}`);
 
-  return makeMutableDocument<T, T>(doc);
+  return makeMutableDocument<T>(doc);
 }
 
 export async function getSpecificDocumentFromTransaction<
@@ -27,5 +27,5 @@ export async function getSpecificDocumentFromTransaction<
 
   invariant(doc.exists, `No document available at ${documentRef.path}`);
 
-  return makeMutableDocumentFromTransaction<T, T>(doc, transaction);
+  return makeMutableDocumentFromTransaction<T>(doc, transaction);
 }

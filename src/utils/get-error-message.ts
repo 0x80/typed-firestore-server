@@ -7,7 +7,7 @@ export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
 }
 
-interface ErrorWithMessage {
+type ErrorWithMessage = {
   message: string;
 }
 

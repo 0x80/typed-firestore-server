@@ -129,6 +129,38 @@ await processQuery(refs.userWishlist(user.id))(null, {
 });
 ```
 
+Fetching documents from a collection is very similar to processing a query. You
+first pass the typed collection reference, and then pass an optional query and
+select statement to the returned function. Without a query, you will fetch the
+full collection.
+
+Only in this case, instead of passing null for the query, you can also not pass
+anything.
+
+```ts
+/**
+ * Fetch an entire collection, where allBooks is typed to
+ * FsMutableDocument<Book>[]
+ */
+const allBooks = await getDocuments(refs.books)();
+
+/** Fetch documents using a query */
+const publishedBooks = await getDocuments(refs.books)((query) =>
+  query.where("is_published", "==", true)
+);
+
+/**
+ * Similar to processQuery, the data can be narrowed by passing a select option
+ * separately. Here, allBooks is typed as FsMutableDocument<Pick<Book, "author"
+ *
+ * | "title">>[]
+ */
+const narrowPublishedBooks = await getDocuments(refs.books)(
+  (query) => query.where("is_published", "==", true),
+  { select: ["author", "title"] }
+);
+```
+
 ## API
 
 More documentation will follow. In the meantime, please look at the function

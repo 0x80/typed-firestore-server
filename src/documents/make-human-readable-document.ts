@@ -5,7 +5,7 @@ type JsonPrimitive = string | number | boolean | null;
 type JsonArray = JsonValue[];
 type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
-interface JsonObject {
+type JsonObject = {
   [key: string]: JsonValue;
 }
 

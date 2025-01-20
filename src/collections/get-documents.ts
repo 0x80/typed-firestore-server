@@ -10,11 +10,11 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
 import type { SelectedDocument } from "./types";
 
-export interface GetDocumentsOptions<
+export type GetDocumentsOptions<
   T extends UnknownObject,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
-> {
+> = {
   select?: S;
   /**
    * Normally a limit clause on the query is ignored because of the batching
@@ -25,14 +25,14 @@ export interface GetDocumentsOptions<
   disableBatching?: boolean;
   batchSize?: number;
   limitToFirstBatch?: boolean;
-}
+};
 
 export function getDocuments<
   T extends UnknownObject,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: ((collection: CollectionReference) => Query) | null,
+    queryFn: ((collection: CollectionReference) => Query) | null | undefined,
     options: GetDocumentsOptions<T, K, S> = {}
   ): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> => {
     const {
@@ -67,7 +67,10 @@ export function getDocumentsFromTransaction<
   K extends keyof T = keyof T,
 >(transaction: Transaction, collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: ((collection: CollectionReference<T>) => Query<T>) | null,
+    queryFn:
+      | ((collection: CollectionReference<T>) => Query<T>)
+      | null
+      | undefined,
     options: { select?: S } = {}
   ): Promise<FsDocument<SelectedDocument<T, K, S>>[]> => {
     const finalQuery = queryFn

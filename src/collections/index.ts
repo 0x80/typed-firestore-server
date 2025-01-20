@@ -1,2 +1,2 @@
-export * from "./documents";
+export * from "./get-documents";
 export * from "./process-query";

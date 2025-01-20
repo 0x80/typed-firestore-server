@@ -4,8 +4,9 @@ import type {
   Query,
   QueryDocumentSnapshot,
   Transaction,
+  UpdateData,
 } from "firebase-admin/firestore";
-import { makeDocument, makeMutableDocument } from "~/documents";
+import { makeDocument } from "~/documents";
 import type { FsDocument, FsMutableDocument, UnknownObject } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
@@ -38,9 +39,9 @@ export function getDocuments<
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
   options: GetDocumentsOptions<T, K, S> = {}
-): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> {
+): Promise<FsMutableDocument<SelectedDocument<T, K, S>, T>[]> {
   const {
-    disableBatching: useQueryLimit = false,
+    disableBatching = false,
     batchSize = DEFAULT_BATCH_SIZE,
     limitToFirstBatch = false,
   } = options;
@@ -51,18 +52,24 @@ export function getDocuments<
       : queryFn(collectionRef)
     : collectionRef;
 
-  if (useQueryLimit) {
+  if (disableBatching) {
     return (async () => {
       const snapshot = await finalQuery.get();
-      return snapshot.docs.map((doc) =>
-        makeMutableDocument(
-          doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
-        )
-      );
+      return snapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          data: (
+            doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+          ).data(),
+          ref: doc.ref,
+          update: (data: UpdateData<T>) => doc.ref.update(data),
+          updatePartial: (data: Partial<T>) => doc.ref.update(data),
+        } as FsMutableDocument<SelectedDocument<T, K, S>, T>;
+      });
     })();
   } else {
     const limitedQuery = finalQuery.limit(batchSize);
-    return getDocumentsBatch<SelectedDocument<T, K, S>>(limitedQuery, {
+    return getDocumentsBatch<SelectedDocument<T, K, S>, T>(limitedQuery, {
       limitToFirstBatch,
     });
   }

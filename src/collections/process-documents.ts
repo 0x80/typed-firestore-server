@@ -38,7 +38,7 @@ export async function processDocuments<
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
   handler: (
-    document: FsMutableDocument<SelectedDocument<T, K, S>>
+    document: FsMutableDocument<SelectedDocument<T, K, S>, T>
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T> & { select?: S } = {}
 ) {
@@ -111,7 +111,7 @@ export async function processDocumentsByChunk<
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
   handler: (
-    documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
+    documents: FsMutableDocument<SelectedDocument<T, K, S>, T>[]
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T> & { select?: S } = {}
 ) {

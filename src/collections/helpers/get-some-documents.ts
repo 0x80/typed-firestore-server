@@ -10,12 +10,17 @@ import type { FsMutableDocument, UnknownObject } from "~/types";
  * Returns [documents, lastDocumentSnapshot], so that the last document snapshot
  * can be passed in as the "startAfter" argument.
  */
-export async function getSomeDocuments<T extends UnknownObject>(
+export async function getSomeDocuments<
+  T extends UnknownObject,
+  TFull extends UnknownObject,
+>(
   query: Query,
   startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,
   batchSize: number,
   limitToFirstBatch?: boolean
-): Promise<[FsMutableDocument<T>[], QueryDocumentSnapshot<T> | undefined]> {
+): Promise<
+  [FsMutableDocument<T, TFull>[], QueryDocumentSnapshot<T> | undefined]
+> {
   const limitedQuery = query.limit(batchSize);
 
   const pagedQuery = startAfterSnapshot
@@ -29,7 +34,7 @@ export async function getSomeDocuments<T extends UnknownObject>(
   }
 
   const documents = snapshot.docs.map((doc) =>
-    makeMutableDocument(doc as DocumentSnapshot<T>)
+    makeMutableDocument<T, TFull>(doc as DocumentSnapshot<T>)
   );
 
   /** Do not return the last snapshot if this batch was the last batch */

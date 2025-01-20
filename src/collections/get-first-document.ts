@@ -15,7 +15,7 @@ export function getFirstDocument<
   collectionRef: CollectionReference<T>,
   queryFn: (collection: CollectionReference) => Query,
   options: { select?: S } = {}
-): Promise<FsMutableDocument<SelectedDocument<T, K, S>> | undefined> {
+): Promise<FsMutableDocument<SelectedDocument<T, K, S>, T> | undefined> {
   const finalQuery = options.select
     ? queryFn(collectionRef).select(...(options.select as string[]))
     : queryFn(collectionRef);

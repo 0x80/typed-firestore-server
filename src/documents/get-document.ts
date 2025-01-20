@@ -20,7 +20,7 @@ export async function getDocument<T extends UnknownObject>(
     `No document available at ${collectionRef.path}/${documentId}`
   );
 
-  return makeMutableDocument<T>(doc);
+  return makeMutableDocument<T, T>(doc);
 }
 
 export async function getDocumentMaybe<T extends UnknownObject>(
@@ -33,7 +33,7 @@ export async function getDocumentMaybe<T extends UnknownObject>(
 
   if (!doc.exists) return;
 
-  return makeMutableDocument<T>(doc);
+  return makeMutableDocument<T, T>(doc);
 }
 
 export async function getDocumentFromTransaction<T extends UnknownObject>(
@@ -48,7 +48,7 @@ export async function getDocumentFromTransaction<T extends UnknownObject>(
     `No document available at ${collectionRef.path}/${documentId}`
   );
 
-  return makeMutableDocumentFromTransaction<T>(doc, transaction);
+  return makeMutableDocumentFromTransaction<T, T>(doc, transaction);
 }
 
 export async function getDocumentFromTransactionMaybe<T extends UnknownObject>(
@@ -64,5 +64,5 @@ export async function getDocumentFromTransactionMaybe<T extends UnknownObject>(
     return;
   }
 
-  return makeMutableDocumentFromTransaction<T>(doc, transaction);
+  return makeMutableDocumentFromTransaction<T, T>(doc, transaction);
 }

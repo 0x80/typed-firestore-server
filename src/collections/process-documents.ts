@@ -16,7 +16,7 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 import type { SelectedDocument } from "./types";
 
-type ProcessQueryOptions<T extends UnknownObject> = {
+type ProcessDocumentsOptions<T extends UnknownObject> = {
   select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
@@ -27,7 +27,7 @@ type ProcessQueryOptions<T extends UnknownObject> = {
  * Process a collection using a query. If the query is null, the entire
  * collection is retrieved. An optional select statement can narrow the data.
  */
-export function processQuery<
+export function processDocuments<
   T extends UnknownObject,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
@@ -36,7 +36,7 @@ export function processQuery<
     handler: (
       document: FsMutableDocument<SelectedDocument<T, K, S>>
     ) => Promise<unknown>,
-    options: ProcessQueryOptions<T> & { select?: S } = {}
+    options: ProcessDocumentsOptions<T> & { select?: S } = {}
   ) => {
     const {
       throttleSeconds = 0,
@@ -98,7 +98,7 @@ export function processQuery<
  * query is null, the entire collection is retrieved. An optional select
  * statement can narrow the data.
  */
-export function processQueryByChunk<
+export function processDocumentsByChunk<
   T extends UnknownObject,
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
@@ -110,7 +110,7 @@ export function processQueryByChunk<
     handler: (
       documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
     ) => Promise<unknown>,
-    options: ProcessQueryOptions<T> & { select?: S } = {}
+    options: ProcessDocumentsOptions<T> & { select?: S } = {}
   ) => {
     const {
       throttleSeconds = 0,

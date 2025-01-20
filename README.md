@@ -91,13 +91,13 @@ few key things to note:
 
 ```ts
 import { refs } from "./db-refs";
-import { processQuery } from "@typed-firestore/server";
+import { processDocuments } from "@typed-firestore/server";
 
 /**
  * Process the results of a query, including an optional strongly-typed select
  * statement.
  */
-await processQuery(refs.books)(
+await processDocuments(refs.books)(
   (book) => book.where("is_published", "==", true),
   async (book) => {
     /** Only title and is_published are available here, because we selected them! */
@@ -114,7 +114,7 @@ await processQuery(refs.books)(
  * Process an entire collection by setting the query to null. This is typically
  * useful if you need to migrate data after the document type changes.
  */
-await processQuery(refs.userWishlist(user.id))(null, {
+await processDocuments(refs.userWishlist(user.id))(null, {
   handler: async (item) => {
     /** The returned document has a typed update function */
     await item.update({
@@ -150,14 +150,41 @@ const publishedBooks = await getDocuments(refs.books)((query) =>
 );
 
 /**
- * Similar to processQuery, the data can be narrowed by passing a select option
- * separately. Here, allBooks is typed as FsMutableDocument<Pick<Book, "author"
+ * Similar to processDocuments, the data can be narrowed by passing a select
+ * option separately. Here, allBooks is typed as FsMutableDocument<Pick<Book,
+ * "author"
  *
  * | "title">>[]
  */
 const narrowPublishedBooks = await getDocuments(refs.books)(
   (query) => query.where("is_published", "==", true),
   { select: ["author", "title"] }
+);
+```
+
+For cloud functions, there are helpers to get the data from the event.
+Unfortunately here we do not have access to a typed collection reference, so we
+need to pass the type manually.
+
+```ts
+import { type Book } from "./types";
+import {
+  getDataOnWritten,
+  getBeforeAndAfterOnWritten,
+} from "@typed-firestore/server/functions";
+import { onDocumentWritten } from "firebase-functions/v2/firestore";
+
+export const handleBookUpdates = onDocumentWritten(
+  {
+    document: "books/{documentId}",
+  },
+  async (event) => {
+    /** Get only the most recent data */
+    const data = getDataOnWritten<Book>(event);
+
+    /** Get the before and after the write event */
+    const [before, after] = getBeforeAndAfterOnWritten<Book>(event);
+  }
 );
 ```
 
@@ -197,12 +224,13 @@ native Firestore functions.
 | `getDocuments`                | Fetch documents using a query                                           |
 | `getDocumentsFromTransaction` | Fetch documents using a query as part of a transaction                  |
 | `getFirstDocument`            | Fetch the first document from a query                                   |
-| `processCollection`           | Process an entire collection using a handler per document               |
-| `processCollectionByChunk`    | Process an entire collection using a handler per chunk                  |
-| `processQuery`                | Query a collection and process the results using a handler per document |
-| `processQueryByChunk`         | Query a collection and process the results using a handler per chunk    |
+| `processDocuments`            | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk`     | Query a collection and process the results using a handler per chunk    |
 
 ### Cloud Functions
+
+When writing cloud functions, you typically need to get the data from the event
+and then process it. These functions take the event and return typed data.
 
 | Function                     | Description                                                |
 | ---------------------------- | ---------------------------------------------------------- |

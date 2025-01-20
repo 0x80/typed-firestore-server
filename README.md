@@ -179,25 +179,34 @@ native Firestore functions.
 | `getBeforeAndAfterOnWritten` | Get the before and after data from a document write event  |
 | `getBeforeAndAfterOnUpdated` | Get the before and after data from a document update event |
 
+Note that the functions are exposed on `@typed-firestore/server/functions`, so
+that the `firebase-admin` and `firebase-functions` peer-dependencies can both be
+optional.
+
+As long as you only import code from `@typed-firestore/server`, you shouldn't
+need `firebase-functions` and as long as you only import code from
+`@typed-firestore/server/functions`, you shouldn't need `firebase-admin`.
+
+Importing types should not affect this.
+
 ## Where Typing Was Ignored
 
-You might notice that the query `where()` function is still the regular untyped
-Firestore API, and that is deliberate. I think this part would be difficult to
-type, and the API shape would be very different from the official API.
-
-Besides having strong typing, I also wanted to make this library non intrusive
-and thus easy to adopt.
+You might have noticed that the query `where()` function is still using the
+regular untyped Firestore API, and that is deliberate. I think this part would
+be difficult to type, and the API shape would be very different from the
+official API. Besides wanting strong typing, I also want this library to be
+non-intrusive and easy to adopt.
 
 I would argue that the `where()` clause is the least critical part anyway. If
-you make a mistake there, there is little chance to ruin things and you will
-likely find out during development.
+you make a mistake with it, there is little chance to ruin in the database
+things and you will likely discover the problem during development.
 
 In my experience, if you use a `select()` without matching typing, or send the
-wrong data to `update()` you could easily mess things up in a way that is risky
-or time consuming to fix, especially when writing database migration scripts.
-
-So I think the trade-off for simplicity is worth it.
+wrong data to `update()` you can easily mess things up in a way that is risky or
+time consuming to restore, especially when writing database migration scripts.
 
 It might be possible to create a clean fully-typed API for queries with some
-type gymnastics, but that is not something I am willing to spend lots of time
-on.
+fancy type gymnastics, but that is not something I am willing to spend lots of
+time on.
+
+I think the trade-off for simplicity and familiarity is warranted.

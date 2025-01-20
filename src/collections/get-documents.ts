@@ -32,7 +32,7 @@ export function getDocuments<
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: ((collection: CollectionReference) => Query) | null | undefined,
+    queryFn?: ((collection: CollectionReference) => Query) | null,
     options: GetDocumentsOptions<T, K, S> = {}
   ): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> => {
     const {
@@ -67,10 +67,7 @@ export function getDocumentsFromTransaction<
   K extends keyof T = keyof T,
 >(transaction: Transaction, collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn:
-      | ((collection: CollectionReference<T>) => Query<T>)
-      | null
-      | undefined,
+    queryFn?: ((collection: CollectionReference<T>) => Query<T>) | null,
     options: { select?: S } = {}
   ): Promise<FsDocument<SelectedDocument<T, K, S>>[]> => {
     const finalQuery = queryFn

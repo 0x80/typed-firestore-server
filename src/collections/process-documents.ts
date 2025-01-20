@@ -32,7 +32,7 @@ export function processDocuments<
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn: ((collection: CollectionReference) => Query) | null | undefined,
+    queryFn: ((collection: CollectionReference) => Query) | null,
     handler: (
       document: FsMutableDocument<SelectedDocument<T, K, S>>
     ) => Promise<unknown>,
@@ -103,10 +103,7 @@ export function processDocumentsByChunk<
   K extends keyof T = keyof T,
 >(collectionRef: CollectionReference<T>) {
   return async <S extends K[] | undefined = undefined>(
-    queryFn:
-      | ((collection: CollectionReference<T>) => Query<T>)
-      | null
-      | undefined,
+    queryFn: ((collection: CollectionReference<T>) => Query<T>) | null,
     handler: (
       documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
     ) => Promise<unknown>,

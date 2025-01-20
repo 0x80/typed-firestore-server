@@ -82,12 +82,12 @@ await runTransaction(async (tx) => {
 The functions below that query collections should look familiar, but there are a
 few key things to note:
 
-1. The functions take only a collection reference, and then return a function
-   that is typed to take the query and handler. This is necessary for the
-   handler to be typed correctly.
-2. The optional select statement should be defined separately from the query. In
-   theory you can still also set it on the query but your data will not be typed
-   properly and it can lead to serious mistakes, so be mindful of that.
+1. The functions take a collection reference, and then return another function
+   that takes the query builder and handler. This is necessary for the handler
+   to be typed correctly.
+2. The optional `select` statement should be defined separately from the query.
+   In theory you can still set it on the query directly, but your data will not
+   be typed correctly and it can lead to serious mistakes, so keep that in mind.
 
 ```ts
 import { refs } from "./db-refs";

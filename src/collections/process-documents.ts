@@ -1,4 +1,5 @@
 import type {
+  CollectionGroup,
   CollectionReference,
   Query,
   QueryDocumentSnapshot,
@@ -27,70 +28,72 @@ type ProcessDocumentsOptions<T extends UnknownObject> = {
  * Process a collection using a query. If the query is null, the entire
  * collection is retrieved. An optional select statement can narrow the data.
  */
-export function processDocuments<
+export async function processDocuments<
   T extends UnknownObject,
   K extends keyof T = keyof T,
->(collectionRef: CollectionReference<T>) {
-  return async <S extends K[] | undefined = undefined>(
-    queryFn: ((collection: CollectionReference) => Query) | null,
-    handler: (
-      document: FsMutableDocument<SelectedDocument<T, K, S>>
-    ) => Promise<unknown>,
-    options: ProcessDocumentsOptions<T> & { select?: S } = {}
-  ) => {
-    const {
-      throttleSeconds = 0,
-      limitToFirstBatch = false,
-      batchSize = DEFAULT_BATCH_SIZE,
-    } = options;
+  S extends K[] | undefined = undefined,
+>(
+  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  queryFn:
+    | ((collection: CollectionReference | CollectionGroup) => Query)
+    | null,
+  handler: (
+    document: FsMutableDocument<SelectedDocument<T, K, S>>
+  ) => Promise<unknown>,
+  options: ProcessDocumentsOptions<T> & { select?: S } = {}
+) {
+  const {
+    throttleSeconds = 0,
+    limitToFirstBatch = false,
+    batchSize = DEFAULT_BATCH_SIZE,
+  } = options;
 
-    const query = queryFn
-      ? options.select
-        ? queryFn(collectionRef).select(...(options.select as string[]))
-        : queryFn(collectionRef)
-      : collectionRef;
+  const query = queryFn
+    ? options.select
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef)
+    : collectionRef;
 
-    let lastDocumentSnapshot:
-      | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
-      | undefined;
-    let count = 0;
+  let lastDocumentSnapshot:
+    | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+    | undefined;
+  let count = 0;
 
-    const errors: { id: string; message: string }[] = [];
+  const errors: { id: string; message: string }[] = [];
 
-    do {
-      verboseCount("Processing chunk");
+  do {
+    verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
-        query,
-        lastDocumentSnapshot,
-        batchSize,
-        limitToFirstBatch
-      );
+    const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+      query,
+      lastDocumentSnapshot,
+      batchSize,
+      limitToFirstBatch
+    );
 
-      await processInChunks(
-        documents,
-        async (doc) => {
-          try {
-            await handler(doc);
-          } catch (err) {
-            errors.push({ id: doc.id, message: getErrorMessage(err) });
-          }
-        },
-        { throttleSeconds }
-      );
+    await processInChunks(
+      documents,
+      async (doc) => {
+        try {
+          await handler(doc);
+        } catch (err) {
+          errors.push({ id: doc.id, message: getErrorMessage(err) });
+        }
+      },
+      { throttleSeconds }
+    );
 
-      count += documents.length;
-      lastDocumentSnapshot = _lastDocumentSnapshot;
-    } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
+    count += documents.length;
+    lastDocumentSnapshot = _lastDocumentSnapshot;
+  } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
 
-    verboseLog(`Processed ${String(count)} documents`);
+  verboseLog(`Processed ${String(count)} documents`);
 
-    if (errors.length > 0) {
-      errors.forEach(({ id, message }) => {
-        console.error(`${id}: ${message}`);
-      });
-    }
-  };
+  if (errors.length > 0) {
+    errors.forEach(({ id, message }) => {
+      console.error(`${id}: ${message}`);
+    });
+  }
 }
 
 /**
@@ -98,72 +101,74 @@ export function processDocuments<
  * query is null, the entire collection is retrieved. An optional select
  * statement can narrow the data.
  */
-export function processDocumentsByChunk<
+export async function processDocumentsByChunk<
   T extends UnknownObject,
   K extends keyof T = keyof T,
->(collectionRef: CollectionReference<T>) {
-  return async <S extends K[] | undefined = undefined>(
-    queryFn: ((collection: CollectionReference<T>) => Query<T>) | null,
-    handler: (
-      documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
-    ) => Promise<unknown>,
-    options: ProcessDocumentsOptions<T> & { select?: S } = {}
-  ) => {
-    const {
-      throttleSeconds = 0,
-      limitToFirstBatch = false,
-      batchSize = DEFAULT_BATCH_SIZE,
-    } = options;
+  S extends K[] | undefined = undefined,
+>(
+  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  queryFn:
+    | ((collection: CollectionReference | CollectionGroup) => Query)
+    | null,
+  handler: (
+    documents: FsMutableDocument<SelectedDocument<T, K, S>>[]
+  ) => Promise<unknown>,
+  options: ProcessDocumentsOptions<T> & { select?: S } = {}
+) {
+  const {
+    throttleSeconds = 0,
+    limitToFirstBatch = false,
+    batchSize = DEFAULT_BATCH_SIZE,
+  } = options;
 
-    const query = queryFn
-      ? options.select
-        ? queryFn(collectionRef).select(...(options.select as string[]))
-        : queryFn(collectionRef)
-      : collectionRef;
+  const query = queryFn
+    ? options.select
+      ? queryFn(collectionRef).select(...(options.select as string[]))
+      : queryFn(collectionRef)
+    : collectionRef;
 
-    let lastDocumentSnapshot:
-      | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
-      | undefined;
-    let count = 0;
+  let lastDocumentSnapshot:
+    | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+    | undefined;
+  let count = 0;
 
-    const errors: string[] = [];
+  const errors: string[] = [];
 
-    do {
-      verboseCount("Processing chunk");
+  do {
+    verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
-        query,
-        lastDocumentSnapshot,
-        batchSize,
-        limitToFirstBatch
-      );
+    const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+      query,
+      lastDocumentSnapshot,
+      batchSize,
+      limitToFirstBatch
+    );
 
-      if (isEmpty(documents)) {
-        continue;
-      }
-
-      try {
-        await processInChunksByChunk(
-          documents,
-          async (docs) => {
-            await handler(docs);
-          },
-          { throttleSeconds }
-        );
-      } catch (err) {
-        errors.push(getErrorMessage(err));
-      }
-
-      count += documents.length;
-      lastDocumentSnapshot = _lastDocumentSnapshot;
-    } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
-
-    verboseLog(`Processed ${String(count)} documents`);
-
-    if (errors.length > 0) {
-      errors.forEach((message) => {
-        console.error(message);
-      });
+    if (isEmpty(documents)) {
+      continue;
     }
-  };
+
+    try {
+      await processInChunksByChunk(
+        documents,
+        async (docs) => {
+          await handler(docs);
+        },
+        { throttleSeconds }
+      );
+    } catch (err) {
+      errors.push(getErrorMessage(err));
+    }
+
+    count += documents.length;
+    lastDocumentSnapshot = _lastDocumentSnapshot;
+  } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
+
+  verboseLog(`Processed ${String(count)} documents`);
+
+  if (errors.length > 0) {
+    errors.forEach((message) => {
+      console.error(message);
+    });
+  }
 }

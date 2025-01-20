@@ -1,4 +1,5 @@
 import type {
+  CollectionGroup,
   CollectionReference,
   Query,
   QueryDocumentSnapshot,
@@ -32,8 +33,10 @@ export function getDocuments<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  collectionRef: CollectionReference<T>,
-  queryFn?: ((collection: CollectionReference) => Query) | null,
+  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  queryFn?:
+    | ((collection: CollectionReference | CollectionGroup) => Query)
+    | null,
   options: GetDocumentsOptions<T, K, S> = {}
 ): Promise<FsMutableDocument<SelectedDocument<T, K, S>>[]> {
   const {
@@ -71,8 +74,10 @@ export function getDocumentsFromTransaction<
   S extends K[] | undefined = undefined,
 >(
   transaction: Transaction,
-  collectionRef: CollectionReference<T>,
-  queryFn?: ((collection: CollectionReference) => Query) | null,
+  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  queryFn?:
+    | ((collection: CollectionReference | CollectionGroup) => Query)
+    | null,
   options: { select?: S } = {}
 ): Promise<FsDocument<SelectedDocument<T, K, S>>[]> {
   const finalQuery = queryFn

@@ -33,7 +33,7 @@ export async function processDocuments<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn:
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
@@ -50,9 +50,9 @@ export async function processDocuments<
 
   const query = queryFn
     ? options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef)
-    : collectionRef;
+      ? queryFn(ref).select(...(options.select as string[]))
+      : queryFn(ref)
+    : ref;
 
   let lastDocumentSnapshot:
     | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
@@ -106,7 +106,7 @@ export async function processDocumentsByChunk<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn:
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
@@ -123,9 +123,9 @@ export async function processDocumentsByChunk<
 
   const query = queryFn
     ? options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef)
-    : collectionRef;
+      ? queryFn(ref).select(...(options.select as string[]))
+      : queryFn(ref)
+    : ref;
 
   let lastDocumentSnapshot:
     | QueryDocumentSnapshot<SelectedDocument<T, K, S>>

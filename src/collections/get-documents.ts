@@ -34,7 +34,7 @@ export function getDocuments<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn?:
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
@@ -48,9 +48,9 @@ export function getDocuments<
 
   const finalQuery = queryFn
     ? options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef)
-    : collectionRef;
+      ? queryFn(ref).select(...(options.select as string[]))
+      : queryFn(ref)
+    : ref;
 
   if (disableBatching) {
     return (async () => {
@@ -80,8 +80,8 @@ export function getDocumentsInTransaction<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  transaction: Transaction,
-  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  tx: Transaction,
+  ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn?:
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
@@ -89,12 +89,12 @@ export function getDocumentsInTransaction<
 ): Promise<FsDocument<SelectedDocument<T, K, S>>[]> {
   const finalQuery = queryFn
     ? options.select
-      ? queryFn(collectionRef).select(...(options.select as string[]))
-      : queryFn(collectionRef)
-    : collectionRef;
+      ? queryFn(ref).select(...(options.select as string[]))
+      : queryFn(ref)
+    : ref;
 
   return (async () => {
-    const snapshot = await transaction.get(finalQuery);
+    const snapshot = await tx.get(finalQuery);
     if (snapshot.empty) return [];
 
     return snapshot.docs.map((doc) =>

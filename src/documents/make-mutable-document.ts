@@ -29,14 +29,14 @@ export function makeMutableDocumentInTransaction<
   TFull extends UnknownObject = TNarrowOrFull,
 >(
   doc: DocumentSnapshot<TNarrowOrFull>,
-  transaction: Transaction
+  tx: Transaction
 ): FsMutableDocumentInTransaction<TNarrowOrFull, TFull> {
   return {
     id: doc.id,
     data: doc.data()!,
     ref: doc.ref,
-    update: (data: UpdateData<TFull>) => transaction.update(doc.ref, data),
+    update: (data: UpdateData<TFull>) => tx.update(doc.ref, data),
     updateWithPartial: (data: Partial<TFull>) =>
-      transaction.update(doc.ref, data as UpdateData<TFull>),
+      tx.update(doc.ref, data as UpdateData<TFull>),
   };
 }

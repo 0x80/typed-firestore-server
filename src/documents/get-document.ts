@@ -10,26 +10,23 @@ import {
 } from "./make-mutable-document";
 
 export async function getDocument<T extends UnknownObject>(
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string
 ) {
-  const doc = await collectionRef.doc(documentId).get();
+  const doc = await ref.doc(documentId).get();
 
-  invariant(
-    doc.exists,
-    `No document available at ${collectionRef.path}/${documentId}`
-  );
+  invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
 
   return makeMutableDocument<T>(doc);
 }
 
 export async function getDocumentMaybe<T extends UnknownObject>(
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId?: string | null
 ) {
   if (!documentId) return;
 
-  const doc = await collectionRef.doc(documentId).get();
+  const doc = await ref.doc(documentId).get();
 
   if (!doc.exists) return;
 
@@ -37,32 +34,29 @@ export async function getDocumentMaybe<T extends UnknownObject>(
 }
 
 export async function getDocumentInTransaction<T extends UnknownObject>(
-  transaction: Transaction,
-  collectionRef: CollectionReference<T>,
+  tx: Transaction,
+  ref: CollectionReference<T>,
   documentId: string
 ) {
-  const doc = await transaction.get(collectionRef.doc(documentId));
+  const doc = await tx.get(ref.doc(documentId));
 
-  invariant(
-    doc.exists,
-    `No document available at ${collectionRef.path}/${documentId}`
-  );
+  invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
 
-  return makeMutableDocumentInTransaction<T>(doc, transaction);
+  return makeMutableDocumentInTransaction<T>(doc, tx);
 }
 
 export async function getDocumentInTransactionMaybe<T extends UnknownObject>(
-  transaction: Transaction,
-  collectionRef: CollectionReference<T>,
+  tx: Transaction,
+  ref: CollectionReference<T>,
   documentId?: string | null
 ) {
   if (!documentId) return;
 
-  const doc = await transaction.get(collectionRef.doc(documentId));
+  const doc = await tx.get(ref.doc(documentId));
 
   if (!doc.exists) {
     return;
   }
 
-  return makeMutableDocumentInTransaction<T>(doc, transaction);
+  return makeMutableDocumentInTransaction<T>(doc, tx);
 }

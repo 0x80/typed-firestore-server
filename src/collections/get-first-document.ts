@@ -17,13 +17,13 @@ export async function getFirstDocument<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   queryFn: (collection: CollectionReference) => Query,
   options: { select?: S } = {}
 ): Promise<FsMutableDocument<SelectedDocument<T, K, S>, T> | undefined> {
   const finalQuery = options.select
-    ? queryFn(collectionRef).select(...(options.select as string[]))
-    : queryFn(collectionRef);
+    ? queryFn(ref).select(...(options.select as string[]))
+    : queryFn(ref);
 
   const snapshot = await finalQuery.limit(1).get();
 
@@ -41,16 +41,16 @@ export async function getFirstDocumentInTransaction<
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
-  transaction: Transaction,
-  collectionRef: CollectionReference<T> | CollectionGroup<T>,
+  tx: Transaction,
+  ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: (collection: CollectionReference | CollectionGroup) => Query,
   options: { select?: S } = {}
 ) {
   const finalQuery = options.select
-    ? queryFn(collectionRef).select(...(options.select as string[]))
-    : queryFn(collectionRef);
+    ? queryFn(ref).select(...(options.select as string[]))
+    : queryFn(ref);
 
-  const snapshot = await transaction.get(finalQuery.limit(1));
+  const snapshot = await tx.get(finalQuery.limit(1));
 
   if (snapshot.empty) {
     return;
@@ -58,6 +58,6 @@ export async function getFirstDocumentInTransaction<
 
   return makeMutableDocumentInTransaction<SelectedDocument<T, K, S>, T>(
     snapshot.docs[0] as DocumentSnapshot<SelectedDocument<T, K, S>>,
-    transaction
+    tx
   );
 }

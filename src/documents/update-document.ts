@@ -11,43 +11,43 @@ import type { UnknownObject } from "~/types";
  * and `updateWithPartial` methods.
  */
 export async function updateDocument<T extends UnknownObject>(
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string,
   data: UpdateData<T>
 ) {
-  const docRef = collectionRef.doc(documentId);
+  const docRef = ref.doc(documentId);
 
   await docRef.update(data);
 }
 
 export async function updateDocumentWithPartial<T extends UnknownObject>(
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string,
   data: Partial<T>
 ) {
-  const docRef = collectionRef.doc(documentId);
+  const docRef = ref.doc(documentId);
 
   await docRef.update(data);
 }
 
 export function updateDocumentInTransaction<T extends UnknownObject>(
   tx: Transaction,
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string,
   data: UpdateData<T>
 ) {
-  const docRef = collectionRef.doc(documentId);
+  const docRef = ref.doc(documentId);
 
   tx.update(docRef, data);
 }
 
 export function updateDocumentWithPartialInTransaction<T extends UnknownObject>(
   tx: Transaction,
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string,
   data: Partial<T>
 ) {
-  const docRef = collectionRef.doc(documentId);
+  const docRef = ref.doc(documentId);
 
   tx.update(docRef, data as UpdateData<T>);
 }

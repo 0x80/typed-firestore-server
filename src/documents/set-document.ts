@@ -8,22 +8,22 @@ import type { UnknownObject } from "~/types";
 
 /** Create or overwrite a document. */
 export async function setDocument<T extends UnknownObject>(
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string,
   data: WithFieldValue<T>
 ) {
-  const docRef = collectionRef.doc(documentId);
+  const docRef = ref.doc(documentId);
 
   await docRef.set(data);
 }
 
 export function setDocumentInTransaction<T extends UnknownObject>(
   tx: Transaction,
-  collectionRef: CollectionReference<T>,
+  ref: CollectionReference<T>,
   documentId: string,
   data: WithFieldValue<T>
 ) {
-  const docRef = collectionRef.doc(documentId);
+  const docRef = ref.doc(documentId);
 
   tx.set(docRef, data);
 }
@@ -33,16 +33,16 @@ export function setDocumentInTransaction<T extends UnknownObject>(
  * separately.
  */
 export async function setSpecificDocument<T extends UnknownObject>(
-  documentRef: DocumentReference<T>,
+  ref: DocumentReference<T>,
   data: WithFieldValue<T>
 ) {
-  await documentRef.set(data);
+  await ref.set(data);
 }
 
 export function setSpecificDocumentInTransaction<T extends UnknownObject>(
   tx: Transaction,
-  documentRef: DocumentReference<T>,
+  ref: DocumentReference<T>,
   data: WithFieldValue<T>
 ) {
-  tx.set(documentRef, data);
+  tx.set(ref, data);
 }

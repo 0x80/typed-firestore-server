@@ -4,10 +4,16 @@ import type {
   Query,
   QueryDocumentSnapshot,
   Transaction,
-  UpdateData,
 } from "firebase-admin/firestore";
-import { makeDocument } from "~/documents";
-import type { FsDocument, FsMutableDocument, UnknownObject } from "~/types";
+import {
+  makeMutableDocument,
+  makeMutableDocumentInTransaction,
+} from "~/documents";
+import type {
+  FsMutableDocument,
+  FsMutableDocumentInTransaction,
+  UnknownObject,
+} from "~/types";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
 import type { SelectedDocument } from "./types";
@@ -55,17 +61,11 @@ export function getDocuments<
   if (disableBatching) {
     return (async () => {
       const snapshot = await finalQuery.get();
-      return snapshot.docs.map((doc) => {
-        return {
-          id: doc.id,
-          data: (
-            doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
-          ).data(),
-          ref: doc.ref,
-          update: (data: UpdateData<T>) => doc.ref.update(data),
-          updateWithPartial: (data: Partial<T>) => doc.ref.update(data),
-        } as FsMutableDocument<SelectedDocument<T, K, S>, T>;
-      });
+      return snapshot.docs.map((doc) =>
+        makeMutableDocument<SelectedDocument<T, K, S>, T>(
+          doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+        )
+      );
     })();
   } else {
     const limitedQuery = finalQuery.limit(batchSize);
@@ -75,7 +75,12 @@ export function getDocuments<
   }
 }
 
-export function getDocumentsInTransaction<
+/**
+ * Because transactions are limited to 500 operations, we do not use batching /
+ * pagination here. here. You should limit the query if you expect the document
+ * count to be close to the maximum.
+ */
+export async function getDocumentsInTransaction<
   T extends UnknownObject,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
@@ -86,19 +91,20 @@ export function getDocumentsInTransaction<
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
   options: { select?: S } = {}
-): Promise<FsDocument<SelectedDocument<T, K, S>>[]> {
+): Promise<FsMutableDocumentInTransaction<SelectedDocument<T, K, S>, T>[]> {
   const finalQuery = queryFn
     ? options.select
       ? queryFn(ref).select(...(options.select as string[]))
       : queryFn(ref)
     : ref;
 
-  return (async () => {
-    const snapshot = await tx.get(finalQuery);
-    if (snapshot.empty) return [];
+  const snapshot = await tx.get(finalQuery);
+  if (snapshot.empty) return [];
 
-    return snapshot.docs.map((doc) =>
-      makeDocument(doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>)
-    );
-  })();
+  return snapshot.docs.map((doc) =>
+    makeMutableDocumentInTransaction<SelectedDocument<T, K, S>, T>(
+      doc as QueryDocumentSnapshot<SelectedDocument<T, K, S>>,
+      tx
+    )
+  );
 }

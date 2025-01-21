@@ -25,6 +25,7 @@ export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
    * without FieldValue.
    */
   updateWithPartial: (data: Partial<TFull>) => Promise<WriteResult>;
+  delete: () => Promise<WriteResult>;
 }> &
   FsDocument<TNarrowOrFull>;
 
@@ -40,5 +41,6 @@ export type FsMutableDocumentInTransaction<
    * without FieldValue.
    */
   updateWithPartial: (data: Partial<TFull>) => Transaction;
+  delete: () => Transaction;
 }> &
   FsDocument<TNarrowOrFull>;

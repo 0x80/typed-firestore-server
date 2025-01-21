@@ -21,6 +21,7 @@ export function makeMutableDocument<
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => doc.ref.update(data),
     updateWithPartial: (data: Partial<TFull>) => doc.ref.update(data),
+    delete: () => doc.ref.delete(),
   };
 }
 
@@ -38,5 +39,6 @@ export function makeMutableDocumentInTransaction<
     update: (data: UpdateData<TFull>) => tx.update(doc.ref, data),
     updateWithPartial: (data: Partial<TFull>) =>
       tx.update(doc.ref, data as UpdateData<TFull>),
+    delete: () => tx.delete(doc.ref),
   };
 }

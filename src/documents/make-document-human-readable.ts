@@ -7,14 +7,14 @@ type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 type JsonObject = {
   [key: string]: JsonValue;
-}
+};
 
 /**
  * Make a human-readable Firestore document for exporting to JSON. Useful for
  * debugging. It converts all Timestamps to strings and sorts object keys
  * alphabetically.
  */
-export function makeHumanReadableDocument(
+export function makeDocumentHumanReadable(
   documentData: FirebaseFirestore.DocumentData
 ) {
   return sortObjectKeysRecursive(convertTimestampsRecursive(documentData));

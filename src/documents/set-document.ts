@@ -1,6 +1,6 @@
 import {
   CollectionReference,
-  type DocumentReference,
+  type SetOptions,
   type Transaction,
   type WithFieldValue,
 } from "firebase-admin/firestore";
@@ -10,39 +10,22 @@ import type { UnknownObject } from "~/types";
 export async function setDocument<T extends UnknownObject>(
   ref: CollectionReference<T>,
   documentId: string,
-  data: WithFieldValue<T>
+  data: WithFieldValue<T>,
+  options: SetOptions = {}
 ) {
   const docRef = ref.doc(documentId);
 
-  await docRef.set(data);
+  await docRef.set(data, options);
 }
 
 export function setDocumentInTransaction<T extends UnknownObject>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,
-  data: WithFieldValue<T>
+  data: WithFieldValue<T>,
+  options: SetOptions = {}
 ) {
   const docRef = ref.doc(documentId);
 
-  tx.set(docRef, data);
-}
-
-/**
- * Create or overwrite a document in a collection where each document is typed
- * separately.
- */
-export async function setSpecificDocument<T extends UnknownObject>(
-  ref: DocumentReference<T>,
-  data: WithFieldValue<T>
-) {
-  await ref.set(data);
-}
-
-export function setSpecificDocumentInTransaction<T extends UnknownObject>(
-  tx: Transaction,
-  ref: DocumentReference<T>,
-  data: WithFieldValue<T>
-) {
-  tx.set(ref, data);
+  tx.set(docRef, data, options);
 }

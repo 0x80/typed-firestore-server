@@ -1,5 +1,6 @@
 import {
   CollectionReference,
+  type DocumentReference,
   type WithFieldValue,
 } from "firebase-admin/firestore";
 import type { UnknownObject } from "~/types";
@@ -13,4 +14,15 @@ export async function setDocument<T extends UnknownObject>(
   const docRef = collectionRef.doc(documentId);
 
   await docRef.set(data);
+}
+
+/**
+ * Create or overwrite a document in a collection where each document is typed
+ * separately.
+ */
+export async function setSpecificDocument<T extends UnknownObject>(
+  documentRef: DocumentReference<T>,
+  data: WithFieldValue<T>
+) {
+  await documentRef.set(data);
 }

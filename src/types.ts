@@ -24,11 +24,11 @@ export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
    * sometimes does not accept perfectly valid data. This is an alternative
    * without FieldValue.
    */
-  updatePartial: (data: Partial<TFull>) => Promise<WriteResult>;
+  updateWithPartial: (data: Partial<TFull>) => Promise<WriteResult>;
 }> &
   FsDocument<TNarrowOrFull>;
 
-export type FsMutableDocumentFromTransaction<
+export type FsMutableDocumentInTransaction<
   TNarrowOrFull,
   TFull = TNarrowOrFull,
 > = Readonly<{
@@ -39,6 +39,6 @@ export type FsMutableDocumentFromTransaction<
    * sometimes does not accept perfectly valid data. This is an alternative
    * without FieldValue.
    */
-  updatePartial: (data: Partial<TFull>) => Transaction;
+  updateWithPartial: (data: Partial<TFull>) => Transaction;
 }> &
   FsDocument<TNarrowOrFull>;

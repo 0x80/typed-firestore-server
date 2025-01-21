@@ -32,7 +32,7 @@ export async function getDocumentDataMaybe<T extends UnknownObject>(
   return doc.data()!;
 }
 
-export async function getDocumentDataFromTransaction<T extends UnknownObject>(
+export async function getDocumentDataInTransaction<T extends UnknownObject>(
   transaction: Transaction,
   collectionRef: CollectionReference<T>,
   documentId: string
@@ -47,7 +47,7 @@ export async function getDocumentDataFromTransaction<T extends UnknownObject>(
   return doc.data()!;
 }
 
-export async function getDocumentDataFromTransactionMaybe<
+export async function getDocumentDataInTransactionMaybe<
   T extends UnknownObject,
 >(
   transaction: Transaction,

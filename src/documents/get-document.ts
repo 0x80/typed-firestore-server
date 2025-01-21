@@ -6,7 +6,7 @@ import type { UnknownObject } from "~/types";
 import { invariant } from "~/utils";
 import {
   makeMutableDocument,
-  makeMutableDocumentFromTransaction,
+  makeMutableDocumentInTransaction,
 } from "./make-mutable-document";
 
 export async function getDocument<T extends UnknownObject>(
@@ -36,7 +36,7 @@ export async function getDocumentMaybe<T extends UnknownObject>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getDocumentFromTransaction<T extends UnknownObject>(
+export async function getDocumentInTransaction<T extends UnknownObject>(
   transaction: Transaction,
   collectionRef: CollectionReference<T>,
   documentId: string
@@ -48,10 +48,10 @@ export async function getDocumentFromTransaction<T extends UnknownObject>(
     `No document available at ${collectionRef.path}/${documentId}`
   );
 
-  return makeMutableDocumentFromTransaction<T>(doc, transaction);
+  return makeMutableDocumentInTransaction<T>(doc, transaction);
 }
 
-export async function getDocumentFromTransactionMaybe<T extends UnknownObject>(
+export async function getDocumentInTransactionMaybe<T extends UnknownObject>(
   transaction: Transaction,
   collectionRef: CollectionReference<T>,
   documentId?: string | null
@@ -64,5 +64,5 @@ export async function getDocumentFromTransactionMaybe<T extends UnknownObject>(
     return;
   }
 
-  return makeMutableDocumentFromTransaction<T>(doc, transaction);
+  return makeMutableDocumentInTransaction<T>(doc, transaction);
 }

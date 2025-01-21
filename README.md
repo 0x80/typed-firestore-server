@@ -65,7 +65,7 @@ await user.update({
 /** Helps with writing transactions */
 await runTransaction(async (tx) => {
   /** Get a document as part of a transaction */
-  const user = await getDocumentFromTransaction(tx, refs.users, "id123");
+  const user = await getDocumentInTransaction(tx, refs.users, "id123");
 
   /**
    * In this case, the typed update function calls the transaction, and is
@@ -221,28 +221,32 @@ Firestore functions.
 
 ### Single Documents
 
-| Function                              | Description                                                                          |
-| ------------------------------------- | ------------------------------------------------------------------------------------ |
-| `getDocument`                         | Fetch a document                                                                     |
-| `getDocumentData`                     | Fetch only the data part of a document                                               |
-| `getDocumentMaybe`                    | Fetch a document that might not exist                                                |
-| `getDocumentDataMaybe`                | Fetch only the data part of a that might not exist                                   |
-| `getDocumentFromTransaction`          | Fetch a document as part of a transaction                                            |
-| `getDocumentDataFromTransaction`      | Fetch only the data part of a document as part of a transaction                      |
-| `getDocumentFromTransactionMaybe`     | Fetch a document that might not exist as part of a transaction                       |
-| `getDocumentDataFromTransactionMaybe` | Fetch only the data part of a document that might not exist as part of a transaction |
-| `getSpecificDocument`                 | Fetch a document using a typed document ref instead of a collection ref              |
-| `getSpecificDocumentFromTransaction`  | Fetch a document using a typed document ref as part of a transaction                 |
+| Function                                 | Description                                                               |
+| ---------------------------------------- | ------------------------------------------------------------------------- |
+| `getDocument`                            | Fetch a document                                                          |
+| `getDocumentMaybe`                       | Fetch a document that might not exist                                     |
+| `getDocumentInTransaction`               | Fetch a document as part of a transaction                                 |
+| `getDocumentInTransactionMaybe`          | Fetch a document that might not exist as part of a transaction            |
+| `getSpecificDocument`                    | Fetch a document from an inconsistent collection                          |
+| `getSpecificDocumentInTransaction`       | Fetch a document from an inconsistent collection as part of a transaction |
+| `setDocument`                            | Create or overwrite a document                                            |
+| `setDocumentInTransaction`               | Create or overwrite a document as part of a transaction                   |
+| `setSpecificDocument`                    | Create or overwrite a specific document                                   |
+| `setSpecificDocumentInTransaction`       | Create or overwrite a specific document as part of a transaction          |
+| `updateDocument`                         | Update a document                                                         |
+| `updateDocumentWithPartial`              | Update a document with a partial object                                   |
+| `updateDocumentInTransaction`            | Update a document as part of a transaction                                |
+| `updateDocumentWithPartialInTransaction` | Update a document with a partial object as part of a transaction          |
 
 ### Collections and Queries
 
-| Function                      | Description                                                             |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| `getDocuments`                | Fetch documents using a query                                           |
-| `getDocumentsFromTransaction` | Fetch documents using a query as part of a transaction                  |
-| `getFirstDocument`            | Fetch the first document from a query                                   |
-| `processDocuments`            | Query a collection and process the results using a handler per document |
-| `processDocumentsByChunk`     | Query a collection and process the results using a handler per chunk    |
+| Function                    | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`              | Fetch documents using a query                                           |
+| `getDocumentsInTransaction` | Fetch documents using a query as part of a transaction                  |
+| `getFirstDocument`          | Fetch the first document from a query                                   |
+| `processDocuments`          | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk`   | Query a collection and process the results using a handler per chunk    |
 
 The same functions for with collection groups also.
 

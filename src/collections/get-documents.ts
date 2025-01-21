@@ -63,7 +63,7 @@ export function getDocuments<
           ).data(),
           ref: doc.ref,
           update: (data: UpdateData<T>) => doc.ref.update(data),
-          updatePartial: (data: Partial<T>) => doc.ref.update(data),
+          updateWithPartial: (data: Partial<T>) => doc.ref.update(data),
         } as FsMutableDocument<SelectedDocument<T, K, S>, T>;
       });
     })();
@@ -75,7 +75,7 @@ export function getDocuments<
   }
 }
 
-export function getDocumentsFromTransaction<
+export function getDocumentsInTransaction<
   T extends UnknownObject,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,

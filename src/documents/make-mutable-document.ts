@@ -5,7 +5,7 @@ import type {
 } from "firebase-admin/firestore";
 import type {
   FsMutableDocument,
-  FsMutableDocumentFromTransaction,
+  FsMutableDocumentInTransaction,
   UnknownObject,
 } from "~/types";
 
@@ -20,23 +20,23 @@ export function makeMutableDocument<
     data: doc.data()!,
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => doc.ref.update(data),
-    updatePartial: (data: Partial<TFull>) => doc.ref.update(data),
+    updateWithPartial: (data: Partial<TFull>) => doc.ref.update(data),
   };
 }
 
-export function makeMutableDocumentFromTransaction<
+export function makeMutableDocumentInTransaction<
   TNarrowOrFull extends UnknownObject,
   TFull extends UnknownObject = TNarrowOrFull,
 >(
   doc: DocumentSnapshot<TNarrowOrFull>,
   transaction: Transaction
-): FsMutableDocumentFromTransaction<TNarrowOrFull, TFull> {
+): FsMutableDocumentInTransaction<TNarrowOrFull, TFull> {
   return {
     id: doc.id,
     data: doc.data()!,
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => transaction.update(doc.ref, data),
-    updatePartial: (data: Partial<TFull>) =>
+    updateWithPartial: (data: Partial<TFull>) =>
       transaction.update(doc.ref, data as UpdateData<TFull>),
   };
 }

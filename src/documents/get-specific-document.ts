@@ -3,7 +3,7 @@ import type { UnknownObject } from "~/types";
 import { invariant } from "~/utils";
 import {
   makeMutableDocument,
-  makeMutableDocumentFromTransaction,
+  makeMutableDocumentInTransaction,
 } from "./make-mutable-document";
 
 /**
@@ -20,12 +20,13 @@ export async function getSpecificDocument<T extends UnknownObject>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getSpecificDocumentFromTransaction<
-  T extends UnknownObject,
->(transaction: Transaction, documentRef: DocumentReference<T>) {
+export async function getSpecificDocumentInTransaction<T extends UnknownObject>(
+  transaction: Transaction,
+  documentRef: DocumentReference<T>
+) {
   const doc = await transaction.get(documentRef);
 
   invariant(doc.exists, `No document available at ${documentRef.path}`);
 
-  return makeMutableDocumentFromTransaction<T>(doc, transaction);
+  return makeMutableDocumentInTransaction<T>(doc, transaction);
 }

@@ -240,13 +240,14 @@ Firestore functions.
 
 ### Collections and Queries
 
-| Function                    | Description                                                             |
-| --------------------------- | ----------------------------------------------------------------------- |
-| `getDocuments`              | Fetch documents using a query                                           |
-| `getDocumentsInTransaction` | Fetch documents using a query as part of a transaction                  |
-| `getFirstDocument`          | Fetch the first document from a query                                   |
-| `processDocuments`          | Query a collection and process the results using a handler per document |
-| `processDocumentsByChunk`   | Query a collection and process the results using a handler per chunk    |
+| Function                        | Description                                                             |
+| ------------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`                  | Fetch documents using a query                                           |
+| `getDocumentsInTransaction`     | Fetch documents using a query as part of a transaction                  |
+| `getFirstDocument`              | Fetch the first document from a query                                   |
+| `getFirstDocumentInTransaction` | Fetch the first document from a query as part of a transaction          |
+| `processDocuments`              | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk`       | Query a collection and process the results using a handler per chunk    |
 
 The same functions for with collection groups also.
 

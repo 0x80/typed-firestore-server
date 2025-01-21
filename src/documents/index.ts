@@ -1,3 +1,4 @@
+export * from "./add-document";
 export * from "./get-document";
 export * from "./get-document-data";
 export * from "./get-specific-document";

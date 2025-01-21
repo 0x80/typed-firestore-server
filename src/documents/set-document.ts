@@ -13,9 +13,7 @@ export async function setDocument<T extends UnknownObject>(
   data: WithFieldValue<T>,
   options: SetOptions = {}
 ) {
-  const docRef = ref.doc(documentId);
-
-  await docRef.set(data, options);
+  await ref.doc(documentId).set(data, options);
 }
 
 export function setDocumentInTransaction<T extends UnknownObject>(
@@ -25,7 +23,5 @@ export function setDocumentInTransaction<T extends UnknownObject>(
   data: WithFieldValue<T>,
   options: SetOptions = {}
 ) {
-  const docRef = ref.doc(documentId);
-
-  tx.set(docRef, data, options);
+  tx.set(ref.doc(documentId), data, options);
 }

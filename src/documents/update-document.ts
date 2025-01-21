@@ -15,9 +15,7 @@ export async function updateDocument<T extends UnknownObject>(
   documentId: string,
   data: UpdateData<T>
 ) {
-  const docRef = ref.doc(documentId);
-
-  await docRef.update(data);
+  await ref.doc(documentId).update(data);
 }
 
 export async function updateDocumentWithPartial<T extends UnknownObject>(
@@ -25,9 +23,7 @@ export async function updateDocumentWithPartial<T extends UnknownObject>(
   documentId: string,
   data: Partial<T>
 ) {
-  const docRef = ref.doc(documentId);
-
-  await docRef.update(data);
+  await ref.doc(documentId).update(data);
 }
 
 export function updateDocumentInTransaction<T extends UnknownObject>(
@@ -36,9 +32,7 @@ export function updateDocumentInTransaction<T extends UnknownObject>(
   documentId: string,
   data: UpdateData<T>
 ) {
-  const docRef = ref.doc(documentId);
-
-  tx.update(docRef, data);
+  tx.update(ref.doc(documentId), data);
 }
 
 export function updateDocumentWithPartialInTransaction<T extends UnknownObject>(
@@ -47,7 +41,5 @@ export function updateDocumentWithPartialInTransaction<T extends UnknownObject>(
   documentId: string,
   data: Partial<T>
 ) {
-  const docRef = ref.doc(documentId);
-
-  tx.update(docRef, data as UpdateData<T>);
+  tx.update(ref.doc(documentId), data as UpdateData<T>);
 }

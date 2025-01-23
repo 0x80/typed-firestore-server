@@ -3,7 +3,7 @@ import {
   type Transaction,
   type UpdateData,
 } from "firebase-admin/firestore";
-import type { UnknownObject } from "~/types";
+import type { PartialWithFieldValue, UnknownObject } from "~/types";
 
 /**
  * Update a document in a collection. You would only use this if you do not
@@ -19,8 +19,8 @@ export async function updateSpecificDocument<T extends UnknownObject>(
 
 export async function updateSpecificDocumentWithPartial<
   T extends UnknownObject,
->(ref: DocumentReference<T>, data: Partial<T>) {
-  await ref.update(data);
+>(ref: DocumentReference<T>, data: PartialWithFieldValue<T>) {
+  await ref.update(data as UpdateData<T>);
 }
 
 export function updateSpecificDocumentInTransaction<T extends UnknownObject>(
@@ -33,6 +33,6 @@ export function updateSpecificDocumentInTransaction<T extends UnknownObject>(
 
 export function updateSpecificDocumentWithPartialInTransaction<
   T extends UnknownObject,
->(tx: Transaction, ref: DocumentReference<T>, data: Partial<T>) {
+>(tx: Transaction, ref: DocumentReference<T>, data: PartialWithFieldValue<T>) {
   tx.update(ref, data as UpdateData<T>);
 }

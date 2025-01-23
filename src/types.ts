@@ -1,11 +1,17 @@
 import type {
   DocumentReference,
+  FieldValue,
   Transaction,
   UpdateData,
   WriteResult,
 } from "firebase-admin/firestore";
 
 export type UnknownObject = Record<string, unknown>;
+
+/** Makes each property in T optional and allows FieldValue as a value */
+export type PartialWithFieldValue<T> = {
+  [P in keyof T]?: T[P] | FieldValue;
+};
 
 /**
  * A simple serialize-able document type. Use this when defining functions that
@@ -19,12 +25,10 @@ export type FsDocument<T> = Readonly<{
 export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
   ref: DocumentReference;
   update: (data: UpdateData<TFull>) => Promise<WriteResult>;
-  /**
-   * The Firestore `UpdateData` type which allows the use of FieldValue
-   * sometimes does not accept perfectly valid data. This is an alternative
-   * without FieldValue.
-   */
-  updateWithPartial: (data: Partial<TFull>) => Promise<WriteResult>;
+  /** Like Partial<T> but also accepts FieldValue for any property. */
+  updateWithPartial: (
+    data: PartialWithFieldValue<TFull>
+  ) => Promise<WriteResult>;
   delete: () => Promise<WriteResult>;
 }> &
   FsDocument<TNarrowOrFull>;
@@ -35,12 +39,8 @@ export type FsMutableDocumentInTransaction<
 > = Readonly<{
   ref: DocumentReference;
   update: (data: UpdateData<TFull>) => Transaction;
-  /**
-   * The Firestore `UpdateData` type which allows the use of FieldValue
-   * sometimes does not accept perfectly valid data. This is an alternative
-   * without FieldValue.
-   */
-  updateWithPartial: (data: Partial<TFull>) => Transaction;
+  /** Like Partial<T> but also accepts FieldValue for any property. */
+  updateWithPartial: (data: PartialWithFieldValue<TFull>) => Transaction;
   delete: () => Transaction;
 }> &
   FsDocument<TNarrowOrFull>;

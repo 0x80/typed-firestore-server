@@ -33,7 +33,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "pnpm@9.15.3",
+  "packageManager": "pnpm@10.0.0",
   "engines": {
     "node": ">=20"
   },

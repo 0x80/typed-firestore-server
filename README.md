@@ -2,16 +2,22 @@
 
 Elegant, typed abstractions for Firestore in server environments.
 
-> This library is still experimental. I am in the process of finalizing the 1.0
-> API in the coming days.
-
-All functions are designed to take a re-usable typed collection reference as
-their first argument. The various functions can infer their return type from it,
-which greatly reduces boilerplate code as well as the risk of making mistakes.
+- A non-intrusive, easy-to-adopt API without lock-in
+- Write clean, readable, strongly-typed code, without the need to cast or even
+  import types
+- Greatly reduce the risk of mistakes
+- Simplify transaction code
+- Conveniently get data from cloud function events
 
 For React applications check out
 [@typed-firestore/react](https://github.com/0x80/typed-firestore-react) which
 uses similar abstractions.
+
+Using these abstractions, you can write very safe code. The only thing to keep
+in mind is to **always write your select statement separate** from the query.
+For more info see
+[Handling Collections and Queries](#handling-collections-and-queries) for more
+information.
 
 ## Installation
 
@@ -19,10 +25,14 @@ uses similar abstractions.
 
 ## Usage
 
-### Type Your Database Collections
+### Typing Your Database
 
-Create a file in which you define refs for all of your database collections, and
-map each to the appropriate type, as shown below.
+All functions are designed to take a re-usable typed collection reference as one
+of their arguments. The various functions can infer their return type from it,
+and apply the necessary restrictions.
+
+Start by creating a file in which you define refs for all of your database
+collections, and map each to the appropriate type, as shown below.
 
 ```ts
 // db-refs.ts
@@ -44,6 +54,10 @@ export const refs = {
   /** This object never needs to change */
 } as const;
 ```
+
+If you have collections that mix files with different types, you can declare the
+type for each individual document using a `DocumentReference` and use the
+functions that are focused on specific documents, like `getSpecificDocument`.
 
 ### Handling Single Documents
 
@@ -68,8 +82,8 @@ await runTransaction(async (tx) => {
   const user = await getDocumentInTransaction(tx, refs.users, "id123");
 
   /**
-   * In this case, the typed update function calls the transaction, and is
-   * therefore not async. It will execute when the transaction is committed.
+   * In this case, the update function calls the transaction, and is therefore
+   * not async. Instead, it will execute when the transaction is committed.
    */
   user.update({
     /** Properties here will be restricted to what is available in the User type */
@@ -83,12 +97,18 @@ await runTransaction(async (tx) => {
 ### Handling Collections and Queries
 
 The functions that work with collections should look familiar, but there is one
-things to always keep in mind:
+thing to always keep in mind:
 
 The optional `select` statement should **ALWAYS** be defined separately from the
-query. You can still set it on the query directly, because that part is still
-the official Firestore API, but then your data will **not be typed correctly**
-and it can lead to **painful mistakes**, so keep that in mind.
+query, otherwise we can not narrow the returned type correctly.
+
+Because the query part is using the official Firestore API, you can still place
+a select on the query, but then your data will **not be typed correctly** and it
+can lead to **painful mistakes**, so try to keep that in mind!
+
+This is not a risk introduced by this library. If you use the official
+`.select()` API you are always at risk because you would have to type the result
+manually.
 
 ```ts
 import { refs } from "./db-refs";
@@ -151,9 +171,7 @@ const publishedBooks = await getDocuments(refs.books, (query) =>
 /**
  * Similar to processDocuments, the data can be narrowed by passing a select
  * option separately. Here, allBooks is typed as FsMutableDocument<Pick<Book,
- * "author"
- *
- * | "title">>[]
+ * "author" | "title">>[]
  */
 const narrowPublishedBooks = await getDocuments(
   refs.books,

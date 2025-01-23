@@ -235,7 +235,15 @@ data and id.
 
 The mutable version `FsMutableDocument<T>` also provides a typed `update`
 function and the original `ref` in case you need to call any other native
-Firestore functions.
+Firestore APIs.
+
+The `update` function is typed using Firestore's official `UpdateData<T>` type,
+but this type is not perfect and it can reject nested data that is actually
+valid.
+
+For those situations we provide an alternative called `updateWithPartial`, which
+is based on `Partial<T>` while also allowing `FieldValue` types to be used for
+each of the root properties.
 
 ### Single Documents
 
@@ -311,4 +319,5 @@ It might be possible to create a clean fully-typed API for queries with some
 fancy type gymnastics, but that is not something I am willing to spend lots of
 time on.
 
-I think the trade-off for simplicity and familiarity is warranted.
+I think this trade-off, for the sake of simplicity and familiarity, is
+warranted.

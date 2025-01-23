@@ -25,7 +25,11 @@ export type FsDocument<T> = Readonly<{
 export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
   ref: DocumentReference;
   update: (data: UpdateData<TFull>) => Promise<WriteResult>;
-  /** Like Partial<T> but also accepts FieldValue for any property. */
+  /**
+   * The Firestore UpdateData<T> type can reject nested data that is perfectly
+   * valid. In those cases you have this as an alternative based on Partial<T>
+   * with FieldValue allowed for each root property.
+   */
   updateWithPartial: (
     data: PartialWithFieldValue<TFull>
   ) => Promise<WriteResult>;
@@ -39,7 +43,11 @@ export type FsMutableDocumentInTransaction<
 > = Readonly<{
   ref: DocumentReference;
   update: (data: UpdateData<TFull>) => Transaction;
-  /** Like Partial<T> but also accepts FieldValue for any property. */
+  /**
+   * The Firestore UpdateData<T> type can reject nested data that is perfectly
+   * valid. In those cases you have this as an alternative based on Partial<T>
+   * with FieldValue allowed for each root property.
+   */
   updateWithPartial: (data: PartialWithFieldValue<TFull>) => Transaction;
   delete: () => Transaction;
 }> &

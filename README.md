@@ -3,19 +3,19 @@
 Elegant, typed abstractions for Firestore in server environments.
 
 - A non-intrusive, easy-to-adopt API without lock-in
-- Write clean, readable, strongly-typed code, without the need to cast or even
-  import types
-- Greatly reduce the risk of mistakes
+- Write clean, strongly-typed code, without the need to manually apply types
+- Get correctly typed data when using select statements
 - Simplify transaction code
 - Conveniently get data from cloud function events
+- Easily process entire collections
 
 For React applications check out
 [@typed-firestore/react](https://github.com/0x80/typed-firestore-react) which
-uses similar abstractions.
+applies the same concepts.
 
-Using these abstractions, you can write very safe code. The only thing to keep
-in mind is to **always write your select statement separate** from the query.
-For more info see
+Using these abstractions, the risks of manually applying types are almost
+eliminated. The main thing to remember is to **always write your select
+statement separate** from the query. For more info see
 [Handling Collections and Queries](#handling-collections-and-queries) for more
 information.
 
@@ -28,8 +28,8 @@ information.
 ### Typing Your Database
 
 All functions are designed to take a re-usable typed collection reference as one
-of their arguments. The various functions can infer their return type from it,
-and apply the necessary restrictions.
+of their arguments. The functions can infer the other types from it, and apply
+the necessary restrictions.
 
 Start by creating a file in which you define refs for all of your database
 collections, and map each to the appropriate type, as shown below.
@@ -55,9 +55,13 @@ export const refs = {
 } as const;
 ```
 
-If you have collections that mix files with different types, you can declare the
-type for each individual document using a `DocumentReference` and use the
-functions that are focused on specific documents, like `getSpecificDocument`.
+The example above assumes that the documents in each collection are typed
+uniformly, which is typically the case.
+
+If you have collections with specific documents that have their own distinct
+type, you can declare the type for each individual document using a
+`DocumentReference`, and then use the functions that are focused on specific
+documents, like `getSpecificDocument`.
 
 ### Handling Single Documents
 
@@ -94,21 +98,67 @@ await runTransaction(async (tx) => {
 });
 ```
 
-### Handling Collections and Queries
+### Querying Collections
 
-The functions that work with collections should look familiar, but there is one
-thing to always keep in mind:
+When fetching documents from a collection you can choose to pass a query, and
+without it, you will get the entire collection. By default, documents are
+fetched in batches of 500.
 
-The optional `select` statement should **ALWAYS** be defined separately from the
-query, otherwise we can not narrow the returned type correctly.
+```ts
+/**
+ * Fetch an entire collection, where allBooks is typed to
+ * FsMutableDocument<Book>[]
+ */
+const allBooks = await getDocuments(refs.books);
 
-Because the query part is using the official Firestore API, you can still place
-a select on the query, but then your data will **not be typed correctly** and it
-can lead to **painful mistakes**, so try to keep that in mind!
+/** Fetch documents using a query */
+const publishedBooks = await getDocuments(refs.books, (query) =>
+  query.where("is_published", "==", true)
+);
 
-This is not a risk introduced by this library. If you use the official
-`.select()` API you are always at risk because you would have to type the result
-manually.
+/**
+ * With a select statement, the data and type can be narrowed simultaneously. In
+ * this example, publishedBooks is typed as FsMutableDocument<Pick<Book,
+ * "author"
+ *
+ * | "title">>[]
+ */
+const publishedBooks = await getDocuments(
+  refs.books,
+  (query) => query.where("is_published", "==", true),
+  { select: ["author", "title"] }
+);
+```
+
+All functions also support collection groups. You simply pass it a typed
+`CollectionGroup` instead of a typed `CollectionReference`.
+
+```ts
+const groupRef = db.collectionGroup(
+  "wishlist"
+) as CollectionGroup<WishlistItem>;
+
+const allWishlistItems = await getDocuments(groupRef, (query) =>
+  query.where("is_archived", "==", false)
+);
+```
+
+### Processing Collections
+
+It is common to want to process many or all documents in a collection. For
+example when you want to make an analysis or migrate documents to an updated
+schema type.
+
+The processing functions are very similar to the query functions, but in
+addition you pass a handler that gets called for each document, or each chunk of
+documents.
+
+The handlers are awaited for each batch of documents, so memory only holds on to
+one chunk at a time, making it possible to iterate over millions of documents
+with constant low memory usage.
+
+The query part is again optional, and without it you will process the entire
+collection.
 
 ```ts
 import { refs } from "./db-refs";
@@ -121,12 +171,11 @@ import { processDocuments } from "@typed-firestore/server";
 await processDocuments(refs.books,
   (query) => query.where("is_published", "==", true),
   async (book) => {
-    /** Only title and is_published are available here, because we selected them! */
+    /** Only title and is_published are available here, because we selected them below */
     console.log(book.author, book.title);
   },
   /**
-   * Select is defined separately from the query, because otherwise we can't
-   * enforce typing on the result.
+   * Select should be defined separately from the query, because otherwise we can not narrow the type.
    */
   { select: ["author", "title"] }
 );
@@ -150,56 +199,11 @@ await processDocuments(refs.userWishlist(user.id), null, {
 });
 ```
 
-Fetching documents from a collection is very similar to processing documents.
-The query part is optional and without it you will fetch the full collection.
+### Cloud Function Utilities
 
-Only in this case, instead of passing null for the query, you can also not pass
-anything.
-
-```ts
-/**
- * Fetch an entire collection, where allBooks is typed to
- * FsMutableDocument<Book>[]
- */
-const allBooks = await getDocuments(refs.books);
-
-/** Fetch documents using a query */
-const publishedBooks = await getDocuments(refs.books, (query) =>
-  query.where("is_published", "==", true)
-);
-
-/**
- * Similar to processDocuments, the data can be narrowed by passing a select
- * option separately. Here, allBooks is typed as FsMutableDocument<Pick<Book,
- * "author" | "title">>[]
- */
-const narrowPublishedBooks = await getDocuments(
-  refs.books,
-  (query) => query.where("is_published", "==", true),
-  { select: ["author", "title"] }
-);
-```
-
-All functions also support collection groups. You simply pass in a typed
-CollectionGroup instead of a typed CollectionReference.
-
-```ts
-/**
- * If you use this regularly, place the ref in the db-refs.ts file together with
- * the others.
- */
-const groupRef = db.collectionGroup(
-  "wishlist"
-) as CollectionGroup<WishlistItem>;
-
-const allWishlistItems = await getDocuments(groupRef, (query) =>
-  query.where("is_archived", "==", false)
-);
-```
-
-For cloud functions, there are helpers to get the data from the event.
-Unfortunately here we do not have access to a typed collection reference, so we
-need to pass the type manually.
+For cloud functions, there are helpers to get the data from the event. Here we
+pass the typed collection reference purely for type inference, and to stay
+consistent with the other APIs.
 
 ```ts
 import { type Book } from "./types";
@@ -215,13 +219,31 @@ export const handleBookUpdates = onDocumentWritten(
   },
   async (event) => {
     /** Get only the most recent data */
-    const data = getDataOnWritten<Book>(event);
+    const data = getDataOnWritten(refs.books, event);
 
     /** Get the before and after the write event */
-    const [before, after] = getBeforeAndAfterOnWritten<Book>(event);
+    const [before, after] = getBeforeAndAfterOnWritten(refs.books, event);
   }
 );
 ```
+
+## Keep Select Separate from Query
+
+The functions that work with collections should look very familiar, but there
+also lies a problem:
+
+The optional `select` statement should **ALWAYS** be defined separately from the
+query, otherwise the returned type will not be narrowed correctly.
+
+Because the query part is still the original Firestore API, nothing will prevent
+you from using a select on the query, but as a result your data will **not be
+typed correctly** and it could lead to **painful mistakes**, so try to keep this
+in mind!
+
+To be clear, the risk itself is not caused by this library. Using
+`.select("a", "b", "c")` the standard way is always risky, because you would
+have to align it manually with a `Pick<T, 'a' | 'b' | 'c'>`, which is obviously
+worse.
 
 ## API
 

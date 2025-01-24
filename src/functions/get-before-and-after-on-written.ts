@@ -1,3 +1,4 @@
+import type { CollectionReference } from "firebase-admin/firestore";
 import type { Change } from "firebase-functions";
 import type {
   DocumentSnapshot,
@@ -9,6 +10,7 @@ import {
 } from "./helpers/get-event-data";
 
 export function getBeforeAndAfterOnWritten<T>(
+  _collectionRef: CollectionReference<T>,
   event: FirestoreEvent<Change<DocumentSnapshot> | undefined>
 ): readonly [T | undefined, T | undefined] {
   return [

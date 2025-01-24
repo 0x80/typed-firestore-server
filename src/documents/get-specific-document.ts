@@ -1,5 +1,5 @@
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
-import type { UnknownObject } from "~/types";
+import type { FsData } from "~/types";
 import { invariant } from "~/utils";
 import {
   makeMutableDocument,
@@ -10,7 +10,7 @@ import {
  * When you have a collection with differently typed documents, you can define
  * document refs for each of them specifically
  */
-export async function getSpecificDocument<T extends UnknownObject>(
+export async function getSpecificDocument<T extends FsData>(
   ref: DocumentReference<T>
 ) {
   const doc = await ref.get();
@@ -20,7 +20,7 @@ export async function getSpecificDocument<T extends UnknownObject>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getSpecificDocumentInTransaction<T extends UnknownObject>(
+export async function getSpecificDocumentInTransaction<T extends FsData>(
   tx: Transaction,
   ref: DocumentReference<T>
 ) {

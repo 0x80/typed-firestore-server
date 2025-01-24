@@ -9,11 +9,11 @@ import {
   makeMutableDocument,
   makeMutableDocumentInTransaction,
 } from "~/documents";
-import type { FsMutableDocument, UnknownObject } from "~/types";
+import type { FsData, FsMutableDocument } from "~/types";
 import type { SelectedDocument } from "./types";
 
 export async function getFirstDocument<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
@@ -37,7 +37,7 @@ export async function getFirstDocument<
 }
 
 export async function getFirstDocumentInTransaction<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(

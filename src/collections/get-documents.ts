@@ -10,16 +10,16 @@ import {
   makeMutableDocumentInTransaction,
 } from "~/documents";
 import type {
+  FsData,
   FsMutableDocument,
   FsMutableDocumentInTransaction,
-  UnknownObject,
 } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getDocumentsBatch } from "./helpers";
 import type { SelectedDocument } from "./types";
 
 export type GetDocumentsOptions<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 > = {
@@ -36,7 +36,7 @@ export type GetDocumentsOptions<
 };
 
 export function getDocuments<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
@@ -81,7 +81,7 @@ export function getDocuments<
  * count to be close to the maximum.
  */
 export async function getDocumentsInTransaction<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(

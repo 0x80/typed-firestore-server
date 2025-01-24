@@ -6,11 +6,11 @@ import type {
   WriteResult,
 } from "firebase-admin/firestore";
 
-export type UnknownObject = Record<string, unknown>;
+export type FsData = Record<string, unknown>;
 
-/** Makes each property in T optional and allows FieldValue as a value */
+/** Makes each root property optional and allows FieldValue as a value */
 export type PartialWithFieldValue<T> = {
-  [P in keyof T]?: T[P] | FieldValue;
+  [P in keyof T]?: T[P] extends object ? T[P] : T[P] | FieldValue;
 };
 
 /**

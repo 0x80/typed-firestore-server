@@ -1,7 +1,7 @@
 import type { DocumentSnapshot } from "firebase-admin/firestore";
-import type { FsDocument, UnknownObject } from "~/types";
+import type { FsData, FsDocument } from "~/types";
 
-export function makeDocument<T extends UnknownObject>(
+export function makeDocument<T extends FsData>(
   doc: DocumentSnapshot<T>
 ): FsDocument<T> {
   return {

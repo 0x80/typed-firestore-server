@@ -1,6 +1,6 @@
-import type { UnknownObject } from "~/types";
+import type { FsData } from "~/types";
 
-export function isPlainObject(value: unknown): value is UnknownObject {
+export function isPlainObject(value: unknown): value is FsData {
   if (typeof value !== "object" || value === null) return false;
 
   const proto = Object.getPrototypeOf(value) as object | null;

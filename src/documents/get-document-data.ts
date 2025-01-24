@@ -2,10 +2,10 @@ import type {
   CollectionReference,
   Transaction,
 } from "firebase-admin/firestore";
-import type { UnknownObject } from "~/types";
+import type { FsData } from "~/types";
 import { invariant } from "~/utils";
 
-export async function getDocumentData<T extends UnknownObject>(
+export async function getDocumentData<T extends FsData>(
   ref: CollectionReference<T>,
   documentId: string
 ) {
@@ -16,7 +16,7 @@ export async function getDocumentData<T extends UnknownObject>(
   return doc.data()!;
 }
 
-export async function getDocumentDataMaybe<T extends UnknownObject>(
+export async function getDocumentDataMaybe<T extends FsData>(
   ref: CollectionReference<T>,
   documentId?: string | null
 ) {
@@ -29,7 +29,7 @@ export async function getDocumentDataMaybe<T extends UnknownObject>(
   return doc.data()!;
 }
 
-export async function getDocumentDataInTransaction<T extends UnknownObject>(
+export async function getDocumentDataInTransaction<T extends FsData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string
@@ -41,9 +41,11 @@ export async function getDocumentDataInTransaction<T extends UnknownObject>(
   return doc.data()!;
 }
 
-export async function getDocumentDataInTransactionMaybe<
-  T extends UnknownObject,
->(tx: Transaction, ref: CollectionReference<T>, documentId?: string | null) {
+export async function getDocumentDataInTransactionMaybe<T extends FsData>(
+  tx: Transaction,
+  ref: CollectionReference<T>,
+  documentId?: string | null
+) {
   if (!documentId) return;
 
   const doc = await tx.get(ref.doc(documentId));

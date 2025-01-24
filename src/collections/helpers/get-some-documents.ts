@@ -4,16 +4,13 @@ import type {
   QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
-import type { FsMutableDocument, UnknownObject } from "~/types";
+import type { FsData, FsMutableDocument } from "~/types";
 
 /**
  * Returns [documents, lastDocumentSnapshot], so that the last document snapshot
  * can be passed in as the "startAfter" argument.
  */
-export async function getSomeDocuments<
-  T extends UnknownObject,
-  TFull extends UnknownObject,
->(
+export async function getSomeDocuments<T extends FsData, TFull extends FsData>(
   query: Query,
   startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,
   batchSize: number,

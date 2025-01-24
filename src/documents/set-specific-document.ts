@@ -4,13 +4,13 @@ import type {
   Transaction,
   WithFieldValue,
 } from "firebase-admin/firestore";
-import type { UnknownObject } from "~/types";
+import type { FsData } from "~/types";
 
 /**
  * Create or overwrite a document in a collection where each document is typed
  * separately.
  */
-export async function setSpecificDocument<T extends UnknownObject>(
+export async function setSpecificDocument<T extends FsData>(
   ref: DocumentReference<T>,
   data: WithFieldValue<T>,
   options: SetOptions = {}
@@ -18,7 +18,7 @@ export async function setSpecificDocument<T extends UnknownObject>(
   await ref.set(data, options);
 }
 
-export function setSpecificDocumentInTransaction<T extends UnknownObject>(
+export function setSpecificDocumentInTransaction<T extends FsData>(
   tx: Transaction,
   ref: DocumentReference<T>,
   data: WithFieldValue<T>,

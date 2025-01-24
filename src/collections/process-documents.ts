@@ -5,7 +5,7 @@ import type {
   QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { processInChunks, processInChunksByChunk } from "process-in-chunks";
-import type { FsMutableDocument, UnknownObject } from "~/types";
+import type { FsData, FsMutableDocument } from "~/types";
 import {
   getErrorMessage,
   isDefined,
@@ -17,7 +17,7 @@ import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
 import type { SelectedDocument } from "./types";
 
-type ProcessDocumentsOptions<T extends UnknownObject> = {
+type ProcessDocumentsOptions<T extends FsData> = {
   select?: (keyof T)[];
   batchSize?: number;
   limitToFirstBatch?: boolean;
@@ -29,7 +29,7 @@ type ProcessDocumentsOptions<T extends UnknownObject> = {
  * collection is retrieved. An optional select statement can narrow the data.
  */
 export async function processDocuments<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(
@@ -102,7 +102,7 @@ export async function processDocuments<
  * statement can narrow the data.
  */
 export async function processDocumentsByChunk<
-  T extends UnknownObject,
+  T extends FsData,
   K extends keyof T = keyof T,
   S extends K[] | undefined = undefined,
 >(

@@ -5,9 +5,9 @@ import type {
   UpdateData,
 } from "firebase-admin/firestore";
 import type {
+  FsData,
   FsMutableDocument,
   FsMutableDocumentInTransaction,
-  UnknownObject,
 } from "~/types";
 
 /** Makes each property in T optional and allows FieldValue as a value */
@@ -16,8 +16,8 @@ type PartialWithFieldValue<T> = {
 };
 
 export function makeMutableDocument<
-  TNarrowOrFull extends UnknownObject,
-  TFull extends UnknownObject = TNarrowOrFull,
+  TNarrowOrFull extends FsData,
+  TFull extends FsData = TNarrowOrFull,
 >(
   doc: DocumentSnapshot<TNarrowOrFull>
 ): FsMutableDocument<TNarrowOrFull, TFull> {
@@ -33,8 +33,8 @@ export function makeMutableDocument<
 }
 
 export function makeMutableDocumentInTransaction<
-  TNarrowOrFull extends UnknownObject,
-  TFull extends UnknownObject = TNarrowOrFull,
+  TNarrowOrFull extends FsData,
+  TFull extends FsData = TNarrowOrFull,
 >(
   doc: DocumentSnapshot<TNarrowOrFull>,
   tx: Transaction

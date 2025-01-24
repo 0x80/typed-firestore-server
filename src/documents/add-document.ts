@@ -2,9 +2,9 @@ import {
   CollectionReference,
   type WithFieldValue,
 } from "firebase-admin/firestore";
-import type { UnknownObject } from "~/types";
+import type { FsData } from "~/types";
 
-export async function addDocument<T extends UnknownObject>(
+export async function addDocument<T extends FsData>(
   ref: CollectionReference<T>,
   data: WithFieldValue<T>
 ) {

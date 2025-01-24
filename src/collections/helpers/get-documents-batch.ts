@@ -1,12 +1,9 @@
 import type { Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
-import type { FsMutableDocument, UnknownObject } from "~/types";
+import type { FsData, FsMutableDocument } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "../constants";
 import { getSomeDocuments } from "./get-some-documents";
 
-export async function getDocumentsBatch<
-  T extends UnknownObject,
-  TFull extends UnknownObject,
->(
+export async function getDocumentsBatch<T extends FsData, TFull extends FsData>(
   query: Query,
   options: { limitToFirstBatch?: boolean } = {}
 ): Promise<FsMutableDocument<T, TFull>[]> {

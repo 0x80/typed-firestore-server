@@ -3,14 +3,14 @@ import {
   type Transaction,
   type UpdateData,
 } from "firebase-admin/firestore";
-import type { PartialWithFieldValue, UnknownObject } from "~/types";
+import type { FsData, PartialWithFieldValue } from "~/types";
 
 /**
  * Update a document in a collection. You would only use this if you do not
  * already have a handle to a FsMutableDocument, because that has typed `update`
  * and `updateWithPartial` methods.
  */
-export async function updateDocument<T extends UnknownObject>(
+export async function updateDocument<T extends FsData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: UpdateData<T>
@@ -18,7 +18,7 @@ export async function updateDocument<T extends UnknownObject>(
   await ref.doc(documentId).update(data);
 }
 
-export async function updateDocumentWithPartial<T extends UnknownObject>(
+export async function updateDocumentWithPartial<T extends FsData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: PartialWithFieldValue<T>
@@ -26,7 +26,7 @@ export async function updateDocumentWithPartial<T extends UnknownObject>(
   await ref.doc(documentId).update(data as UpdateData<T>);
 }
 
-export function updateDocumentInTransaction<T extends UnknownObject>(
+export function updateDocumentInTransaction<T extends FsData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,
@@ -35,7 +35,7 @@ export function updateDocumentInTransaction<T extends UnknownObject>(
   tx.update(ref.doc(documentId), data);
 }
 
-export function updateDocumentWithPartialInTransaction<T extends UnknownObject>(
+export function updateDocumentWithPartialInTransaction<T extends FsData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,

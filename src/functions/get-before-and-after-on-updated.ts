@@ -1,5 +1,6 @@
 import type {
   CollectionReference,
+  DocumentReference,
   DocumentSnapshot,
 } from "firebase-admin/firestore";
 import type { Change } from "firebase-functions";
@@ -10,7 +11,7 @@ import {
 } from "./helpers/get-event-data";
 
 export function getBeforeAndAfterOnUpdated<T>(
-  _collectionRef: CollectionReference<T>,
+  _ref: CollectionReference<T> | DocumentReference<T>,
   event: FirestoreEvent<Change<DocumentSnapshot> | undefined>
 ): readonly [T | undefined, T | undefined] {
   return [getEventDataBefore<T>(event), getEventDataAfter<T>(event)] as const;

@@ -8,9 +8,23 @@ import type {
 
 export type FsData = Record<string, unknown>;
 
-/** Makes each root property optional and allows FieldValue as a value */
-export type PartialWithFieldValue<T> = {
-  [P in keyof T]?: T[P] extends object ? T[P] : T[P] | FieldValue;
+/**
+ * Makes each property in T optional and allows FieldValue as a value for
+ * everything. A more loose version of FsPartialWithFieldValue that Firestore
+ * provides.
+ */
+export type FsPartialWithFieldValue<T> = {
+  [P in keyof T]?: T[P] | FieldValue;
+};
+
+/**
+ * A type that enforces FieldValue for specified properties while preserving the
+ * original types for other properties. This is useful when you want to set
+ * FieldValues, but also pass the data on to other functions that want to use
+ * the other properties in their original type.
+ */
+export type WithFieldValueProperties<T, K extends keyof T> = {
+  [P in keyof T]: P extends K ? FieldValue : T[P];
 };
 
 /**
@@ -31,7 +45,7 @@ export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
    * with FieldValue allowed for each root property.
    */
   updateWithPartial: (
-    data: PartialWithFieldValue<TFull>
+    data: FsPartialWithFieldValue<TFull>
   ) => Promise<WriteResult>;
   delete: () => Promise<WriteResult>;
 }> &
@@ -48,7 +62,7 @@ export type FsMutableDocumentInTransaction<
    * valid. In those cases you have this as an alternative based on Partial<T>
    * with FieldValue allowed for each root property.
    */
-  updateWithPartial: (data: PartialWithFieldValue<TFull>) => Transaction;
+  updateWithPartial: (data: FsPartialWithFieldValue<TFull>) => Transaction;
   delete: () => Transaction;
 }> &
   FsDocument<TNarrowOrFull>;

@@ -3,7 +3,7 @@ import {
   type Transaction,
   type UpdateData,
 } from "firebase-admin/firestore";
-import type { FsData, PartialWithFieldValue } from "~/types";
+import type { FsData, FsPartialWithFieldValue } from "~/types";
 
 /**
  * Update a document in a collection. You would only use this if you do not
@@ -19,7 +19,7 @@ export async function updateSpecificDocument<T extends FsData>(
 
 export async function updateSpecificDocumentWithPartial<T extends FsData>(
   ref: DocumentReference<T>,
-  data: PartialWithFieldValue<T>
+  data: FsPartialWithFieldValue<T>
 ) {
   await ref.update(data as UpdateData<T>);
 }
@@ -34,6 +34,10 @@ export function updateSpecificDocumentInTransaction<T extends FsData>(
 
 export function updateSpecificDocumentWithPartialInTransaction<
   T extends FsData,
->(tx: Transaction, ref: DocumentReference<T>, data: PartialWithFieldValue<T>) {
+>(
+  tx: Transaction,
+  ref: DocumentReference<T>,
+  data: FsPartialWithFieldValue<T>
+) {
   tx.update(ref, data as UpdateData<T>);
 }

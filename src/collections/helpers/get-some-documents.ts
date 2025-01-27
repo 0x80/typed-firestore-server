@@ -33,9 +33,12 @@ export async function getSomeDocuments<T extends FsData, TFull extends FsData>(
     makeMutableDocument<T, TFull>(doc as DocumentSnapshot<T>)
   );
 
-  /** Do not return the last snapshot if this batch was the last batch */
+  /**
+   * Return undefined if this batch was smaller than the requested size, meaning
+   * we've reached the end
+   */
   const lastDocumentSnapshot =
-    documents.length === batchSize ? snapshot.docs.at(-1) : undefined;
+    documents.length < batchSize ? undefined : snapshot.docs.at(-1);
 
   return [
     documents,

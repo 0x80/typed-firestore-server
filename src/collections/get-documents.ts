@@ -13,7 +13,7 @@ import type {
   FsMutableDocument,
   FsMutableDocumentInTransaction,
 } from "~/types";
-import { buildQuery, getDocumentsBatched } from "./helpers";
+import { buildQuery, getDocumentsChunked } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 export type GetDocumentsOptions<
@@ -21,6 +21,7 @@ export type GetDocumentsOptions<
   S extends (keyof T)[] | undefined = undefined,
 > = {
   select?: S;
+  chunkSize?: number;
 };
 
 export async function getDocuments<
@@ -42,7 +43,10 @@ export async function getDocuments<
       )
     );
   } else {
-    return getDocumentsBatched<SelectedDocument<T, S>, T>(query);
+    return getDocumentsChunked<SelectedDocument<T, S>, T>(
+      query,
+      options.chunkSize
+    );
   }
 }
 

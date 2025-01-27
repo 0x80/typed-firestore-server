@@ -13,14 +13,14 @@ import {
   verboseCount,
   verboseLog,
 } from "~/utils";
-import { DEFAULT_BATCH_SIZE } from "./constants";
-import { getSomeDocuments } from "./helpers";
+import { DEFAULT_CHUNK_SIZE } from "./constants";
+import { getDocuments } from "./get-documents";
+import { buildQuery, getSomeDocuments } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 type ProcessDocumentsOptions<T extends FsData> = {
   select?: (keyof T)[];
-  batchSize?: number;
-  limitToFirstBatch?: boolean;
+  chunkSize?: number;
   throttleSeconds?: number;
 };
 
@@ -39,34 +39,14 @@ export async function processDocuments<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T> & { select?: S } = {}
 ) {
-  const {
-    throttleSeconds = 0,
-    limitToFirstBatch = false,
-    batchSize = DEFAULT_BATCH_SIZE,
-  } = options;
+  const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
 
-  const query = queryFn
-    ? options.select
-      ? queryFn(ref).select(...(options.select as string[]))
-      : queryFn(ref)
-    : ref;
-
-  let lastDocumentSnapshot:
-    | QueryDocumentSnapshot<SelectedDocument<T, S>>
-    | undefined;
-  let count = 0;
+  const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 
   const errors: { id: string; message: string }[] = [];
 
-  do {
-    verboseCount("Processing chunk");
-
-    const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
-      query,
-      lastDocumentSnapshot,
-      batchSize,
-      limitToFirstBatch
-    );
+  if (disableBatching) {
+    const documents = await getDocuments(ref, queryFn, options);
 
     await processInChunks(
       documents,
@@ -77,19 +57,46 @@ export async function processDocuments<
           errors.push({ id: doc.id, message: getErrorMessage(err) });
         }
       },
-      { throttleSeconds }
+      { throttleSeconds, chunkSize }
     );
+  } else {
+    let lastDocumentSnapshot:
+      | QueryDocumentSnapshot<SelectedDocument<T, S>>
+      | undefined;
+    let count = 0;
 
-    count += documents.length;
-    lastDocumentSnapshot = _lastDocumentSnapshot;
-  } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
+    do {
+      verboseCount("Processing chunk");
 
-  verboseLog(`Processed ${String(count)} documents`);
+      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+        query,
+        lastDocumentSnapshot,
+        chunkSize
+      );
 
-  if (errors.length > 0) {
-    errors.forEach(({ id, message }) => {
-      console.error(`${id}: ${message}`);
-    });
+      await processInChunks(
+        documents,
+        async (doc) => {
+          try {
+            await handler(doc);
+          } catch (err) {
+            errors.push({ id: doc.id, message: getErrorMessage(err) });
+          }
+        },
+        { throttleSeconds, chunkSize }
+      );
+
+      count += documents.length;
+      lastDocumentSnapshot = _lastDocumentSnapshot;
+    } while (isDefined(lastDocumentSnapshot));
+
+    verboseLog(`Processed ${String(count)} documents`);
+
+    if (errors.length > 0) {
+      errors.forEach(({ id, message }) => {
+        console.error(`${id}: ${message}`);
+      });
+    }
   }
 }
 
@@ -111,38 +118,14 @@ export async function processDocumentsByChunk<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T> & { select?: S } = {}
 ) {
-  const {
-    throttleSeconds = 0,
-    limitToFirstBatch = false,
-    batchSize = DEFAULT_BATCH_SIZE,
-  } = options;
+  const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
 
-  const query = queryFn
-    ? options.select
-      ? queryFn(ref).select(...(options.select as string[]))
-      : queryFn(ref)
-    : ref;
-
-  let lastDocumentSnapshot:
-    | QueryDocumentSnapshot<SelectedDocument<T, S>>
-    | undefined;
-  let count = 0;
+  const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 
   const errors: string[] = [];
 
-  do {
-    verboseCount("Processing chunk");
-
-    const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
-      query,
-      lastDocumentSnapshot,
-      batchSize,
-      limitToFirstBatch
-    );
-
-    if (isEmpty(documents)) {
-      continue;
-    }
+  if (disableBatching) {
+    const documents = await getDocuments(ref, queryFn, options);
 
     try {
       await processInChunksByChunk(
@@ -150,21 +133,52 @@ export async function processDocumentsByChunk<
         async (docs) => {
           await handler(docs);
         },
-        { throttleSeconds }
+        { throttleSeconds, chunkSize }
       );
     } catch (err) {
       errors.push(getErrorMessage(err));
     }
+  } else {
+    let lastDocumentSnapshot:
+      | QueryDocumentSnapshot<SelectedDocument<T, S>>
+      | undefined;
+    let count = 0;
 
-    count += documents.length;
-    lastDocumentSnapshot = _lastDocumentSnapshot;
-  } while (isDefined(lastDocumentSnapshot) && !limitToFirstBatch);
+    do {
+      verboseCount("Processing chunk");
 
-  verboseLog(`Processed ${String(count)} documents`);
+      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+        query,
+        lastDocumentSnapshot,
+        chunkSize
+      );
 
-  if (errors.length > 0) {
-    errors.forEach((message) => {
-      console.error(message);
-    });
+      if (isEmpty(documents)) {
+        continue;
+      }
+
+      try {
+        await processInChunksByChunk(
+          documents,
+          async (docs) => {
+            await handler(docs);
+          },
+          { throttleSeconds, chunkSize }
+        );
+      } catch (err) {
+        errors.push(getErrorMessage(err));
+      }
+
+      count += documents.length;
+      lastDocumentSnapshot = _lastDocumentSnapshot;
+    } while (isDefined(lastDocumentSnapshot));
+
+    verboseLog(`Processed ${String(count)} documents`);
+
+    if (errors.length > 0) {
+      errors.forEach((message) => {
+        console.error(message);
+      });
+    }
   }
 }

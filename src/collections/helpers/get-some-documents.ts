@@ -13,8 +13,7 @@ import type { FsData, FsMutableDocument } from "~/types";
 export async function getSomeDocuments<T extends FsData, TFull extends FsData>(
   query: Query,
   startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,
-  batchSize: number,
-  limitToFirstBatch?: boolean
+  batchSize: number
 ): Promise<
   [FsMutableDocument<T, TFull>[], QueryDocumentSnapshot<T> | undefined]
 > {
@@ -40,8 +39,6 @@ export async function getSomeDocuments<T extends FsData, TFull extends FsData>(
 
   return [
     documents,
-    limitToFirstBatch
-      ? undefined
-      : (lastDocumentSnapshot as QueryDocumentSnapshot<T> | undefined),
+    lastDocumentSnapshot as QueryDocumentSnapshot<T> | undefined,
   ];
 }

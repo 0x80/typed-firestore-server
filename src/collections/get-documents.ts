@@ -34,13 +34,13 @@ export async function getDocuments<
   queryFn?: QueryBuilder | null,
   options: GetDocumentsOptions<T, S> = {}
 ): Promise<FsMutableDocument<SelectedDocument<T, S>, T>[]> {
-  const { query, disableBatching, limit } = buildQuery(
+  const { query, disableChunking, limit } = buildQuery(
     ref,
     queryFn,
     options.select
   );
 
-  if (disableBatching) {
+  if (disableChunking) {
     invariant(
       limit && limit <= MAX_QUERY_LIMIT,
       `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`

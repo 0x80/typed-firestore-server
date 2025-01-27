@@ -7,10 +7,13 @@ import { makeMutableDocument } from "~/documents";
 import type { FsData, FsMutableDocument } from "~/types";
 
 /**
- * Returns [documents, lastDocumentSnapshot], so that the last document snapshot
- * can be passed in as the "startAfter" argument.
+ * Returns [documents, lastSnapshot], so that the last document snapshot can be
+ * passed in as the "startAfter" argument in the next cycle.
  */
-export async function getSomeDocuments<T extends FsData, TFull extends FsData>(
+export async function getChunkOfDocuments<
+  T extends FsData,
+  TFull extends FsData,
+>(
   query: Query,
   startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,
   batchSize: number
@@ -37,11 +40,8 @@ export async function getSomeDocuments<T extends FsData, TFull extends FsData>(
    * Return undefined if this batch was smaller than the requested size, meaning
    * we've reached the end
    */
-  const lastDocumentSnapshot =
+  const lastSnapshot =
     documents.length < batchSize ? undefined : snapshot.docs.at(-1);
 
-  return [
-    documents,
-    lastDocumentSnapshot as QueryDocumentSnapshot<T> | undefined,
-  ];
+  return [documents, lastSnapshot as QueryDocumentSnapshot<T> | undefined];
 }

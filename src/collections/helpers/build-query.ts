@@ -27,7 +27,7 @@ export function buildQuery<T extends FsData>(
     "Select is not allowed to be set on the query. Use the options instead."
   );
 
-  const disableBatching = isDefined(limit);
+  const disableChunking = isDefined(limit);
 
   const query = queryFn
     ? optionsSelect
@@ -35,5 +35,5 @@ export function buildQuery<T extends FsData>(
       : queryFn(ref)
     : ref;
 
-  return { query, disableBatching, limit };
+  return { query, disableChunking, limit };
 }

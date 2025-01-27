@@ -16,7 +16,7 @@ import {
 } from "~/utils";
 import { DEFAULT_CHUNK_SIZE, MAX_QUERY_LIMIT } from "./constants";
 import { getDocuments } from "./get-documents";
-import { buildQuery, getSomeDocuments } from "./helpers";
+import { buildQuery, getChunkOfDocuments } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 type ProcessDocumentsOptions<
@@ -43,7 +43,7 @@ export async function processDocuments<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
 ) {
-  const { query, disableBatching, limit } = buildQuery(
+  const { query, disableChunking, limit } = buildQuery(
     ref,
     queryFn,
     options.select
@@ -53,7 +53,7 @@ export async function processDocuments<
 
   const errors: { id: string; message: string }[] = [];
 
-  if (disableBatching) {
+  if (disableChunking) {
     invariant(
       limit && limit <= MAX_QUERY_LIMIT,
       `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
@@ -81,7 +81,7 @@ export async function processDocuments<
     do {
       verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+      const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments(
         query,
         lastDocumentSnapshot,
         chunkSize
@@ -131,13 +131,13 @@ export async function processDocumentsByChunk<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
 ) {
-  const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
+  const { query, disableChunking } = buildQuery(ref, queryFn, options.select);
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 
   const errors: string[] = [];
 
-  if (disableBatching) {
+  if (disableChunking) {
     const documents = await getDocuments(ref, queryFn, options);
 
     try {
@@ -160,7 +160,7 @@ export async function processDocumentsByChunk<
     do {
       verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getSomeDocuments(
+      const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments(
         query,
         lastDocumentSnapshot,
         chunkSize

@@ -1,4 +1,4 @@
 export * from "./build-query";
-export * from "./get-documents-batched";
+export * from "./get-all-documents-chunked";
+export * from "./get-chunk-of-documents";
 export * from "./get-query-info";
-export * from "./get-some-documents";

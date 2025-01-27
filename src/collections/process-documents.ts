@@ -15,7 +15,7 @@ import {
 } from "~/utils";
 import { DEFAULT_BATCH_SIZE } from "./constants";
 import { getSomeDocuments } from "./helpers";
-import type { SelectedDocument } from "./types";
+import type { QueryBuilder, SelectedDocument } from "./types";
 
 type ProcessDocumentsOptions<T extends FsData> = {
   select?: (keyof T)[];
@@ -30,15 +30,12 @@ type ProcessDocumentsOptions<T extends FsData> = {
  */
 export async function processDocuments<
   T extends FsData,
-  K extends keyof T = keyof T,
-  S extends K[] | undefined = undefined,
+  S extends (keyof T)[] | undefined = undefined,
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
-  queryFn:
-    | ((collection: CollectionReference | CollectionGroup) => Query)
-    | null,
+  queryFn: QueryBuilder | null,
   handler: (
-    document: FsMutableDocument<SelectedDocument<T, K, S>, T>
+    document: FsMutableDocument<SelectedDocument<T, S>, T>
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T> & { select?: S } = {}
 ) {
@@ -55,7 +52,7 @@ export async function processDocuments<
     : ref;
 
   let lastDocumentSnapshot:
-    | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+    | QueryDocumentSnapshot<SelectedDocument<T, S>>
     | undefined;
   let count = 0;
 
@@ -103,15 +100,14 @@ export async function processDocuments<
  */
 export async function processDocumentsByChunk<
   T extends FsData,
-  K extends keyof T = keyof T,
-  S extends K[] | undefined = undefined,
+  S extends (keyof T)[] | undefined = undefined,
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn:
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
   handler: (
-    documents: FsMutableDocument<SelectedDocument<T, K, S>, T>[]
+    documents: FsMutableDocument<SelectedDocument<T, S>, T>[]
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T> & { select?: S } = {}
 ) {
@@ -128,7 +124,7 @@ export async function processDocumentsByChunk<
     : ref;
 
   let lastDocumentSnapshot:
-    | QueryDocumentSnapshot<SelectedDocument<T, K, S>>
+    | QueryDocumentSnapshot<SelectedDocument<T, S>>
     | undefined;
   let count = 0;
 

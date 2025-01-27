@@ -1,5 +1,14 @@
+import type {
+  CollectionGroup,
+  CollectionReference,
+  Query,
+} from "firebase-admin/firestore";
+
 export type SelectedDocument<
   T,
-  K extends keyof T,
-  S extends K[] | undefined,
-> = S extends K[] ? Pick<T, S[number]> : T;
+  S extends (keyof T)[] | undefined = undefined,
+> = S extends (keyof T)[] ? Pick<T, S[number]> : T;
+
+export type QueryBuilder = (
+  collection: CollectionReference | CollectionGroup
+) => Query;

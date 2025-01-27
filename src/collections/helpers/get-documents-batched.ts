@@ -3,10 +3,11 @@ import type { FsData, FsMutableDocument } from "~/types";
 import { DEFAULT_BATCH_SIZE } from "../constants";
 import { getSomeDocuments } from "./get-some-documents";
 
-export async function getDocumentsBatch<T extends FsData, TFull extends FsData>(
-  query: Query,
-  options: { limitToFirstBatch?: boolean } = {}
-): Promise<FsMutableDocument<T, TFull>[]> {
+/** This gets the documents in batches, overriding any limit set on the query */
+export async function getDocumentsBatched<
+  T extends FsData,
+  TFull extends FsData,
+>(query: Query): Promise<FsMutableDocument<T, TFull>[]> {
   const documents: FsMutableDocument<T, TFull>[] = [];
   let lastDocumentSnapshot: QueryDocumentSnapshot<T> | undefined;
 
@@ -14,8 +15,7 @@ export async function getDocumentsBatch<T extends FsData, TFull extends FsData>(
     const [chunk, _lastDocumentSnapshot] = await getSomeDocuments<T, TFull>(
       query,
       lastDocumentSnapshot,
-      DEFAULT_BATCH_SIZE,
-      options.limitToFirstBatch
+      DEFAULT_BATCH_SIZE
     );
 
     documents.push(...chunk);

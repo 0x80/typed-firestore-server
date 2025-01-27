@@ -2,22 +2,17 @@
 
 Elegant, typed abstractions for Firestore in server environments.
 
-- A non-intrusive, easy-to-adopt API without lock-in
-- Write clean, strongly-typed code, without the need to manually apply types
+- A non-intrusive, use-to-use API without lock-in
+- Write clean, strongly-typed code, without boilerplate
 - Get correctly typed data when using select statements
 - Simplify transaction code
 - Conveniently get data from cloud function events
 - Easily process entire collections
+- Minimize the risk of mistakes
 
 For React applications check out
 [@typed-firestore/react](https://github.com/0x80/typed-firestore-react) which
 applies the same concepts.
-
-Using these abstractions, the risks of manually applying types are almost
-eliminated. The main thing to remember is to **always write your select
-statement separate** from the query. For more info see
-[Handling Collections and Queries](#handling-collections-and-queries) for more
-information.
 
 ## Installation
 
@@ -59,9 +54,9 @@ The example above assumes that the documents in each collection are typed
 uniformly, which is typically the case.
 
 If you have collections with specific documents that have their own distinct
-type, you can declare the type for each individual document using a
-`DocumentReference`, and then use the functions that are focused on specific
-documents, like `getSpecificDocument`.
+types, you can declare the type for each individual document using a
+`DocumentReference`, and the API that is focused on specific documents, like
+`getSpecificDocument`.
 
 ### Handling Single Documents
 
@@ -126,6 +121,10 @@ const publishedBooks = await getDocuments(refs.books, (query) =>
 const publishedBooks = await getDocuments(
   refs.books,
   (query) => query.where("is_published", "==", true),
+  /**
+   * Select should be defined separately from the query, because otherwise we
+   * can not narrow the type.
+   */
   { select: ["author", "title"] }
 );
 ```
@@ -153,9 +152,9 @@ The processing functions are very similar to the query functions, but in
 addition you pass a handler that gets called for each document, or each chunk of
 documents.
 
-The handlers are awaited for each batch of documents, so memory only holds on to
-one chunk at a time, making it possible to iterate over millions of documents
-with constant low memory usage.
+The handlers are awaited for each batch of documents, so memory only has to hold
+on to one chunk at a time, making it possible to iterate over unlimited amounts
+of documents with constant low memory usage.
 
 The query part is again optional, and without it you will process the entire
 collection.
@@ -229,21 +228,21 @@ export const handleBookUpdates = onDocumentWritten(
 
 ## Keep Select Separate from Query
 
-The functions that work with collections should look very familiar, but there
-also lies a problem:
+The functions that work with collections should look very familiar, with the
+exception of the `select` option.
 
-The optional `select` statement should **ALWAYS** be defined separately from the
-query, otherwise the returned type will not be narrowed correctly.
+A `select` should always be defined separately from the query, otherwise the
+returned type will not be narrowed correctly.
 
 Because the query part is still the original Firestore API, nothing will prevent
-you from using a select on the query, but as a result your data will **not be
-typed correctly** and it could lead to **painful mistakes**, so try to keep this
-in mind!
+you from using a `select` on the query directly, but it will be detected at
+runtime and an error will be thrown.
 
-To be clear, the risk itself is not caused by this library. Using
-`.select("a", "b", "c")` the standard way is always risky, because you would
-have to align it manually with a `Pick<T, 'a' | 'b' | 'c'>`, which is obviously
-worse.
+## Limit Disables Batching
+
+If you use a `limit` on the query, it will be detected and the default batching
+mechanism will be disabled. As a result, all documents will be fetched in one
+go. Firestore has a limit of `1000` documents per query.
 
 ## API
 
@@ -288,21 +287,20 @@ each of the root properties.
 
 ### Collections and Queries
 
-| Function                        | Description                                                             |
-| ------------------------------- | ----------------------------------------------------------------------- |
-| `getDocuments`                  | Fetch documents using a query                                           |
-| `getDocumentsInTransaction`     | Fetch documents using a query as part of a transaction                  |
-| `getFirstDocument`              | Fetch the first document from a query                                   |
-| `getFirstDocumentInTransaction` | Fetch the first document from a query as part of a transaction          |
-| `processDocuments`              | Query a collection and process the results using a handler per document |
-| `processDocumentsByChunk`       | Query a collection and process the results using a handler per chunk    |
+| Function                    | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`              | Fetch documents using a query                                           |
+| `getDocumentsInTransaction` | Fetch documents using a query as part of a transaction                  |
+| `processDocuments`          | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk`   | Query a collection and process the results using a handler per chunk    |
 
-The same functions for with collection groups also.
+These functions will also work for collection groups.
 
 ### Cloud Functions
 
 When writing cloud functions, you typically need to get the data from the event
-and then process it. These functions take the event and return typed data.
+and then process it. The following functions take this event and return typed
+data.
 
 | Function                     | Description                                                |
 | ---------------------------- | ---------------------------------------------------------- |
@@ -321,25 +319,24 @@ need `firebase-functions` and as long as you only import code from
 
 Importing types should not affect this.
 
+The functions are only supporting 2nd gen cloud functions.
+
 ## Where Typing Was Ignored
 
 You might have noticed that the query `where()` function is still using the
-regular untyped Firestore API, and that is deliberate. I think this part would
-be difficult to type, and the API shape would be very different from the
-official API. Besides wanting strong typing, I also want this library to be
+official Firestore API. No typing is enforced here at the moment. I think this
+part would be difficult to type, and possibly the API shape would have to be
+very different. Besides wanting strong typing, I also want this library to be
 non-intrusive and easy to adopt.
 
 I would argue that the `where()` clause is the least critical part anyway. If
-you make a mistake with it, there is little chance to ruin in the database
-things and you will likely discover the problem during development.
+you make a mistake with it, there is little chance to ruin things in the
+database and you will likely discover the mistake already during development.
 
-In my experience, if you use a `select()` without matching typing, or send the
-wrong data to `update()` you can easily mess things up in a way that is risky or
-time consuming to restore, especially when writing database migration scripts.
+I suspect it might even be possible to create a fully-typed query builder
+function that looks like the official API, via some advanced type gymnastics,
+but that seems to be outside of my current capabilities, and it is not something
+I am willing to spend a lot of time on.
 
-It might be possible to create a clean fully-typed API for queries with some
-fancy type gymnastics, but that is not something I am willing to spend lots of
-time on.
-
-I think this trade-off, for the sake of simplicity and familiarity, is
+For now, I think this trade-off, for the sake of simplicity and familiarity, is
 warranted.

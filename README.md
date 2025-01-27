@@ -198,6 +198,11 @@ await processDocuments(refs.userWishlist(user.id), null, {
 });
 ```
 
+For these types of long-running operations, I typically want a bit of visual
+feedback to follow the progress. Set environment variable `VERBOSE` to `true` or
+`1`, to have the `getDocuments` and `processDocuments` function log information
+to the console about the chunks that are being fetched and processed.
+
 ### Cloud Function Utilities
 
 For cloud functions, there are helpers to get the data from the event. Here we

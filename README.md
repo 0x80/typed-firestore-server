@@ -281,18 +281,20 @@ each of the root properties.
 | `setSpecificDocument`                    | Create or overwrite a specific document                                   |
 | `setSpecificDocumentInTransaction`       | Create or overwrite a specific document as part of a transaction          |
 | `updateDocument`                         | Update a document                                                         |
-| `updateDocumentWithPartial`              | Update a document with a partial object                                   |
 | `updateDocumentInTransaction`            | Update a document as part of a transaction                                |
+| `updateDocumentWithPartial`              | Update a document with a partial object                                   |
 | `updateDocumentWithPartialInTransaction` | Update a document with a partial object as part of a transaction          |
 
 ### Collections and Queries
 
-| Function                    | Description                                                             |
-| --------------------------- | ----------------------------------------------------------------------- |
-| `getDocuments`              | Fetch documents using a query                                           |
-| `getDocumentsInTransaction` | Fetch documents using a query as part of a transaction                  |
-| `processDocuments`          | Query a collection and process the results using a handler per document |
-| `processDocumentsByChunk`   | Query a collection and process the results using a handler per chunk    |
+| Function                        | Description                                                             |
+| ------------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`                  | Fetch documents using a query                                           |
+| `getDocumentsInTransaction`     | Fetch documents using a query as part of a transaction                  |
+| `getFirstDocument`              | Fetch the first result of a query                                       |
+| `getFirstDocumentInTransaction` | Fetch the first result of a query as part of a transaction              |
+| `processDocuments`              | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk`       | Query a collection and process the results using a handler per chunk    |
 
 These functions will also work for collection groups.
 

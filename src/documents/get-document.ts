@@ -42,7 +42,7 @@ export async function getDocumentInTransaction<T extends FsData>(
 
   invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
 
-  return makeMutableDocumentInTransaction<T>(doc, tx);
+  return makeMutableDocumentInTransaction<T>(tx, doc);
 }
 
 export async function getDocumentInTransactionMaybe<T extends FsData>(
@@ -58,5 +58,5 @@ export async function getDocumentInTransactionMaybe<T extends FsData>(
     return;
   }
 
-  return makeMutableDocumentInTransaction<T>(doc, tx);
+  return makeMutableDocumentInTransaction<T>(tx, doc);
 }

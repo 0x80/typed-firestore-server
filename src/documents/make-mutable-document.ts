@@ -36,8 +36,8 @@ export function makeMutableDocumentInTransaction<
   TNarrowOrFull extends FsData,
   TFull extends FsData = TNarrowOrFull,
 >(
-  doc: DocumentSnapshot<TNarrowOrFull>,
-  tx: Transaction
+  tx: Transaction,
+  doc: DocumentSnapshot<TNarrowOrFull>
 ): FsMutableDocumentInTransaction<TNarrowOrFull, TFull> {
   return {
     id: doc.id,

@@ -28,5 +28,5 @@ export async function getSpecificDocumentInTransaction<T extends FsData>(
 
   invariant(doc.exists, `No document available at ${ref.path}`);
 
-  return makeMutableDocumentInTransaction<T>(doc, tx);
+  return makeMutableDocumentInTransaction<T>(tx, doc);
 }

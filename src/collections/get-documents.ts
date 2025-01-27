@@ -72,8 +72,8 @@ export async function getDocumentsInTransaction<
 
   return snapshot.docs.map((doc) =>
     makeMutableDocumentInTransaction<SelectedDocument<T, S>, T>(
-      doc as QueryDocumentSnapshot<SelectedDocument<T, S>>,
-      tx
+      tx,
+      doc as QueryDocumentSnapshot<SelectedDocument<T, S>>
     )
   );
 }

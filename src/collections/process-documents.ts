@@ -18,8 +18,11 @@ import { getDocuments } from "./get-documents";
 import { buildQuery, getSomeDocuments } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
-type ProcessDocumentsOptions<T extends FsData> = {
-  select?: (keyof T)[];
+type ProcessDocumentsOptions<
+  T extends FsData,
+  S extends (keyof T)[] | undefined = undefined,
+> = {
+  select?: S;
   chunkSize?: number;
   throttleSeconds?: number;
 };
@@ -37,7 +40,7 @@ export async function processDocuments<
   handler: (
     document: FsMutableDocument<SelectedDocument<T, S>, T>
   ) => Promise<unknown>,
-  options: ProcessDocumentsOptions<T> & { select?: S } = {}
+  options: ProcessDocumentsOptions<T, S> = {}
 ) {
   const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
 
@@ -116,7 +119,7 @@ export async function processDocumentsByChunk<
   handler: (
     documents: FsMutableDocument<SelectedDocument<T, S>, T>[]
   ) => Promise<unknown>,
-  options: ProcessDocumentsOptions<T> & { select?: S } = {}
+  options: ProcessDocumentsOptions<T, S> = {}
 ) {
   const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
 

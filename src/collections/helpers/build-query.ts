@@ -35,5 +35,5 @@ export function buildQuery<T extends FsData>(
       : queryFn(ref)
     : ref;
 
-  return { query, disableBatching };
+  return { query, disableBatching, limit };
 }

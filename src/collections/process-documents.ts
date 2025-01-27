@@ -8,12 +8,13 @@ import { processInChunks, processInChunksByChunk } from "process-in-chunks";
 import type { FsData, FsMutableDocument } from "~/types";
 import {
   getErrorMessage,
+  invariant,
   isDefined,
   isEmpty,
   verboseCount,
   verboseLog,
 } from "~/utils";
-import { DEFAULT_CHUNK_SIZE } from "./constants";
+import { DEFAULT_CHUNK_SIZE, MAX_QUERY_LIMIT } from "./constants";
 import { getDocuments } from "./get-documents";
 import { buildQuery, getSomeDocuments } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
@@ -42,13 +43,22 @@ export async function processDocuments<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
 ) {
-  const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
+  const { query, disableBatching, limit } = buildQuery(
+    ref,
+    queryFn,
+    options.select
+  );
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 
   const errors: { id: string; message: string }[] = [];
 
   if (disableBatching) {
+    invariant(
+      limit && limit <= MAX_QUERY_LIMIT,
+      `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
+    );
+
     const documents = await getDocuments(ref, queryFn, options);
 
     await processInChunks(

@@ -13,6 +13,8 @@ import type {
   FsMutableDocument,
   FsMutableDocumentInTransaction,
 } from "~/types";
+import { invariant } from "~/utils";
+import { MAX_QUERY_LIMIT } from "./constants";
 import { buildQuery, getDocumentsChunked } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
@@ -32,9 +34,18 @@ export async function getDocuments<
   queryFn?: QueryBuilder | null,
   options: GetDocumentsOptions<T, S> = {}
 ): Promise<FsMutableDocument<SelectedDocument<T, S>, T>[]> {
-  const { query, disableBatching } = buildQuery(ref, queryFn, options.select);
+  const { query, disableBatching, limit } = buildQuery(
+    ref,
+    queryFn,
+    options.select
+  );
 
   if (disableBatching) {
+    invariant(
+      limit && limit <= MAX_QUERY_LIMIT,
+      `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
+    );
+
     const snapshot = await query.get();
 
     return snapshot.docs.map((doc) =>

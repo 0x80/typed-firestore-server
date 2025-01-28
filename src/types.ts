@@ -1,6 +1,7 @@
 import type {
   DocumentReference,
   FieldValue,
+  PartialWithFieldValue,
   Transaction,
   UpdateData,
   WriteResult,
@@ -13,9 +14,11 @@ export type FsData = Record<string, unknown>;
  * everything. A more loose version of FsPartialWithFieldValue that Firestore
  * provides.
  */
-export type FsPartialWithFieldValue<T> = {
-  [P in keyof T]?: T[P] | FieldValue;
-};
+// export type FsPartialWithFieldValue<T> = {
+//   [P in keyof T]?: T[P] | FieldValue;
+// };
+
+export type FsPartialWithFieldValue<T> = PartialWithFieldValue<T>;
 
 /**
  * A type that enforces FieldValue for specified properties while preserving the

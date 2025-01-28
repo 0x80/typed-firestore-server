@@ -1,5 +1,6 @@
 import type {
   DocumentSnapshot,
+  PartialWithFieldValue,
   Transaction,
   UpdateData,
 } from "firebase-admin/firestore";
@@ -7,7 +8,6 @@ import type {
   FsData,
   FsMutableDocument,
   FsMutableDocumentInTransaction,
-  FsPartialWithFieldValue,
 } from "~/types";
 
 export function makeMutableDocument<
@@ -21,7 +21,7 @@ export function makeMutableDocument<
     data: doc.data()!,
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => doc.ref.update(data),
-    updateWithPartial: (data: FsPartialWithFieldValue<TFull>) =>
+    updateWithPartial: (data: PartialWithFieldValue<TFull>) =>
       doc.ref.update(data as UpdateData<TFull>),
     delete: () => doc.ref.delete(),
   };
@@ -39,7 +39,7 @@ export function makeMutableDocumentInTransaction<
     data: doc.data()!,
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => tx.update(doc.ref, data),
-    updateWithPartial: (data: FsPartialWithFieldValue<TFull>) =>
+    updateWithPartial: (data: PartialWithFieldValue<TFull>) =>
       tx.update(doc.ref, data as UpdateData<TFull>),
     delete: () => tx.delete(doc.ref),
   };

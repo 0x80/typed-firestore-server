@@ -4,7 +4,6 @@ import type {
   PartialWithFieldValue,
   Transaction,
   UpdateData,
-  WriteResult,
 } from "firebase-admin/firestore";
 
 export type FsData = Record<string, unknown>;
@@ -29,17 +28,15 @@ export type FsDocument<T> = Readonly<{
 }>;
 
 export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
-  ref: DocumentReference;
-  update: (data: UpdateData<TFull>) => Promise<WriteResult>;
+  ref: DocumentReference<TNarrowOrFull>;
+  update: (data: UpdateData<TFull>) => Promise<void>;
   /**
    * The Firestore UpdateData<T> type can reject nested data that is perfectly
    * valid. In those cases you have this as an alternative based on Partial<T>
    * with FieldValue allowed for each root property.
    */
-  updateWithPartial: (
-    data: PartialWithFieldValue<TFull>
-  ) => Promise<WriteResult>;
-  delete: () => Promise<WriteResult>;
+  updateWithPartial: (data: PartialWithFieldValue<TFull>) => Promise<void>;
+  delete: () => Promise<void>;
 }> &
   FsDocument<TNarrowOrFull>;
 
@@ -47,7 +44,7 @@ export type FsMutableDocumentInTransaction<
   TNarrowOrFull,
   TFull = TNarrowOrFull,
 > = Readonly<{
-  ref: DocumentReference;
+  ref: DocumentReference<TNarrowOrFull>;
   update: (data: UpdateData<TFull>) => Transaction;
   /**
    * The Firestore UpdateData<T> type can reject nested data that is perfectly

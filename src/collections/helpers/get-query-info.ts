@@ -23,7 +23,7 @@ export type QueryInfo = {
 /**
  * Gets information about a query's options like limit and select. We need this
  * because select shouldn't be allowed to be set on the query and a specified
- * limit should switch off batching
+ * limit should switch off pagination
  */
 export function getQueryInfo(query: Query): QueryInfo {
   const internalQuery = query as unknown as InternalQuery;

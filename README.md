@@ -96,8 +96,8 @@ await runTransaction(async (tx) => {
 ### Querying Collections
 
 When fetching documents from a collection you can choose to pass a query, and
-without it, you will get the entire collection. By default, documents are
-fetched in batches of 500.
+without it, you will get the entire collection. If no limit is set, documents
+are internally fetched using pagination.
 
 ```ts
 /**
@@ -108,7 +108,10 @@ const allBooks = await getDocuments(refs.books);
 
 /** Fetch documents using a query */
 const publishedBooks = await getDocuments(refs.books, (query) =>
-  query.where("is_published", "==", true)
+  query
+    .where("is_published", "==", true)
+    .orderBy("published_at", "desc")
+    .limit(50)
 );
 
 /**
@@ -122,15 +125,15 @@ const publishedBooks = await getDocuments(
   refs.books,
   (query) => query.where("is_published", "==", true),
   /**
-   * Select should be defined separately from the query, because otherwise we
-   * can not narrow the type.
+   * A select should be declared separate from the query, because otherwise we
+   * can not type the result properly. A select statement directly on the query
+   * is detected and results in an error.
    */
   { select: ["author", "title"] }
 );
 ```
 
-All functions also support collection groups. You simply pass it a typed
-`CollectionGroup` instead of a typed `CollectionReference`.
+All functions also support collection groups:
 
 ```ts
 const groupRef = db.collectionGroup(
@@ -152,11 +155,11 @@ The processing functions are very similar to the query functions, but in
 addition you pass a handler that gets called for each document, or each chunk of
 documents.
 
-The handlers are awaited for each batch of documents, so memory only has to hold
+The handlers are awaited for each chunk of documents, so memory only has to hold
 on to one chunk at a time, making it possible to iterate over unlimited amounts
 of documents with constant low memory usage.
 
-The query part is again optional, and without it you will process the entire
+The query part again is optional, and without it you will process the entire
 collection.
 
 ```ts
@@ -196,18 +199,26 @@ await processDocuments(refs.userWishlist(user.id), null, {
   /** Pass an empty select for efficiency if you do not use any data */
   { select: [] }
 });
+
+/**
+ * If you want the handler function to receive the full chunk of documents, there is a function for that. And in addition you can control the chunk size.
+ */
+await processDocumentsByChunk(refs.users, null, {
+  handler: async (chunk) => {
+    // Handle 10 User documents at once
+  },
+  { chunkSize: 10 },
+});
 ```
 
-For these types of long-running operations, I typically want a bit of visual
-feedback to follow the progress. Set environment variable `VERBOSE` to `true` or
-`1`, to have the `getDocuments` and `processDocuments` function log information
-to the console about the chunks that are being fetched and processed.
+For these types of long-running operations, I like to have some visual feedback
+to follow the progress. Set environment variable `VERBOSE` to `true` or `1`, to
+have the `getDocuments` and `processDocuments` function log information to the
+console about the chunks that are being fetched and processed.
 
 ### Cloud Function Utilities
 
-For cloud functions, there are helpers to get the data from the event. Here we
-pass the typed collection reference purely for type inference, and to stay
-consistent with the other APIs.
+For cloud functions, there are helpers to get typed data from the event.
 
 ```ts
 import { type Book } from "./types";
@@ -231,6 +242,10 @@ export const handleBookUpdates = onDocumentWritten(
 );
 ```
 
+Note that here we pass the typed collection reference only to facilitate the
+type inference, and to keep things consistent. The data is not actually being
+fetched from the ref.
+
 ## Keep Select Separate from Query
 
 The functions that work with collections should look very familiar, with the
@@ -243,33 +258,56 @@ Because the query part is still the original Firestore API, nothing will prevent
 you from using a `select` on the query directly, but it will be detected at
 runtime and an error will be thrown.
 
-## Limit Disables Batching
+## Limit Disables Pagination
 
-If you use a `limit` on the query, it will be detected and the default batching
+If you use a `limit` on the query, it will be detected and the pagination
 mechanism will be disabled. As a result, all documents will be fetched in one
-go. Firestore has a limit of `1000` documents per query.
+go.
+
+Firestore has a limit of `1000` documents per query, so setting a limit of
+`1001` or higher should result in an error. If you do not set a limit,
+pagination will allow you to fetch unlimited documents (in the case of
+`processDocuments`) or as much as your memory can hold (in the case of
+`getDocuments`).
 
 ## API
-
-More documentation will follow. In the meantime, please look at the function
-signatures. I think they are pretty self-explanatory.
 
 ## Document Types
 
 All functions return a form of `FsDocument<T>`, which conveniently combines the
-data and id.
+data and id. You can use this type for defining function that do not need to
+mutate the data, like `function readBook(book: FsDocument<Book>){}`
 
-The mutable version `FsMutableDocument<T>` also provides a typed `update`
-function and the original `ref` in case you need to call any other native
-Firestore APIs.
+```ts
+type FsDocument<T> = Readonly<{
+  id: string;
+  data: T;
+}>;
+```
 
-The `update` function is typed using Firestore's official `UpdateData<T>` type,
-but this type is not perfect and it can reject nested data that is actually
-valid.
+A mutable variant called `FsMutableDocument<T>` is what all API abstractions
+return, and it provides an additional typed `update` function and the original
+`ref` in case you need to call any other native Firestore APIs.
 
-For those situations we provide an alternative called `updateWithPartial`, which
-is based on `Partial<T>` while also allowing `FieldValue` types to be used for
-each of the root properties.
+```ts
+type FsMutableDocument<T> = Readonly<{
+  id: string;
+  data: T;
+  ref: DocumentReference<T>;
+  update: (data: UpdateData<T>) => void;
+  updateWithPartial: (data: PartialWithFieldValue<T>) => void;
+  delete: () => void;
+}>;
+```
+
+The `update` function is typed using Firestore's `UpdateData<T>` type, but this
+type does not allow you to pass nested object partially, so it can reject data
+that is actually valid.
+
+In those situations you should be able to use `updateWithPartial` instead. This
+function uses Firestore's `PartialWithFieldValue<T>` type. The two flavors are
+purely about typing, and have identical behavior. You can simply try `update()`
+first and if the compiler does not accept it, try `updateWithPartial()` instead.
 
 ### Single Documents
 
@@ -305,9 +343,8 @@ These functions will also work for collection groups.
 
 ### Cloud Functions
 
-When writing cloud functions, you typically need to get the data from the event
-and then process it. The following functions take this event and return typed
-data.
+In cloud functions, you typically get the data from the event and then act on
+it. The following convenience functions take the event and return typed data.
 
 | Function                     | Description                                                |
 | ---------------------------- | ---------------------------------------------------------- |
@@ -316,17 +353,17 @@ data.
 | `getBeforeAndAfterOnWritten` | Get the before and after data from a document write event  |
 | `getBeforeAndAfterOnUpdated` | Get the before and after data from a document update event |
 
-Note that the functions are exposed on `@typed-firestore/server/functions`, so
+Note that the functions are exported on `@typed-firestore/server/functions`, so
 that the `firebase-admin` and `firebase-functions` peer-dependencies can both be
 optional.
 
 As long as you only import code from `@typed-firestore/server`, you shouldn't
-need `firebase-functions` and as long as you only import code from
+need `firebase-functions`, and as long as you only import code from
 `@typed-firestore/server/functions`, you shouldn't need `firebase-admin`.
 
-Importing types should not affect this.
+That is only about importing Javascript code. Types should not affect this.
 
-The functions are only supporting 2nd gen cloud functions.
+The cloud functions utilities are only supporting 2nd gen cloud function events.
 
 ## Where Typing Was Ignored
 

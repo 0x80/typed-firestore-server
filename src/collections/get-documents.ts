@@ -62,9 +62,9 @@ export async function getDocuments<
 }
 
 /**
- * Because transactions are limited to 500 operations, we do not use batching /
- * pagination here. here. You should limit the query if you expect the document
- * count to be close to the maximum.
+ * Because transactions are limited to 500 operations, we do not use pagination
+ * here. You should limit the query if you expect the document count to be close
+ * to the maximum.
  */
 export async function getDocumentsInTransaction<
   T extends FsData,

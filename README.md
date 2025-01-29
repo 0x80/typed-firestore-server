@@ -272,7 +272,7 @@ pagination will allow you to fetch unlimited documents (in the case of
 
 ## API
 
-## Document Types
+### Document Types
 
 All functions return a form of `FsDocument<T>`, which conveniently combines the
 data and id. You can use this type for defining function that do not need to
@@ -308,6 +308,20 @@ In those situations you should be able to use `updateWithPartial` instead. This
 function uses Firestore's `PartialWithFieldValue<T>` type. The two flavors are
 purely about typing, and have identical behavior. You can simply try `update()`
 first and if the compiler does not accept it, try `updateWithPartial()` instead.
+
+In transactions, the type is slightly different, preserving the ability to chain
+transaction operations if you want.
+
+```ts
+export type FsMutableDocumentInTransaction<T> = {
+  id: string;
+  data: T;
+  ref: DocumentReference<T>;
+  update: (data: UpdateData<T>) => Transaction;
+  updatePartial: (data: PartialWithFieldValue<T>) => Transaction;
+  delete: () => Transaction;
+};
+```
 
 ### Single Documents
 

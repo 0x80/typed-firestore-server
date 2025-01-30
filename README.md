@@ -221,7 +221,6 @@ console about the chunks that are being fetched and processed.
 For cloud functions, there are helpers to get typed data from the event.
 
 ```ts
-import { type Book } from "./types";
 import {
   getDataOnWritten,
   getBeforeAndAfterOnWritten,
@@ -242,9 +241,9 @@ export const handleBookUpdates = onDocumentWritten(
 );
 ```
 
-Note that here we pass the typed collection reference only to facilitate the
-type inference, and to keep things consistent. The data is not actually being
-fetched from the ref.
+Here we pass the typed collection reference only to facilitate the type
+inference, and to keep things consistent. The data is extracted from the event
+and not fetched from the ref.
 
 ## Keep Select Separate from Query
 
@@ -379,22 +378,58 @@ That is only about importing Javascript code. Types should not affect this.
 
 The cloud functions utilities are only supporting 2nd gen cloud function events.
 
+## Sharing Types Between Server and Client
+
+When you share your document types between your server and client code, you
+might run into a problem with the `Timestamp` type, because the web and server
+SDKs currently have slightly incompatible types. The web timestamp has a
+`toJSON`method which doesn't exist on the server.
+
+The way I work around this, is by using a type alias called `FsTimestamp` in all
+of my document types. Then, in each of the client-side or server-side
+applications, I declare this type globally in a `global.d.ts` file.
+
+For web it looks like this:
+
+```ts
+import type { Timestamp } from "firebase/firestore";
+
+declare global {
+  type FsTimestamp = Timestamp;
+}
+```
+
+For my server code it looks like this:
+
+```ts
+import type { Timestamp } from "firebase-admin/firestore";
+
+declare global {
+  type FsTimestamp = Timestamp;
+}
+```
+
 ## Where Typing Was Ignored
 
 You might have noticed that the query `where()` function is still using the
-official Firestore API. No typing is enforced here at the moment. I think this
-part would be difficult to type, and possibly the API shape would have to be
-very different. Besides wanting strong typing, I also want this library to be
-non-intrusive and easy to adopt.
+official Firestore API. No type-safety is provided there at the moment. I think
+this part would be quite difficult to type fully, and I fear the API shape would
+have to be very different.
 
-I would argue that the `where()` clause is the least critical part anyway. If
-you make a mistake with it, there is little chance to ruin things in the
-database and you will likely discover the mistake already during development.
+Besides wanting strong typing, I also want these abstractions to be
+non-intrusive and easy-to-adopt. I would argue that the `where()` clause is the
+least critical part anyway. If you make a mistake with it, there is little to no
+chance to ruin things in the database and you will likely discover the mistake
+already during development.
 
-I suspect it might even be possible to create a fully-typed query builder
-function that looks like the official API, via some advanced type gymnastics,
-but that seems to be outside of my current capabilities, and it is not something
-I am willing to spend a lot of time on.
+It might even be possible to create a fully-typed query builder function that
+looks like the current official API, by using some advanced type gymnastics, but
+that seems to be outside of my current skills, and it is not something I am
+willing to spend a lot of time on.
 
-For now, I think this trade-off, for the sake of simplicity and familiarity, is
-warranted.
+For now, this trade-off for the sake of simplicity and familiarity, is something
+I am perfectly comfortable with.
+
+Note that the Typescript compiler will still let you write the `select`
+statement directly on the query, but the library detects this and will throw an
+error if you do.

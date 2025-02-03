@@ -14,6 +14,13 @@ For React applications check out
 [@typed-firestore/react](https://github.com/0x80/typed-firestore-react) which
 applies the same concepts.
 
+For React Native applications, see
+[@typed-firestore/react-native](https://github.com/0x80/typed-firestore-react-native).
+
+💡 Check out my
+[in-depth article](https://dev.to/0x80/how-to-write-clean-typed-firestore-code-37j2)
+about this library.
+
 ## Installation
 
 `pnpm add @typed-firestore/server`, or the equivalent for your package manager.

@@ -7,12 +7,14 @@
     "url": "https://github.com/0x80/typed-firestore-server"
   },
   "keywords": [
-    "firestore",
-    "typescript",
-    "server",
+    "firebase-admin",
     "firebase",
-    "admin",
-    "firebase-admin"
+    "firebase",
+    "firestore",
+    "server",
+    "typed-firestore",
+    "typed",
+    "typescript"
   ],
   "type": "module",
   "files": [
@@ -48,7 +50,7 @@
     "prettier:check": "prettier --check ."
   },
   "author": "Thijs Koerselman",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "process-in-chunks": "1.0.0-1"
   },

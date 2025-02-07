@@ -32,7 +32,7 @@ export async function getFirstDocument<
   const { limit, select: querySelect } = queryInfo;
 
   invariant(
-    isDefined(limit),
+    !isDefined(limit),
     `You should not set a limit when calling getFirstDocument. It returns only one document.`
   );
 
@@ -71,7 +71,7 @@ export async function getFirstDocumentInTransaction<
   const { limit, select: querySelect } = queryInfo;
 
   invariant(
-    isDefined(limit),
+    !isDefined(limit),
     `You should not set a limit when calling getFirstDocument. It returns only one document.`
   );
 

@@ -28,6 +28,15 @@ type ProcessDocumentsOptions<
   throttleSeconds?: number;
 };
 
+/** Maximum number of errors to store in memory */
+const MAX_STORED_ERRORS = 1000;
+
+/** Helper to handle document processing errors */
+function handleProcessingError(id: string, err: unknown) {
+  const message = getErrorMessage(err);
+  console.error(`Error processing document ${id}: ${message}`);
+}
+
 /**
  * Process a collection using a query. If the query is null, the entire
  * collection is retrieved. An optional select statement can narrow the data.
@@ -51,7 +60,7 @@ export async function processDocuments<
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 
-  const errors: { id: string; message: string }[] = [];
+  let errorCount = 0;
 
   if (disableChunking) {
     invariant(
@@ -67,7 +76,10 @@ export async function processDocuments<
         try {
           await handler(doc);
         } catch (err) {
-          errors.push({ id: doc.id, message: getErrorMessage(err) });
+          if (errorCount < MAX_STORED_ERRORS) {
+            handleProcessingError(doc.id, err);
+            errorCount++;
+          }
         }
       },
       { throttleSeconds, chunkSize }
@@ -93,7 +105,10 @@ export async function processDocuments<
           try {
             await handler(doc);
           } catch (err) {
-            errors.push({ id: doc.id, message: getErrorMessage(err) });
+            if (errorCount < MAX_STORED_ERRORS) {
+              handleProcessingError(doc.id, err);
+              errorCount++;
+            }
           }
         },
         { throttleSeconds, chunkSize }
@@ -104,12 +119,12 @@ export async function processDocuments<
     } while (isDefined(lastDocumentSnapshot));
 
     verboseLog(`Processed ${String(count)} documents`);
+  }
 
-    if (errors.length > 0) {
-      errors.forEach(({ id, message }) => {
-        console.error(`${id}: ${message}`);
-      });
-    }
+  if (errorCount >= MAX_STORED_ERRORS) {
+    console.warn(
+      `Error logging was limited to ${String(MAX_STORED_ERRORS)} errors`
+    );
   }
 }
 

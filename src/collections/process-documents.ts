@@ -10,7 +10,6 @@ import {
   getErrorMessage,
   invariant,
   isDefined,
-  isEmpty,
   verboseCount,
   verboseLog,
 } from "~/utils";
@@ -99,11 +98,6 @@ export async function processDocuments<
         chunkSize
       );
 
-      /** Break the loop if we get an empty chunk - we've reached the end */
-      if (isEmpty(documents)) {
-        break;
-      }
-
       await processInChunks(
         documents,
         async (doc) => {
@@ -185,11 +179,6 @@ export async function processDocumentsByChunk<
         lastDocumentSnapshot,
         chunkSize
       );
-
-      /** Break the loop if we get an empty chunk - we've reached the end */
-      if (isEmpty(documents)) {
-        break;
-      }
 
       try {
         await processInChunksByChunk(

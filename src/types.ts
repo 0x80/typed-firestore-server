@@ -7,8 +7,6 @@ import type {
   WriteResult,
 } from "firebase-admin/firestore";
 
-export type FsData = Record<string, unknown>;
-
 /**
  * A type that enforces FieldValue for specified properties while preserving the
  * original types for other properties. This is useful when you want to set

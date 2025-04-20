@@ -41,7 +41,7 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "compile": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
     "build": "tsup-node && tsc --emitDeclarationOnly && tsc-alias --verbose",
     "clean": "del-cli dist tsconfig.tsbuildinfo",
     "test": "echo \"No test specified\"",

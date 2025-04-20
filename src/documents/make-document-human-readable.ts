@@ -1,11 +1,11 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { isPlainObject } from "~/utils";
+import { isJsonObject } from "~/utils";
 
 type JsonPrimitive = string | number | boolean | null;
 type JsonArray = JsonValue[];
 type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
-type JsonObject = {
+export type JsonObject = {
   [key: string]: JsonValue;
 };
 
@@ -26,7 +26,7 @@ function convertTimestampsRecursive(data: JsonObject) {
   for (const [key, value] of Object.entries(convertedData)) {
     if (value instanceof Timestamp) {
       convertedData[key] = `(timestamp) ${value.toDate().toISOString()}`;
-    } else if (isPlainObject(value)) {
+    } else if (isJsonObject(value)) {
       convertedData[key] = convertTimestampsRecursive(value);
     }
   }
@@ -44,11 +44,11 @@ function sortObjectKeysRecursive(obj: JsonObject): JsonObject {
   const sortedObj = sortObjectKeys(obj);
 
   for (const [key, value] of Object.entries(sortedObj)) {
-    if (isPlainObject(value)) {
+    if (isJsonObject(value)) {
       sortedObj[key] = sortObjectKeysRecursive(value);
     } else if (Array.isArray(value)) {
       sortedObj[key] = value.map((item) =>
-        isPlainObject(item) ? sortObjectKeysRecursive(item) : item
+        isJsonObject(item) ? sortObjectKeysRecursive(item) : item
       );
     }
   }

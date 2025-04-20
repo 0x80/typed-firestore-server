@@ -1,15 +1,15 @@
 import type {
   CollectionReference,
+  DocumentData,
   Transaction,
 } from "firebase-admin/firestore";
-import type { FsData } from "~/types";
 import { invariant } from "~/utils";
 import {
   makeMutableDocument,
   makeMutableDocumentInTransaction,
 } from "./make-mutable-document";
 
-export async function getDocument<T extends FsData>(
+export async function getDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string
 ) {
@@ -20,7 +20,7 @@ export async function getDocument<T extends FsData>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getDocumentMaybe<T extends FsData>(
+export async function getDocumentMaybe<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId?: string | null
 ) {
@@ -33,7 +33,7 @@ export async function getDocumentMaybe<T extends FsData>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getDocumentInTransaction<T extends FsData>(
+export async function getDocumentInTransaction<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string
@@ -45,7 +45,7 @@ export async function getDocumentInTransaction<T extends FsData>(
   return makeMutableDocumentInTransaction<T>(tx, doc);
 }
 
-export async function getDocumentInTransactionMaybe<T extends FsData>(
+export async function getDocumentInTransactionMaybe<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null

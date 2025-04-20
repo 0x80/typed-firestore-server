@@ -1,5 +1,9 @@
-import type { Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
-import type { FsData, FsMutableDocument } from "~/types";
+import type {
+  DocumentData,
+  Query,
+  QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
+import type { FsMutableDocument } from "~/types";
 import { verboseCount } from "~/utils";
 import { DEFAULT_CHUNK_SIZE } from "../constants";
 import { getChunkOfDocuments } from "./get-chunk-of-documents";
@@ -10,8 +14,8 @@ import { getChunkOfDocuments } from "./get-chunk-of-documents";
  * specified.
  */
 export async function getDocumentsChunked<
-  T extends FsData,
-  TFull extends FsData,
+  T extends DocumentData,
+  TFull extends DocumentData,
 >(
   query: Query,
   chunkSize = DEFAULT_CHUNK_SIZE

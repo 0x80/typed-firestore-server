@@ -1,4 +1,5 @@
 import type {
+  DocumentData,
   QueryDocumentSnapshot,
   Transaction,
 } from "@google-cloud/firestore";
@@ -11,7 +12,6 @@ import {
   makeMutableDocumentInTransaction,
 } from "~/documents";
 import type {
-  FsData,
   FsMutableDocument,
   FsMutableDocumentInTransaction,
 } from "~/types";
@@ -21,7 +21,7 @@ import { getQueryInfo } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 export async function getFirstDocument<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
@@ -56,8 +56,20 @@ export async function getFirstDocument<
   );
 }
 
+// export async function getFirstDocumentData<
+//   T extends DocumentData,
+//   S extends (keyof T)[] | undefined = undefined,
+// >(
+//   ref: CollectionReference<T> | CollectionGroup<T>,
+//   queryFn: QueryBuilder,
+//   options: GetDocumentsOptions<T, S> = {}
+// ): Promise<T | undefined> {
+//   const document = await getFirstDocument(ref, queryFn, options);
+//   return document?.data;
+// }
+
 export async function getFirstDocumentInTransaction<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 >(
   tx: Transaction,

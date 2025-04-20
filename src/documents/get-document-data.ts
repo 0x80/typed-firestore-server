@@ -1,11 +1,11 @@
 import type {
   CollectionReference,
+  DocumentData,
   Transaction,
 } from "firebase-admin/firestore";
-import type { FsData } from "~/types";
 import { invariant } from "~/utils";
 
-export async function getDocumentData<T extends FsData>(
+export async function getDocumentData<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string
 ) {
@@ -16,7 +16,7 @@ export async function getDocumentData<T extends FsData>(
   return doc.data()!;
 }
 
-export async function getDocumentDataMaybe<T extends FsData>(
+export async function getDocumentDataMaybe<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId?: string | null
 ) {
@@ -29,7 +29,7 @@ export async function getDocumentDataMaybe<T extends FsData>(
   return doc.data()!;
 }
 
-export async function getDocumentDataInTransaction<T extends FsData>(
+export async function getDocumentDataInTransaction<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string
@@ -41,7 +41,7 @@ export async function getDocumentDataInTransaction<T extends FsData>(
   return doc.data()!;
 }
 
-export async function getDocumentDataInTransactionMaybe<T extends FsData>(
+export async function getDocumentDataInTransactionMaybe<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null

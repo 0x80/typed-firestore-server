@@ -1,11 +1,12 @@
 import type {
   CollectionGroup,
   CollectionReference,
+  DocumentData,
   Query,
   QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { processInChunks, processInChunksByChunk } from "process-in-chunks";
-import type { FsData, FsMutableDocument } from "~/types";
+import type { FsMutableDocument } from "~/types";
 import {
   getErrorMessage,
   invariant,
@@ -19,7 +20,7 @@ import { buildQuery, getChunkOfDocuments } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 type ProcessDocumentsOptions<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 > = {
   select?: S;
@@ -41,7 +42,7 @@ function handleProcessingError(id: string, err: unknown) {
  * collection is retrieved. An optional select statement can narrow the data.
  */
 export async function processDocuments<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
@@ -133,7 +134,7 @@ export async function processDocuments<
  * statement can narrow the data.
  */
 export async function processDocumentsByChunk<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,

@@ -1,18 +1,18 @@
 import type {
+  DocumentData,
   DocumentSnapshot,
   PartialWithFieldValue,
   Transaction,
   UpdateData,
 } from "firebase-admin/firestore";
 import type {
-  FsData,
   FsMutableDocument,
   FsMutableDocumentInTransaction,
 } from "~/types";
 
 export function makeMutableDocument<
-  TNarrowOrFull extends FsData,
-  TFull extends FsData = TNarrowOrFull,
+  TNarrowOrFull extends DocumentData,
+  TFull extends DocumentData = TNarrowOrFull,
 >(
   doc: DocumentSnapshot<TNarrowOrFull>
 ): FsMutableDocument<TNarrowOrFull, TFull> {
@@ -28,8 +28,8 @@ export function makeMutableDocument<
 }
 
 export function makeMutableDocumentInTransaction<
-  TNarrowOrFull extends FsData,
-  TFull extends FsData = TNarrowOrFull,
+  TNarrowOrFull extends DocumentData,
+  TFull extends DocumentData = TNarrowOrFull,
 >(
   tx: Transaction,
   doc: DocumentSnapshot<TNarrowOrFull>

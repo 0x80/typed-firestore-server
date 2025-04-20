@@ -1,6 +1,7 @@
 import type {
   CollectionGroup,
   CollectionReference,
+  DocumentData,
   QueryDocumentSnapshot,
   Transaction,
 } from "firebase-admin/firestore";
@@ -9,7 +10,6 @@ import {
   makeMutableDocumentInTransaction,
 } from "~/documents";
 import type {
-  FsData,
   FsMutableDocument,
   FsMutableDocumentInTransaction,
 } from "~/types";
@@ -19,7 +19,7 @@ import { buildQuery, getDocumentsChunked } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 export type GetDocumentsOptions<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 > = {
   select?: S;
@@ -27,7 +27,7 @@ export type GetDocumentsOptions<
 };
 
 export async function getDocuments<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
@@ -67,7 +67,7 @@ export async function getDocuments<
  * to the maximum.
  */
 export async function getDocumentsInTransaction<
-  T extends FsData,
+  T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
 >(
   tx: Transaction,

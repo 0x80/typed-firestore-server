@@ -1,17 +1,17 @@
 import {
   CollectionReference,
+  type DocumentData,
   type PartialWithFieldValue,
   type Transaction,
   type UpdateData,
 } from "firebase-admin/firestore";
-import type { FsData } from "~/types";
 
 /**
  * Update a document in a collection. You would only use this if you do not
  * already have a handle to a FsMutableDocument, because that has typed `update`
  * and `updateWithPartial` methods.
  */
-export async function updateDocument<T extends FsData>(
+export async function updateDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: UpdateData<T>
@@ -19,7 +19,7 @@ export async function updateDocument<T extends FsData>(
   await ref.doc(documentId).update(data);
 }
 
-export async function updateDocumentWithPartial<T extends FsData>(
+export async function updateDocumentWithPartial<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: PartialWithFieldValue<T>
@@ -27,7 +27,7 @@ export async function updateDocumentWithPartial<T extends FsData>(
   await ref.doc(documentId).update(data as UpdateData<T>);
 }
 
-export function updateDocumentInTransaction<T extends FsData>(
+export function updateDocumentInTransaction<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,
@@ -36,7 +36,7 @@ export function updateDocumentInTransaction<T extends FsData>(
   tx.update(ref.doc(documentId), data);
 }
 
-export function updateDocumentWithPartialInTransaction<T extends FsData>(
+export function updateDocumentWithPartialInTransaction<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,

@@ -1,18 +1,19 @@
 import type {
+  DocumentData,
   DocumentSnapshot,
   Query,
   QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { makeMutableDocument } from "~/documents";
-import type { FsData, FsMutableDocument } from "~/types";
+import type { FsMutableDocument } from "~/types";
 
 /**
  * Returns [documents, lastSnapshot], so that the last document snapshot can be
  * passed in as the "startAfter" argument in the next cycle.
  */
 export async function getChunkOfDocuments<
-  T extends FsData,
-  TFull extends FsData,
+  T extends DocumentData,
+  TFull extends DocumentData,
 >(
   query: Query,
   startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,

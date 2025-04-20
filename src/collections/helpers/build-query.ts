@@ -1,15 +1,15 @@
 import type {
   CollectionGroup,
   CollectionReference,
+  DocumentData,
 } from "firebase-admin/firestore";
-import type { FsData } from "~/types";
 import { invariant, isDefined } from "~/utils";
 import { MAX_QUERY_LIMIT } from "../constants";
 import type { QueryBuilder } from "../types";
 import { getQueryInfo } from "./get-query-info";
 
 /** Validates the passed-in queryFn and apply options to build the final query */
-export function buildQuery<T extends FsData>(
+export function buildQuery<T extends DocumentData>(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn?: QueryBuilder | null,
   optionsSelect?: (keyof T)[]

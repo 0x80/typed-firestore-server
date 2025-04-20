@@ -56,17 +56,17 @@ export async function getFirstDocument<
   );
 }
 
-// export async function getFirstDocumentData<
-//   T extends DocumentData,
-//   S extends (keyof T)[] | undefined = undefined,
-// >(
-//   ref: CollectionReference<T> | CollectionGroup<T>,
-//   queryFn: QueryBuilder,
-//   options: GetDocumentsOptions<T, S> = {}
-// ): Promise<T | undefined> {
-//   const document = await getFirstDocument(ref, queryFn, options);
-//   return document?.data;
-// }
+export async function getFirstDocumentData<
+  T extends DocumentData,
+  S extends (keyof T)[] | undefined = undefined,
+>(
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn: QueryBuilder,
+  options: GetDocumentsOptions<T, S> = {}
+): Promise<T | undefined> {
+  const document = await getFirstDocument(ref, queryFn, options);
+  return document?.data;
+}
 
 export async function getFirstDocumentInTransaction<
   T extends DocumentData,
@@ -106,4 +106,22 @@ export async function getFirstDocumentInTransaction<
     tx,
     snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, S>>
   );
+}
+
+export async function getFirstDocumentDataInTransaction<
+  T extends DocumentData,
+  S extends (keyof T)[] | undefined = undefined,
+>(
+  tx: Transaction,
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn: QueryBuilder,
+  options: GetDocumentsOptions<T, S> = {}
+): Promise<T | undefined> {
+  const document = await getFirstDocumentInTransaction(
+    tx,
+    ref,
+    queryFn,
+    options
+  );
+  return document?.data;
 }

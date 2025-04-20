@@ -61,6 +61,18 @@ export async function getDocuments<
   }
 }
 
+export async function getDocumentsData<
+  T extends DocumentData,
+  S extends (keyof T)[] | undefined = undefined,
+>(
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn?: QueryBuilder | null,
+  options: GetDocumentsOptions<T, S> = {}
+): Promise<T[]> {
+  const documents = await getDocuments(ref, queryFn, options);
+  return documents.map((doc) => doc.data);
+}
+
 /**
  * Because transactions are limited to 500 operations, we do not use pagination
  * here. You should limit the query if you expect the document count to be close
@@ -87,4 +99,17 @@ export async function getDocumentsInTransaction<
       doc as QueryDocumentSnapshot<SelectedDocument<T, S>>
     )
   );
+}
+
+export async function getDocumentsDataInTransaction<
+  T extends DocumentData,
+  S extends (keyof T)[] | undefined = undefined,
+>(
+  tx: Transaction,
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn?: QueryBuilder | null,
+  options: GetDocumentsOptions<T, S> = {}
+): Promise<T[]> {
+  const documents = await getDocumentsInTransaction(tx, ref, queryFn, options);
+  return documents.map((doc) => doc.data);
 }

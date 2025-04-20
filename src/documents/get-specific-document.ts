@@ -23,6 +23,13 @@ export async function getSpecificDocument<T extends DocumentData>(
   return makeMutableDocument<T>(doc);
 }
 
+export async function getSpecificDocumentData<T extends DocumentData>(
+  ref: DocumentReference<T>
+) {
+  const doc = await getSpecificDocument(ref);
+  return doc.data;
+}
+
 export async function getSpecificDocumentInTransaction<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>

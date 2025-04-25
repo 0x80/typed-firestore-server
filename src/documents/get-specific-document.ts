@@ -23,11 +23,14 @@ export async function getSpecificDocument<T extends DocumentData>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getSpecificDocumentData<T extends DocumentData>(
+export async function getSpecificDocumentMaybe<T extends DocumentData>(
   ref: DocumentReference<T>
 ) {
-  const doc = await getSpecificDocument(ref);
-  return doc.data;
+  const doc = await ref.get();
+
+  if (!doc.exists) return;
+
+  return makeMutableDocument<T>(doc);
 }
 
 export async function getSpecificDocumentInTransaction<T extends DocumentData>(
@@ -37,6 +40,16 @@ export async function getSpecificDocumentInTransaction<T extends DocumentData>(
   const doc = await tx.get(ref);
 
   invariant(doc.exists, `No document available at ${ref.path}`);
+
+  return makeMutableDocumentInTransaction<T>(tx, doc);
+}
+
+export async function getSpecificDocumentInTransactionMaybe<
+  T extends DocumentData,
+>(tx: Transaction, ref: DocumentReference<T>) {
+  const doc = await tx.get(ref);
+
+  if (!doc.exists) return;
 
   return makeMutableDocumentInTransaction<T>(tx, doc);
 }

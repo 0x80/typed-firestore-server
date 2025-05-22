@@ -347,6 +347,7 @@ export type FsMutableDocumentInTransaction<T> = {
 | `updateDocumentInTransaction`            | Update a document as part of a transaction                                |
 | `updateDocumentWithPartial`              | Update a document with a partial object                                   |
 | `updateDocumentWithPartialInTransaction` | Update a document with a partial object as part of a transaction          |
+| `deleteDocument`                         | Delete a document                                                         |
 
 ### Collections and Queries
 

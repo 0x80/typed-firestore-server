@@ -29,11 +29,11 @@ export function buildQuery<T extends DocumentData>(
 
   const disableChunking = isDefined(limit);
 
-  const query = queryFn
-    ? optionsSelect
-      ? queryFn(ref).select(...(optionsSelect as string[]))
-      : queryFn(ref)
-    : ref;
+  const baseQuery = queryFn ? queryFn(ref) : ref;
+
+  const query = optionsSelect
+    ? baseQuery.select(...(optionsSelect as string[]))
+    : baseQuery;
 
   return { query, disableChunking, limit };
 }

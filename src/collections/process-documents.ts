@@ -93,11 +93,10 @@ export async function processDocuments<
     do {
       verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments(
-        query,
-        lastDocumentSnapshot,
-        chunkSize
-      );
+      const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments<
+        SelectedDocument<T, S>,
+        T
+      >(query, lastDocumentSnapshot, chunkSize);
 
       await processInChunks(
         documents,
@@ -175,11 +174,10 @@ export async function processDocumentsByChunk<
     do {
       verboseCount("Processing chunk");
 
-      const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments(
-        query,
-        lastDocumentSnapshot,
-        chunkSize
-      );
+      const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments<
+        SelectedDocument<T, S>,
+        T
+      >(query, lastDocumentSnapshot, chunkSize);
 
       try {
         await processInChunksByChunk(

@@ -33,10 +33,3 @@ export async function getSpecificDocumentDataMaybeTx<T extends DocumentData>(
 
   return makeMutableDocumentTx<T>(tx, doc);
 }
-
-/** @deprecated Use getSpecificDocumentDataMaybeTx */
-export async function getSpecificDocumentDataInTransactionMaybe<
-  T extends DocumentData,
->(tx: Transaction, ref: DocumentReference<T>) {
-  return getSpecificDocumentDataMaybeTx(tx, ref);
-}

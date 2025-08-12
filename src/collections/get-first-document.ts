@@ -110,29 +110,3 @@ export async function getFirstDocumentDataTx<
   const document = await getFirstDocumentTx(tx, ref, queryFn, options);
   return document?.data;
 }
-
-/** @deprecated Use getFirstDocumentTx */
-export async function getFirstDocumentInTransaction<
-  T extends DocumentData,
-  S extends (keyof T)[] | undefined = undefined,
->(
-  tx: Transaction,
-  ref: CollectionReference<T> | CollectionGroup<T>,
-  queryFn: QueryBuilder,
-  options: GetDocumentsOptions<T, S> = {}
-): Promise<FsMutableDocumentTx<SelectedDocument<T, S>, T> | undefined> {
-  return getFirstDocumentTx(tx, ref, queryFn, options);
-}
-
-/** @deprecated Use getFirstDocumentDataTx */
-export async function getFirstDocumentDataInTransaction<
-  T extends DocumentData,
-  S extends (keyof T)[] | undefined = undefined,
->(
-  tx: Transaction,
-  ref: CollectionReference<T> | CollectionGroup<T>,
-  queryFn: QueryBuilder,
-  options: GetDocumentsOptions<T, S> = {}
-): Promise<T | undefined> {
-  return getFirstDocumentDataTx(tx, ref, queryFn, options);
-}

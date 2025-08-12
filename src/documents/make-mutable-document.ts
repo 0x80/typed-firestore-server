@@ -41,14 +41,3 @@ export function makeMutableDocumentTx<
     delete: () => tx.delete(doc.ref),
   };
 }
-
-/** @deprecated Use makeMutableDocumentTx */
-export function makeMutableDocumentInTransaction<
-  TNarrowOrFull extends DocumentData,
-  TFull extends DocumentData = TNarrowOrFull,
->(
-  tx: Transaction,
-  doc: DocumentSnapshot<TNarrowOrFull>
-): FsMutableDocumentTx<TNarrowOrFull, TFull> {
-  return makeMutableDocumentTx(tx, doc);
-}

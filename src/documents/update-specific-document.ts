@@ -40,19 +40,3 @@ export function updateSpecificDocumentPartialTx<T extends DocumentData>(
 ) {
   tx.update(ref, data as UpdateData<T>);
 }
-
-/** @deprecated Use updateSpecificDocumentTx */
-export function updateSpecificDocumentInTransaction<T extends DocumentData>(
-  tx: Transaction,
-  ref: DocumentReference<T>,
-  data: UpdateData<T>
-) {
-  updateSpecificDocumentTx(tx, ref, data);
-}
-
-/** @deprecated Use updateSpecificDocumentPartialTx */
-export function updateSpecificDocumentWithPartialInTransaction<
-  T extends DocumentData,
->(tx: Transaction, ref: DocumentReference<T>, data: PartialWithFieldValue<T>) {
-  updateSpecificDocumentPartialTx(tx, ref, data);
-}

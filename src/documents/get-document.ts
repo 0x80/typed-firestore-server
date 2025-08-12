@@ -60,21 +60,3 @@ export async function getDocumentMaybeTx<T extends DocumentData>(
 
   return makeMutableDocumentTx<T>(tx, doc);
 }
-
-/** @deprecated Use getDocumentTx */
-export async function getDocumentInTransaction<T extends DocumentData>(
-  tx: Transaction,
-  ref: CollectionReference<T>,
-  documentId: string
-) {
-  return getDocumentTx(tx, ref, documentId);
-}
-
-/** @deprecated Use getDocumentMaybeTx */
-export async function getDocumentInTransactionMaybe<T extends DocumentData>(
-  tx: Transaction,
-  ref: CollectionReference<T>,
-  documentId?: string | null
-) {
-  return getDocumentMaybeTx(tx, ref, documentId);
-}

@@ -107,29 +107,3 @@ export async function getDocumentsDataTx<
   const documents = await getDocumentsTx(tx, ref, queryFn, options);
   return documents.map((doc) => doc.data);
 }
-
-/** @deprecated Use getDocumentsTx */
-export async function getDocumentsInTransaction<
-  T extends DocumentData,
-  S extends (keyof T)[] | undefined = undefined,
->(
-  tx: Transaction,
-  ref: CollectionReference<T> | CollectionGroup<T>,
-  queryFn?: QueryBuilder | null,
-  options: GetDocumentsOptions<T, S> = {}
-): Promise<FsMutableDocumentTx<SelectedDocument<T, S>, T>[]> {
-  return getDocumentsTx(tx, ref, queryFn, options);
-}
-
-/** @deprecated Use getDocumentsDataTx */
-export async function getDocumentsDataInTransaction<
-  T extends DocumentData,
-  S extends (keyof T)[] | undefined = undefined,
->(
-  tx: Transaction,
-  ref: CollectionReference<T> | CollectionGroup<T>,
-  queryFn?: QueryBuilder | null,
-  options: GetDocumentsOptions<T, S> = {}
-): Promise<T[]> {
-  return getDocumentsDataTx(tx, ref, queryFn, options);
-}

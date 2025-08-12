@@ -25,14 +25,3 @@ export function setDocumentTx<T extends DocumentData>(
 ) {
   tx.set(ref.doc(documentId), data, options);
 }
-
-/** @deprecated Use setDocumentTx */
-export function setDocumentInTransaction<T extends DocumentData>(
-  tx: Transaction,
-  ref: CollectionReference<T>,
-  documentId: string,
-  data: WithFieldValue<T>,
-  options: SetOptions = {}
-) {
-  setDocumentTx(tx, ref, documentId, data, options);
-}

@@ -56,21 +56,3 @@ export async function getDocumentDataMaybeTx<T extends DocumentData>(
 
   return doc.data()!;
 }
-
-/** @deprecated Use getDocumentDataTx */
-export async function getDocumentDataInTransaction<T extends DocumentData>(
-  tx: Transaction,
-  ref: CollectionReference<T>,
-  documentId: string
-) {
-  return getDocumentDataTx(tx, ref, documentId);
-}
-
-/** @deprecated Use getDocumentDataMaybeTx */
-export async function getDocumentDataInTransactionMaybe<T extends DocumentData>(
-  tx: Transaction,
-  ref: CollectionReference<T>,
-  documentId?: string | null
-) {
-  return getDocumentDataMaybeTx(tx, ref, documentId);
-}

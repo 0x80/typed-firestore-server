@@ -45,7 +45,7 @@ export async function getDocumentTx<T extends DocumentData>(
   return makeMutableDocumentTx<T>(tx, doc);
 }
 
-export async function getDocumentTxMaybe<T extends DocumentData>(
+export async function getDocumentMaybeTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null
@@ -70,11 +70,11 @@ export async function getDocumentInTransaction<T extends DocumentData>(
   return getDocumentTx(tx, ref, documentId);
 }
 
-/** @deprecated Use getDocumentTxMaybe */
+/** @deprecated Use getDocumentMaybeTx */
 export async function getDocumentInTransactionMaybe<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null
 ) {
-  return getDocumentTxMaybe(tx, ref, documentId);
+  return getDocumentMaybeTx(tx, ref, documentId);
 }

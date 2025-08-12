@@ -36,7 +36,7 @@ export function updateDocumentTx<T extends DocumentData>(
   tx.update(ref.doc(documentId), data);
 }
 
-export function updateDocumentWithPartialTx<T extends DocumentData>(
+export function updateDocumentPartialTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,
@@ -55,12 +55,12 @@ export function updateDocumentInTransaction<T extends DocumentData>(
   updateDocumentTx(tx, ref, documentId, data);
 }
 
-/** @deprecated Use updateDocumentWithPartialTx */
+/** @deprecated Use updateDocumentPartialTx */
 export function updateDocumentWithPartialInTransaction<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,
   data: PartialWithFieldValue<T>
 ) {
-  updateDocumentWithPartialTx(tx, ref, documentId, data);
+  updateDocumentPartialTx(tx, ref, documentId, data);
 }

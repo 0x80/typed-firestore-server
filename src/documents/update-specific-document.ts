@@ -33,7 +33,7 @@ export function updateSpecificDocumentTx<T extends DocumentData>(
   tx.update(ref, data);
 }
 
-export function updateSpecificDocumentWithPartialTx<T extends DocumentData>(
+export function updateSpecificDocumentPartialTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>,
   data: PartialWithFieldValue<T>
@@ -50,9 +50,9 @@ export function updateSpecificDocumentInTransaction<T extends DocumentData>(
   updateSpecificDocumentTx(tx, ref, data);
 }
 
-/** @deprecated Use updateSpecificDocumentWithPartialTx */
+/** @deprecated Use updateSpecificDocumentPartialTx */
 export function updateSpecificDocumentWithPartialInTransaction<
   T extends DocumentData,
 >(tx: Transaction, ref: DocumentReference<T>, data: PartialWithFieldValue<T>) {
-  updateSpecificDocumentWithPartialTx(tx, ref, data);
+  updateSpecificDocumentPartialTx(tx, ref, data);
 }

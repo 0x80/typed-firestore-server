@@ -331,23 +331,23 @@ export type FsMutableDocumentTx<T> = {
 
 ### Single Documents
 
-| Function                      | Description                                                               |
-| ----------------------------- | ------------------------------------------------------------------------- |
-| `getDocument`                 | Fetch a document                                                          |
-| `getDocumentMaybe`            | Fetch a document that might not exist                                     |
-| `getDocumentTx`               | Fetch a document as part of a transaction                                 |
-| `getDocumentTxMaybe`          | Fetch a document that might not exist as part of a transaction            |
-| `getSpecificDocument`         | Fetch a document from an inconsistent collection                          |
-| `getSpecificDocumentTx`       | Fetch a document from an inconsistent collection as part of a transaction |
-| `setDocument`                 | Create or overwrite a document                                            |
-| `setDocumentTx`               | Create or overwrite a document as part of a transaction                   |
-| `setSpecificDocument`         | Create or overwrite a specific document                                   |
-| `setSpecificDocumentTx`       | Create or overwrite a specific document as part of a transaction          |
-| `updateDocument`              | Update a document                                                         |
-| `updateDocumentTx`            | Update a document as part of a transaction                                |
-| `updateDocumentWithPartial`   | Update a document with a partial object                                   |
-| `updateDocumentWithPartialTx` | Update a document with a partial object as part of a transaction          |
-| `deleteDocument`              | Delete a document                                                         |
+| Function                    | Description                                                               |
+| --------------------------- | ------------------------------------------------------------------------- |
+| `getDocument`               | Fetch a document                                                          |
+| `getDocumentMaybe`          | Fetch a document that might not exist                                     |
+| `getDocumentTx`             | Fetch a document as part of a transaction                                 |
+| `getDocumentMaybeTx`        | Fetch a document that might not exist as part of a transaction            |
+| `getSpecificDocument`       | Fetch a document from an inconsistent collection                          |
+| `getSpecificDocumentTx`     | Fetch a document from an inconsistent collection as part of a transaction |
+| `setDocument`               | Create or overwrite a document                                            |
+| `setDocumentTx`             | Create or overwrite a document as part of a transaction                   |
+| `setSpecificDocument`       | Create or overwrite a specific document                                   |
+| `setSpecificDocumentTx`     | Create or overwrite a specific document as part of a transaction          |
+| `updateDocument`            | Update a document                                                         |
+| `updateDocumentTx`          | Update a document as part of a transaction                                |
+| `updateDocumentWithPartial` | Update a document with a partial object                                   |
+| `updateDocumentPartialTx`   | Update a document with a partial object as part of a transaction          |
+| `deleteDocument`            | Delete a document                                                         |
 
 ### Collections and Queries
 
@@ -370,25 +370,25 @@ the next major version.
 
 ### Function Rename Map
 
-| Old Name                                         | New Name                              |
-| ------------------------------------------------ | ------------------------------------- |
-| `getDocumentInTransaction`                       | `getDocumentTx`                       |
-| `getDocumentInTransactionMaybe`                  | `getDocumentTxMaybe`                  |
-| `getDocumentDataInTransaction`                   | `getDocumentDataTx`                   |
-| `getDocumentDataInTransactionMaybe`              | `getDocumentDataTxMaybe`              |
-| `getSpecificDocumentInTransaction`               | `getSpecificDocumentTx`               |
-| `getSpecificDocumentInTransactionMaybe`          | `getSpecificDocumentTxMaybe`          |
-| `getSpecificDocumentDataInTransactionMaybe`      | `getSpecificDocumentDataTxMaybe`      |
-| `setDocumentInTransaction`                       | `setDocumentTx`                       |
-| `setSpecificDocumentInTransaction`               | `setSpecificDocumentTx`               |
-| `updateDocumentInTransaction`                    | `updateDocumentTx`                    |
-| `updateDocumentWithPartialInTransaction`         | `updateDocumentWithPartialTx`         |
-| `updateSpecificDocumentInTransaction`            | `updateSpecificDocumentTx`            |
-| `updateSpecificDocumentWithPartialInTransaction` | `updateSpecificDocumentWithPartialTx` |
-| `getDocumentsInTransaction`                      | `getDocumentsTx`                      |
-| `getDocumentsDataInTransaction`                  | `getDocumentsDataTx`                  |
-| `getFirstDocumentInTransaction`                  | `getFirstDocumentTx`                  |
-| `getFirstDocumentDataInTransaction`              | `getFirstDocumentDataTx`              |
+| Old Name                                         | New Name                          |
+| ------------------------------------------------ | --------------------------------- |
+| `getDocumentInTransaction`                       | `getDocumentTx`                   |
+| `getDocumentInTransactionMaybe`                  | `getDocumentMaybeTx`              |
+| `getDocumentDataInTransaction`                   | `getDocumentDataTx`               |
+| `getDocumentDataInTransactionMaybe`              | `getDocumentDataMaybeTx`          |
+| `getSpecificDocumentInTransaction`               | `getSpecificDocumentTx`           |
+| `getSpecificDocumentInTransactionMaybe`          | `getSpecificDocumentMaybeTx`      |
+| `getSpecificDocumentDataInTransactionMaybe`      | `getSpecificDocumentDataMaybeTx`  |
+| `setDocumentInTransaction`                       | `setDocumentTx`                   |
+| `setSpecificDocumentInTransaction`               | `setSpecificDocumentTx`           |
+| `updateDocumentInTransaction`                    | `updateDocumentTx`                |
+| `updateDocumentWithPartialInTransaction`         | `updateDocumentPartialTx`         |
+| `updateSpecificDocumentInTransaction`            | `updateSpecificDocumentTx`        |
+| `updateSpecificDocumentWithPartialInTransaction` | `updateSpecificDocumentPartialTx` |
+| `getDocumentsInTransaction`                      | `getDocumentsTx`                  |
+| `getDocumentsDataInTransaction`                  | `getDocumentsDataTx`              |
+| `getFirstDocumentInTransaction`                  | `getFirstDocumentTx`              |
+| `getFirstDocumentDataInTransaction`              | `getFirstDocumentDataTx`          |
 
 ### Type Rename Map
 

@@ -44,7 +44,7 @@ export async function getSpecificDocumentTx<T extends DocumentData>(
   return makeMutableDocumentTx<T>(tx, doc);
 }
 
-export async function getSpecificDocumentTxMaybe<T extends DocumentData>(
+export async function getSpecificDocumentMaybeTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>
 ) {
@@ -63,9 +63,9 @@ export async function getSpecificDocumentInTransaction<T extends DocumentData>(
   return getSpecificDocumentTx(tx, ref);
 }
 
-/** @deprecated Use getSpecificDocumentTxMaybe */
+/** @deprecated Use getSpecificDocumentMaybeTx */
 export async function getSpecificDocumentInTransactionMaybe<
   T extends DocumentData,
 >(tx: Transaction, ref: DocumentReference<T>) {
-  return getSpecificDocumentTxMaybe(tx, ref);
+  return getSpecificDocumentMaybeTx(tx, ref);
 }

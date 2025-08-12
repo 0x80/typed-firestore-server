@@ -29,7 +29,7 @@ export async function getDocumentDataMaybe<T extends DocumentData>(
   return doc.data()!;
 }
 
-export async function getDocumentDataInTransaction<T extends DocumentData>(
+export async function getDocumentDataTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string
@@ -41,7 +41,7 @@ export async function getDocumentDataInTransaction<T extends DocumentData>(
   return doc.data()!;
 }
 
-export async function getDocumentDataInTransactionMaybe<T extends DocumentData>(
+export async function getDocumentDataTxMaybe<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null
@@ -55,4 +55,22 @@ export async function getDocumentDataInTransactionMaybe<T extends DocumentData>(
   }
 
   return doc.data()!;
+}
+
+/** @deprecated Use getDocumentDataTx */
+export async function getDocumentDataInTransaction<T extends DocumentData>(
+  tx: Transaction,
+  ref: CollectionReference<T>,
+  documentId: string
+) {
+  return getDocumentDataTx(tx, ref, documentId);
+}
+
+/** @deprecated Use getDocumentDataTxMaybe */
+export async function getDocumentDataInTransactionMaybe<T extends DocumentData>(
+  tx: Transaction,
+  ref: CollectionReference<T>,
+  documentId?: string | null
+) {
+  return getDocumentDataTxMaybe(tx, ref, documentId);
 }

@@ -6,7 +6,7 @@ import type {
 import { invariant } from "~/utils";
 import {
   makeMutableDocument,
-  makeMutableDocumentInTransaction,
+  makeMutableDocumentTx,
 } from "./make-mutable-document";
 
 /**
@@ -33,7 +33,7 @@ export async function getSpecificDocumentMaybe<T extends DocumentData>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getSpecificDocumentInTransaction<T extends DocumentData>(
+export async function getSpecificDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>
 ) {
@@ -41,15 +41,31 @@ export async function getSpecificDocumentInTransaction<T extends DocumentData>(
 
   invariant(doc.exists, `No document available at ${ref.path}`);
 
-  return makeMutableDocumentInTransaction<T>(tx, doc);
+  return makeMutableDocumentTx<T>(tx, doc);
 }
 
-export async function getSpecificDocumentInTransactionMaybe<
-  T extends DocumentData,
->(tx: Transaction, ref: DocumentReference<T>) {
+export async function getSpecificDocumentTxMaybe<T extends DocumentData>(
+  tx: Transaction,
+  ref: DocumentReference<T>
+) {
   const doc = await tx.get(ref);
 
   if (!doc.exists) return;
 
-  return makeMutableDocumentInTransaction<T>(tx, doc);
+  return makeMutableDocumentTx<T>(tx, doc);
+}
+
+/** @deprecated Use getSpecificDocumentTx */
+export async function getSpecificDocumentInTransaction<T extends DocumentData>(
+  tx: Transaction,
+  ref: DocumentReference<T>
+) {
+  return getSpecificDocumentTx(tx, ref);
+}
+
+/** @deprecated Use getSpecificDocumentTxMaybe */
+export async function getSpecificDocumentInTransactionMaybe<
+  T extends DocumentData,
+>(tx: Transaction, ref: DocumentReference<T>) {
+  return getSpecificDocumentTxMaybe(tx, ref);
 }

@@ -5,10 +5,7 @@ import type {
   Transaction,
   UpdateData,
 } from "firebase-admin/firestore";
-import type {
-  FsMutableDocument,
-  FsMutableDocumentInTransaction,
-} from "~/types";
+import type { FsMutableDocument, FsMutableDocumentTx } from "~/types";
 
 export function makeMutableDocument<
   TNarrowOrFull extends DocumentData,
@@ -27,13 +24,13 @@ export function makeMutableDocument<
   };
 }
 
-export function makeMutableDocumentInTransaction<
+export function makeMutableDocumentTx<
   TNarrowOrFull extends DocumentData,
   TFull extends DocumentData = TNarrowOrFull,
 >(
   tx: Transaction,
   doc: DocumentSnapshot<TNarrowOrFull>
-): FsMutableDocumentInTransaction<TNarrowOrFull, TFull> {
+): FsMutableDocumentTx<TNarrowOrFull, TFull> {
   return {
     id: doc.id,
     data: doc.data()!,
@@ -43,4 +40,15 @@ export function makeMutableDocumentInTransaction<
       tx.update(doc.ref, data as UpdateData<TFull>),
     delete: () => tx.delete(doc.ref),
   };
+}
+
+/** @deprecated Use makeMutableDocumentTx */
+export function makeMutableDocumentInTransaction<
+  TNarrowOrFull extends DocumentData,
+  TFull extends DocumentData = TNarrowOrFull,
+>(
+  tx: Transaction,
+  doc: DocumentSnapshot<TNarrowOrFull>
+): FsMutableDocumentTx<TNarrowOrFull, TFull> {
+  return makeMutableDocumentTx(tx, doc);
 }

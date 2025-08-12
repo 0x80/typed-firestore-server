@@ -85,7 +85,7 @@ await user.update({
 /** Helps with writing transactions */
 await runTransaction(async (tx) => {
   /** Get a document as part of a transaction */
-  const user = await getDocumentInTransaction(tx, refs.users, "id123");
+  const user = await getDocumentTx(tx, refs.users, "id123");
 
   /**
    * In this case, the update function calls the transaction, and is therefore
@@ -319,7 +319,7 @@ In transactions, the type is slightly different, preserving the ability to chain
 transaction operations if you want.
 
 ```ts
-export type FsMutableDocumentInTransaction<T> = {
+export type FsMutableDocumentTx<T> = {
   id: string;
   data: T;
   ref: DocumentReference<T>;
@@ -331,36 +331,70 @@ export type FsMutableDocumentInTransaction<T> = {
 
 ### Single Documents
 
-| Function                                 | Description                                                               |
-| ---------------------------------------- | ------------------------------------------------------------------------- |
-| `getDocument`                            | Fetch a document                                                          |
-| `getDocumentMaybe`                       | Fetch a document that might not exist                                     |
-| `getDocumentInTransaction`               | Fetch a document as part of a transaction                                 |
-| `getDocumentInTransactionMaybe`          | Fetch a document that might not exist as part of a transaction            |
-| `getSpecificDocument`                    | Fetch a document from an inconsistent collection                          |
-| `getSpecificDocumentInTransaction`       | Fetch a document from an inconsistent collection as part of a transaction |
-| `setDocument`                            | Create or overwrite a document                                            |
-| `setDocumentInTransaction`               | Create or overwrite a document as part of a transaction                   |
-| `setSpecificDocument`                    | Create or overwrite a specific document                                   |
-| `setSpecificDocumentInTransaction`       | Create or overwrite a specific document as part of a transaction          |
-| `updateDocument`                         | Update a document                                                         |
-| `updateDocumentInTransaction`            | Update a document as part of a transaction                                |
-| `updateDocumentWithPartial`              | Update a document with a partial object                                   |
-| `updateDocumentWithPartialInTransaction` | Update a document with a partial object as part of a transaction          |
-| `deleteDocument`                         | Delete a document                                                         |
+| Function                      | Description                                                               |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| `getDocument`                 | Fetch a document                                                          |
+| `getDocumentMaybe`            | Fetch a document that might not exist                                     |
+| `getDocumentTx`               | Fetch a document as part of a transaction                                 |
+| `getDocumentTxMaybe`          | Fetch a document that might not exist as part of a transaction            |
+| `getSpecificDocument`         | Fetch a document from an inconsistent collection                          |
+| `getSpecificDocumentTx`       | Fetch a document from an inconsistent collection as part of a transaction |
+| `setDocument`                 | Create or overwrite a document                                            |
+| `setDocumentTx`               | Create or overwrite a document as part of a transaction                   |
+| `setSpecificDocument`         | Create or overwrite a specific document                                   |
+| `setSpecificDocumentTx`       | Create or overwrite a specific document as part of a transaction          |
+| `updateDocument`              | Update a document                                                         |
+| `updateDocumentTx`            | Update a document as part of a transaction                                |
+| `updateDocumentWithPartial`   | Update a document with a partial object                                   |
+| `updateDocumentWithPartialTx` | Update a document with a partial object as part of a transaction          |
+| `deleteDocument`              | Delete a document                                                         |
 
 ### Collections and Queries
 
-| Function                        | Description                                                             |
-| ------------------------------- | ----------------------------------------------------------------------- |
-| `getDocuments`                  | Fetch documents using a query                                           |
-| `getDocumentsInTransaction`     | Fetch documents using a query as part of a transaction                  |
-| `getFirstDocument`              | Fetch the first result of a query                                       |
-| `getFirstDocumentInTransaction` | Fetch the first result of a query as part of a transaction              |
-| `processDocuments`              | Query a collection and process the results using a handler per document |
-| `processDocumentsByChunk`       | Query a collection and process the results using a handler per chunk    |
+| Function                  | Description                                                             |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`            | Fetch documents using a query                                           |
+| `getDocumentsTx`          | Fetch documents using a query as part of a transaction                  |
+| `getFirstDocument`        | Fetch the first result of a query                                       |
+| `getFirstDocumentTx`      | Fetch the first result of a query as part of a transaction              |
+| `processDocuments`        | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk` | Query a collection and process the results using a handler per chunk    |
 
 These functions will also work for collection groups.
+
+## Migrate to v2
+
+In v2, all functions and types with "InTransaction" in their name have been
+renamed to use "Tx" instead. The old names are deprecated and will be removed in
+the next major version.
+
+### Function Rename Map
+
+| Old Name                                         | New Name                              |
+| ------------------------------------------------ | ------------------------------------- |
+| `getDocumentInTransaction`                       | `getDocumentTx`                       |
+| `getDocumentInTransactionMaybe`                  | `getDocumentTxMaybe`                  |
+| `getDocumentDataInTransaction`                   | `getDocumentDataTx`                   |
+| `getDocumentDataInTransactionMaybe`              | `getDocumentDataTxMaybe`              |
+| `getSpecificDocumentInTransaction`               | `getSpecificDocumentTx`               |
+| `getSpecificDocumentInTransactionMaybe`          | `getSpecificDocumentTxMaybe`          |
+| `getSpecificDocumentDataInTransactionMaybe`      | `getSpecificDocumentDataTxMaybe`      |
+| `setDocumentInTransaction`                       | `setDocumentTx`                       |
+| `setSpecificDocumentInTransaction`               | `setSpecificDocumentTx`               |
+| `updateDocumentInTransaction`                    | `updateDocumentTx`                    |
+| `updateDocumentWithPartialInTransaction`         | `updateDocumentWithPartialTx`         |
+| `updateSpecificDocumentInTransaction`            | `updateSpecificDocumentTx`            |
+| `updateSpecificDocumentWithPartialInTransaction` | `updateSpecificDocumentWithPartialTx` |
+| `getDocumentsInTransaction`                      | `getDocumentsTx`                      |
+| `getDocumentsDataInTransaction`                  | `getDocumentsDataTx`                  |
+| `getFirstDocumentInTransaction`                  | `getFirstDocumentTx`                  |
+| `getFirstDocumentDataInTransaction`              | `getFirstDocumentDataTx`              |
+
+### Type Rename Map
+
+| Old Type                         | New Type              |
+| -------------------------------- | --------------------- |
+| `FsMutableDocumentInTransaction` | `FsMutableDocumentTx` |
 
 ### Cloud Functions
 

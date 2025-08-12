@@ -41,7 +41,7 @@ export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
 }> &
   FsDocument<TNarrowOrFull>;
 
-export type FsMutableDocumentInTransaction<
+export type FsMutableDocumentTx<
   TNarrowOrFull,
   TFull = TNarrowOrFull,
 > = Readonly<{
@@ -56,3 +56,9 @@ export type FsMutableDocumentInTransaction<
   delete: () => Transaction;
 }> &
   FsDocument<TNarrowOrFull>;
+
+/** @deprecated Use FsMutableDocumentTx */
+export type FsMutableDocumentInTransaction<
+  TNarrowOrFull,
+  TFull = TNarrowOrFull,
+> = FsMutableDocumentTx<TNarrowOrFull, TFull>;

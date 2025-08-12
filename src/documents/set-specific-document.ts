@@ -18,11 +18,21 @@ export async function setSpecificDocument<T extends DocumentData>(
   await ref.set(data, options);
 }
 
-export function setSpecificDocumentInTransaction<T extends DocumentData>(
+export function setSpecificDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>,
   data: WithFieldValue<T>,
   options: SetOptions = {}
 ) {
   tx.set(ref, data, options);
+}
+
+/** @deprecated Use setSpecificDocumentTx */
+export function setSpecificDocumentInTransaction<T extends DocumentData>(
+  tx: Transaction,
+  ref: DocumentReference<T>,
+  data: WithFieldValue<T>,
+  options: SetOptions = {}
+) {
+  setSpecificDocumentTx(tx, ref, data, options);
 }

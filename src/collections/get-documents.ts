@@ -5,14 +5,8 @@ import type {
   QueryDocumentSnapshot,
   Transaction,
 } from "firebase-admin/firestore";
-import {
-  makeMutableDocument,
-  makeMutableDocumentInTransaction,
-} from "~/documents";
-import type {
-  FsMutableDocument,
-  FsMutableDocumentInTransaction,
-} from "~/types";
+import { makeMutableDocument, makeMutableDocumentTx } from "~/documents";
+import type { FsMutableDocument, FsMutableDocumentTx } from "~/types";
 import { invariant } from "~/utils";
 import { MAX_QUERY_LIMIT } from "./constants";
 import { buildQuery, getDocumentsChunked } from "./helpers";
@@ -78,6 +72,43 @@ export async function getDocumentsData<
  * here. You should limit the query if you expect the document count to be close
  * to the maximum.
  */
+export async function getDocumentsTx<
+  T extends DocumentData,
+  S extends (keyof T)[] | undefined = undefined,
+>(
+  tx: Transaction,
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn?: QueryBuilder | null,
+  options: GetDocumentsOptions<T, S> = {}
+): Promise<FsMutableDocumentTx<SelectedDocument<T, S>, T>[]> {
+  const { query } = buildQuery(ref, queryFn, options.select);
+
+  const snapshot = await tx.get(query);
+
+  if (snapshot.empty) return [];
+
+  return snapshot.docs.map((doc) =>
+    makeMutableDocumentTx<SelectedDocument<T, S>, T>(
+      tx,
+      doc as QueryDocumentSnapshot<SelectedDocument<T, S>>
+    )
+  );
+}
+
+export async function getDocumentsDataTx<
+  T extends DocumentData,
+  S extends (keyof T)[] | undefined = undefined,
+>(
+  tx: Transaction,
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn?: QueryBuilder | null,
+  options: GetDocumentsOptions<T, S> = {}
+): Promise<T[]> {
+  const documents = await getDocumentsTx(tx, ref, queryFn, options);
+  return documents.map((doc) => doc.data);
+}
+
+/** @deprecated Use getDocumentsTx */
 export async function getDocumentsInTransaction<
   T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
@@ -86,21 +117,11 @@ export async function getDocumentsInTransaction<
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn?: QueryBuilder | null,
   options: GetDocumentsOptions<T, S> = {}
-): Promise<FsMutableDocumentInTransaction<SelectedDocument<T, S>, T>[]> {
-  const { query } = buildQuery(ref, queryFn, options.select);
-
-  const snapshot = await tx.get(query);
-
-  if (snapshot.empty) return [];
-
-  return snapshot.docs.map((doc) =>
-    makeMutableDocumentInTransaction<SelectedDocument<T, S>, T>(
-      tx,
-      doc as QueryDocumentSnapshot<SelectedDocument<T, S>>
-    )
-  );
+): Promise<FsMutableDocumentTx<SelectedDocument<T, S>, T>[]> {
+  return getDocumentsTx(tx, ref, queryFn, options);
 }
 
+/** @deprecated Use getDocumentsDataTx */
 export async function getDocumentsDataInTransaction<
   T extends DocumentData,
   S extends (keyof T)[] | undefined = undefined,
@@ -110,6 +131,5 @@ export async function getDocumentsDataInTransaction<
   queryFn?: QueryBuilder | null,
   options: GetDocumentsOptions<T, S> = {}
 ): Promise<T[]> {
-  const documents = await getDocumentsInTransaction(tx, ref, queryFn, options);
-  return documents.map((doc) => doc.data);
+  return getDocumentsDataTx(tx, ref, queryFn, options);
 }

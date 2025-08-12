@@ -27,7 +27,7 @@ export async function updateDocumentWithPartial<T extends DocumentData>(
   await ref.doc(documentId).update(data as UpdateData<T>);
 }
 
-export function updateDocumentInTransaction<T extends DocumentData>(
+export function updateDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,
@@ -36,7 +36,7 @@ export function updateDocumentInTransaction<T extends DocumentData>(
   tx.update(ref.doc(documentId), data);
 }
 
-export function updateDocumentWithPartialInTransaction<T extends DocumentData>(
+export function updateDocumentPartialTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,

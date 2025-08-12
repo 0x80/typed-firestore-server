@@ -6,7 +6,7 @@ import type {
 import { invariant } from "~/utils";
 import {
   makeMutableDocument,
-  makeMutableDocumentInTransaction,
+  makeMutableDocumentTx,
 } from "./make-mutable-document";
 
 export async function getDocument<T extends DocumentData>(
@@ -33,7 +33,7 @@ export async function getDocumentMaybe<T extends DocumentData>(
   return makeMutableDocument<T>(doc);
 }
 
-export async function getDocumentInTransaction<T extends DocumentData>(
+export async function getDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string
@@ -42,10 +42,10 @@ export async function getDocumentInTransaction<T extends DocumentData>(
 
   invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
 
-  return makeMutableDocumentInTransaction<T>(tx, doc);
+  return makeMutableDocumentTx<T>(tx, doc);
 }
 
-export async function getDocumentInTransactionMaybe<T extends DocumentData>(
+export async function getDocumentMaybeTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null
@@ -58,5 +58,5 @@ export async function getDocumentInTransactionMaybe<T extends DocumentData>(
     return;
   }
 
-  return makeMutableDocumentInTransaction<T>(tx, doc);
+  return makeMutableDocumentTx<T>(tx, doc);
 }

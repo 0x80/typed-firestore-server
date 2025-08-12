@@ -25,7 +25,7 @@ export async function updateSpecificDocumentWithPartial<T extends DocumentData>(
   await ref.update(data as UpdateData<T>);
 }
 
-export function updateSpecificDocumentInTransaction<T extends DocumentData>(
+export function updateSpecificDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>,
   data: UpdateData<T>
@@ -33,8 +33,10 @@ export function updateSpecificDocumentInTransaction<T extends DocumentData>(
   tx.update(ref, data);
 }
 
-export function updateSpecificDocumentWithPartialInTransaction<
-  T extends DocumentData,
->(tx: Transaction, ref: DocumentReference<T>, data: PartialWithFieldValue<T>) {
+export function updateSpecificDocumentPartialTx<T extends DocumentData>(
+  tx: Transaction,
+  ref: DocumentReference<T>,
+  data: PartialWithFieldValue<T>
+) {
   tx.update(ref, data as UpdateData<T>);
 }

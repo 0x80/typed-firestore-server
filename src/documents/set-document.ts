@@ -16,7 +16,7 @@ export async function setDocument<T extends DocumentData>(
   await ref.doc(documentId).set(data, options);
 }
 
-export function setDocumentInTransaction<T extends DocumentData>(
+export function setDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string,

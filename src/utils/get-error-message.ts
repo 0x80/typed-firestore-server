@@ -9,7 +9,7 @@ export function getErrorMessage(error: unknown) {
 
 type ErrorWithMessage = {
   message: string;
-}
+};
 
 function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
   return (

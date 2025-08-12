@@ -7,7 +7,7 @@ import {
   getSpecificDocument,
   getSpecificDocumentMaybe,
 } from "./get-specific-document";
-import { makeMutableDocumentInTransaction } from "./make-mutable-document";
+import { makeMutableDocumentTx } from "./make-mutable-document";
 
 export async function getSpecificDocumentData<T extends DocumentData>(
   ref: DocumentReference<T>
@@ -23,12 +23,13 @@ export async function getSpecificDocumentDataMaybe<T extends DocumentData>(
   return doc?.data;
 }
 
-export async function getSpecificDocumentDataInTransactionMaybe<
-  T extends DocumentData,
->(tx: Transaction, ref: DocumentReference<T>) {
+export async function getSpecificDocumentDataMaybeTx<T extends DocumentData>(
+  tx: Transaction,
+  ref: DocumentReference<T>
+) {
   const doc = await tx.get(ref);
 
   if (!doc.exists) return;
 
-  return makeMutableDocumentInTransaction<T>(tx, doc);
+  return makeMutableDocumentTx<T>(tx, doc);
 }

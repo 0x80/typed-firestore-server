@@ -63,6 +63,7 @@ export async function processDocuments<
   let errorCount = 0;
 
   if (disableChunking) {
+    /** For limits <= MAX_QUERY_LIMIT, use a single query (existing behavior) */
     invariant(
       limit && limit <= MAX_QUERY_LIMIT,
       `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
@@ -85,18 +86,26 @@ export async function processDocuments<
       { throttleSeconds, chunkSize }
     );
   } else {
+    /** For limits > MAX_QUERY_LIMIT or no limit, use chunking */
     let lastDocumentSnapshot:
       | QueryDocumentSnapshot<SelectedDocument<T, S>>
       | undefined;
     let count = 0;
+    const hasLimit = limit && limit > MAX_QUERY_LIMIT;
+    const remainingLimit = hasLimit ? limit : undefined;
 
     do {
       verboseCount("Processing chunk");
 
+      /** Calculate effective chunk size based on remaining limit */
+      const effectiveChunkSize = remainingLimit
+        ? Math.min(remainingLimit - count, Math.min(MAX_QUERY_LIMIT, chunkSize))
+        : Math.min(MAX_QUERY_LIMIT, chunkSize);
+
       const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments<
         SelectedDocument<T, S>,
         T
-      >(query, lastDocumentSnapshot, chunkSize);
+      >(query, lastDocumentSnapshot, effectiveChunkSize);
 
       await processInChunks(
         documents,
@@ -115,6 +124,11 @@ export async function processDocuments<
 
       count += documents.length;
       lastDocumentSnapshot = _lastDocumentSnapshot;
+
+      /** Stop if we've reached the limit */
+      if (remainingLimit && count >= remainingLimit) {
+        break;
+      }
     } while (isDefined(lastDocumentSnapshot));
 
     verboseLog(`Processed ${String(count)} documents`);
@@ -145,13 +159,14 @@ export async function processDocumentsByChunk<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
 ) {
-  const { query, disableChunking } = buildQuery(ref, queryFn, options.select);
+  const { query, disableChunking, limit } = buildQuery(ref, queryFn, options.select);
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 
   const errors: string[] = [];
 
   if (disableChunking) {
+    /** For limits <= MAX_QUERY_LIMIT, use a single query (existing behavior) */
     const documents = await getDocuments(ref, queryFn, options);
 
     try {
@@ -166,18 +181,26 @@ export async function processDocumentsByChunk<
       errors.push(getErrorMessage(err));
     }
   } else {
+    /** For limits > MAX_QUERY_LIMIT or no limit, use chunking */
     let lastDocumentSnapshot:
       | QueryDocumentSnapshot<SelectedDocument<T, S>>
       | undefined;
     let count = 0;
+    const hasLimit = limit && limit > MAX_QUERY_LIMIT;
+    const remainingLimit = hasLimit ? limit : undefined;
 
     do {
       verboseCount("Processing chunk");
 
+      /** Calculate effective chunk size based on remaining limit */
+      const effectiveChunkSize = remainingLimit
+        ? Math.min(remainingLimit - count, Math.min(MAX_QUERY_LIMIT, chunkSize))
+        : Math.min(MAX_QUERY_LIMIT, chunkSize);
+
       const [documents, _lastDocumentSnapshot] = await getChunkOfDocuments<
         SelectedDocument<T, S>,
         T
-      >(query, lastDocumentSnapshot, chunkSize);
+      >(query, lastDocumentSnapshot, effectiveChunkSize);
 
       try {
         await processInChunksByChunk(
@@ -193,6 +216,11 @@ export async function processDocumentsByChunk<
 
       count += documents.length;
       lastDocumentSnapshot = _lastDocumentSnapshot;
+
+      /** Stop if we've reached the limit */
+      if (remainingLimit && count >= remainingLimit) {
+        break;
+      }
     } while (isDefined(lastDocumentSnapshot));
 
     verboseLog(`Processed ${String(count)} documents`);

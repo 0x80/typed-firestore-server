@@ -35,7 +35,7 @@ export async function getDocuments<
   );
 
   if (disableChunking) {
-    // For limits <= MAX_QUERY_LIMIT, use a single query (existing behavior)
+    /** For limits <= MAX_QUERY_LIMIT, use a single query (existing behavior) */
     invariant(
       limit && limit <= MAX_QUERY_LIMIT,
       `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
@@ -49,14 +49,14 @@ export async function getDocuments<
       )
     );
   } else if (limit && limit > MAX_QUERY_LIMIT) {
-    // For limits > MAX_QUERY_LIMIT, use chunking with the specified limit
+    /** For limits > MAX_QUERY_LIMIT, use chunking with the specified limit */
     return getDocumentsChunkedWithLimit<SelectedDocument<T, S>, T>(
       query,
       limit,
       options.chunkSize
     );
   } else {
-    // No limit specified, get all documents using chunking
+    /** No limit specified, get all documents using chunking */
     return getDocumentsChunked<SelectedDocument<T, S>, T>(
       query,
       options.chunkSize

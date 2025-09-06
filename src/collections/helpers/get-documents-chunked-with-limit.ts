@@ -42,12 +42,12 @@ export async function getDocumentsChunkedWithLimit<
     remainingLimit -= chunk.length;
     startAfterSnapshot = lastSnapshot;
 
-    // Stop if we've reached the limit or there are no more documents
+    /** Stop if we've reached the limit or there are no more documents */
     if (remainingLimit <= 0 || !lastSnapshot) {
       break;
     }
   } while (startAfterSnapshot);
 
-  // Ensure we don't return more than the requested limit
+  /** Ensure we don't return more than the requested limit */
   return documents.slice(0, totalLimit);
 }

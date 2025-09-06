@@ -23,7 +23,7 @@ export function buildQuery<T extends DocumentData>(
   );
 
   /**
-   * Disable chunking only for limits <= MAX_QUERY_LIMIT For limits >
+   * Disable chunking only for limits <= MAX_QUERY_LIMIT. For limits >
    * MAX_QUERY_LIMIT, we'll use chunking
    */
   const disableChunking = isDefined(limit) && limit <= MAX_QUERY_LIMIT;

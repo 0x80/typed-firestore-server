@@ -9,7 +9,7 @@ import { makeMutableDocument, makeMutableDocumentTx } from "~/documents";
 import type { FsMutableDocument, FsMutableDocumentTx } from "~/types";
 import { invariant } from "~/utils";
 import { MAX_QUERY_LIMIT } from "./constants";
-import { buildQuery, getDocumentsChunked } from "./helpers";
+import { buildQuery, getDocumentsChunked, getDocumentsChunkedWithLimit } from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 export type GetDocumentsOptions<
@@ -35,6 +35,7 @@ export async function getDocuments<
   );
 
   if (disableChunking) {
+    // For limits <= MAX_QUERY_LIMIT, use a single query (existing behavior)
     invariant(
       limit && limit <= MAX_QUERY_LIMIT,
       `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
@@ -47,7 +48,15 @@ export async function getDocuments<
         doc as QueryDocumentSnapshot<SelectedDocument<T, S>>
       )
     );
+  } else if (limit && limit > MAX_QUERY_LIMIT) {
+    // For limits > MAX_QUERY_LIMIT, use chunking with the specified limit
+    return getDocumentsChunkedWithLimit<SelectedDocument<T, S>, T>(
+      query,
+      limit,
+      options.chunkSize
+    );
   } else {
+    // No limit specified, get all documents using chunking
     return getDocumentsChunked<SelectedDocument<T, S>, T>(
       query,
       options.chunkSize

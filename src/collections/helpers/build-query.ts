@@ -18,16 +18,15 @@ export function buildQuery<T extends DocumentData>(
   const { limit, select: querySelect } = queryInfo;
 
   invariant(
-    !limit || limit <= MAX_QUERY_LIMIT,
-    `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
-  );
-
-  invariant(
     !querySelect,
     "Select is not allowed to be set on the query. Use the options instead."
   );
 
-  const disableChunking = isDefined(limit);
+  /**
+   * Disable chunking only for limits <= MAX_QUERY_LIMIT For limits >
+   * MAX_QUERY_LIMIT, we'll use chunking
+   */
+  const disableChunking = isDefined(limit) && limit <= MAX_QUERY_LIMIT;
 
   const baseQuery = queryFn ? queryFn(ref) : ref;
 

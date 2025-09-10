@@ -14,7 +14,7 @@ export function buildQuery<T extends DocumentData>(
   queryFn?: QueryBuilder | null,
   optionsSelect?: (keyof T)[]
 ): {
-  query: FirebaseFirestore.Query<T>;
+  query: FirebaseFirestore.Query;
   disableChunking: boolean;
   limit: number | undefined;
 } {

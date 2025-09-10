@@ -8,7 +8,7 @@ import { invariant } from "~/utils";
 export async function getDocumentData<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string
-) {
+): Promise<T> {
   const doc = await ref.doc(documentId).get();
 
   invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
@@ -19,7 +19,7 @@ export async function getDocumentData<T extends DocumentData>(
 export async function getDocumentDataMaybe<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId?: string | null
-) {
+): Promise<T | undefined> {
   if (!documentId) return;
 
   const doc = await ref.doc(documentId).get();
@@ -33,7 +33,7 @@ export async function getDocumentDataTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId: string
-) {
+): Promise<T> {
   const doc = await tx.get(ref.doc(documentId));
 
   invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
@@ -45,7 +45,7 @@ export async function getDocumentDataMaybeTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
   documentId?: string | null
-) {
+): Promise<T | undefined> {
   if (!documentId) return;
 
   const doc = await tx.get(ref.doc(documentId));

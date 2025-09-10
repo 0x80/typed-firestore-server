@@ -3,7 +3,7 @@
  * https://kentcdodds.com/blog/get-a-catch-block-error-message-with-typescript
  */
 
-export function getErrorMessage(error: unknown) {
+export function getErrorMessage(error: unknown): string {
   return toErrorWithMessage(error).message;
 }
 

@@ -15,7 +15,7 @@ export async function updateDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: UpdateData<T>
-) {
+): Promise<void> {
   await ref.doc(documentId).update(data);
 }
 
@@ -23,7 +23,7 @@ export async function updateDocumentWithPartial<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: PartialWithFieldValue<T>
-) {
+): Promise<void> {
   await ref.doc(documentId).update(data as UpdateData<T>);
 }
 
@@ -32,7 +32,7 @@ export function updateDocumentTx<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: UpdateData<T>
-) {
+): void {
   tx.update(ref.doc(documentId), data);
 }
 
@@ -41,6 +41,6 @@ export function updateDocumentPartialTx<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: PartialWithFieldValue<T>
-) {
+): void {
   tx.update(ref.doc(documentId), data as UpdateData<T>);
 }

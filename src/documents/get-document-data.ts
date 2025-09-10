@@ -13,7 +13,8 @@ export async function getDocumentData<T extends DocumentData>(
 
   invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
 
-  return doc.data()!;
+  const data = doc.data();
+  return data as T;
 }
 
 export async function getDocumentDataMaybe<T extends DocumentData>(
@@ -26,7 +27,8 @@ export async function getDocumentDataMaybe<T extends DocumentData>(
 
   if (!doc.exists) return;
 
-  return doc.data()!;
+  const data = doc.data();
+  return data as T;
 }
 
 export async function getDocumentDataTx<T extends DocumentData>(
@@ -38,7 +40,8 @@ export async function getDocumentDataTx<T extends DocumentData>(
 
   invariant(doc.exists, `No document available at ${ref.path}/${documentId}`);
 
-  return doc.data()!;
+  const data = doc.data();
+  return data as T;
 }
 
 export async function getDocumentDataMaybeTx<T extends DocumentData>(
@@ -54,5 +57,6 @@ export async function getDocumentDataMaybeTx<T extends DocumentData>(
     return;
   }
 
-  return doc.data()!;
+  const data = doc.data();
+  return data as T;
 }

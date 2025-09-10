@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": ["Bash(tree:*)", "Bash(pnpm run:*)"],
+    "deny": [],
+    "ask": []
+  }
+}

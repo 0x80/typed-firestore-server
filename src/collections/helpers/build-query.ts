@@ -13,7 +13,11 @@ export function buildQuery<T extends DocumentData>(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn?: QueryBuilder | null,
   optionsSelect?: (keyof T)[]
-): { query: FirebaseFirestore.Query<T>; disableChunking: boolean; limit: number | undefined } {
+): {
+  query: FirebaseFirestore.Query<T>;
+  disableChunking: boolean;
+  limit: number | undefined;
+} {
   const queryInfo = queryFn ? getQueryInfo(queryFn(ref)) : {};
   const { limit, select: querySelect } = queryInfo;
 

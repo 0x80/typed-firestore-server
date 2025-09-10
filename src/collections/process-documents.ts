@@ -159,7 +159,11 @@ export async function processDocumentsByChunk<
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
 ) {
-  const { query, disableChunking, limit } = buildQuery(ref, queryFn, options.select);
+  const { query, disableChunking, limit } = buildQuery(
+    ref,
+    queryFn,
+    options.select
+  );
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
 

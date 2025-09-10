@@ -9,8 +9,8 @@ import { DEFAULT_CHUNK_SIZE, MAX_QUERY_LIMIT } from "../constants";
 import { getChunkOfDocuments } from "./get-chunk-of-documents";
 
 /**
- * Gets documents from a query with a specified limit, using pagination when
- * the limit exceeds Firestore's maximum query limit of 1000.
+ * Gets documents from a query with a specified limit, using pagination when the
+ * limit exceeds Firestore's maximum query limit of 1000.
  */
 export async function getDocumentsChunkedWithLimit<
   T extends DocumentData,

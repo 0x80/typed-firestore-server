@@ -9,7 +9,11 @@ import { makeMutableDocument, makeMutableDocumentTx } from "~/documents";
 import type { FsMutableDocument, FsMutableDocumentTx } from "~/types";
 import { invariant } from "~/utils";
 import { MAX_QUERY_LIMIT } from "./constants";
-import { buildQuery, getDocumentsChunked, getDocumentsChunkedWithLimit } from "./helpers";
+import {
+  buildQuery,
+  getDocumentsChunked,
+  getDocumentsChunkedWithLimit,
+} from "./helpers";
 import type { QueryBuilder, SelectedDocument } from "./types";
 
 export type GetDocumentsOptions<

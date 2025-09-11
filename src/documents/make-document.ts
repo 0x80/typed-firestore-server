@@ -6,6 +6,6 @@ export function makeDocument<T extends DocumentData>(
 ): FsDocument<T> {
   return {
     id: doc.id,
-    data: doc.data()!,
+    data: doc.data() as T,
   };
 }

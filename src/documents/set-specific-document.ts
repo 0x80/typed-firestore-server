@@ -14,7 +14,7 @@ export async function setSpecificDocument<T extends DocumentData>(
   ref: DocumentReference<T>,
   data: WithFieldValue<T>,
   options: SetOptions = {}
-) {
+): Promise<void> {
   await ref.set(data, options);
 }
 
@@ -23,6 +23,6 @@ export function setSpecificDocumentTx<T extends DocumentData>(
   ref: DocumentReference<T>,
   data: WithFieldValue<T>,
   options: SetOptions = {}
-) {
+): void {
   tx.set(ref, data, options);
 }

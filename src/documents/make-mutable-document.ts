@@ -13,9 +13,10 @@ export function makeMutableDocument<
 >(
   doc: DocumentSnapshot<TNarrowOrFull>
 ): FsMutableDocument<TNarrowOrFull, TFull> {
+  const data = doc.data();
   return {
     id: doc.id,
-    data: doc.data()!,
+    data: data as TNarrowOrFull,
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => doc.ref.update(data),
     updateWithPartial: (data: PartialWithFieldValue<TFull>) =>
@@ -31,9 +32,10 @@ export function makeMutableDocumentTx<
   tx: Transaction,
   doc: DocumentSnapshot<TNarrowOrFull>
 ): FsMutableDocumentTx<TNarrowOrFull, TFull> {
+  const data = doc.data();
   return {
     id: doc.id,
-    data: doc.data()!,
+    data: data as TNarrowOrFull,
     ref: doc.ref,
     update: (data: UpdateData<TFull>) => tx.update(doc.ref, data),
     updateWithPartial: (data: PartialWithFieldValue<TFull>) =>

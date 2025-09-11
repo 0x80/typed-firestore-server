@@ -7,6 +7,6 @@ import {
 export async function deleteDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string
-) {
+): Promise<void> {
   await ref.doc(documentId).delete();
 }

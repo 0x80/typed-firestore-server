@@ -32,7 +32,7 @@ type ProcessDocumentsOptions<
 const MAX_STORED_ERRORS = 1000;
 
 /** Helper to handle document processing errors */
-function handleProcessingError(id: string, err: unknown) {
+function handleProcessingError(id: string, err: unknown): void {
   const message = getErrorMessage(err);
   console.error(`Error processing document ${id}: ${message}`);
 }
@@ -51,7 +51,7 @@ export async function processDocuments<
     document: FsMutableDocument<SelectedDocument<T, S>, T>
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
-) {
+): Promise<void> {
   const { query, disableChunking, limit } = buildQuery(
     ref,
     queryFn,
@@ -158,7 +158,7 @@ export async function processDocumentsByChunk<
     documents: FsMutableDocument<SelectedDocument<T, S>, T>[]
   ) => Promise<unknown>,
   options: ProcessDocumentsOptions<T, S> = {}
-) {
+): Promise<void> {
   const { query, disableChunking, limit } = buildQuery(
     ref,
     queryFn,

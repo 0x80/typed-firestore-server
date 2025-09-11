@@ -14,14 +14,14 @@ import {
 export async function updateSpecificDocument<T extends DocumentData>(
   ref: DocumentReference<T>,
   data: UpdateData<T>
-) {
+): Promise<void> {
   await ref.update(data);
 }
 
 export async function updateSpecificDocumentWithPartial<T extends DocumentData>(
   ref: DocumentReference<T>,
   data: PartialWithFieldValue<T>
-) {
+): Promise<void> {
   await ref.update(data as UpdateData<T>);
 }
 
@@ -29,7 +29,7 @@ export function updateSpecificDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>,
   data: UpdateData<T>
-) {
+): void {
   tx.update(ref, data);
 }
 
@@ -37,6 +37,6 @@ export function updateSpecificDocumentPartialTx<T extends DocumentData>(
   tx: Transaction,
   ref: DocumentReference<T>,
   data: PartialWithFieldValue<T>
-) {
+): void {
   tx.update(ref, data as UpdateData<T>);
 }

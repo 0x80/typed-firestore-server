@@ -16,11 +16,11 @@ export type JsonObject = {
  */
 export function makeDocumentHumanReadable(
   documentData: FirebaseFirestore.DocumentData
-) {
+): JsonObject {
   return sortObjectKeysRecursive(convertTimestampsRecursive(documentData));
 }
 
-function convertTimestampsRecursive(data: JsonObject) {
+function convertTimestampsRecursive(data: JsonObject): JsonObject {
   const convertedData = { ...data };
 
   for (const [key, value] of Object.entries(convertedData)) {
@@ -34,7 +34,7 @@ function convertTimestampsRecursive(data: JsonObject) {
   return convertedData;
 }
 
-function sortObjectKeys(obj: JsonObject) {
+function sortObjectKeys(obj: JsonObject): JsonObject {
   return Object.fromEntries(
     Object.entries(obj).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
   ) as JsonObject;

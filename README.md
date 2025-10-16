@@ -403,6 +403,7 @@ it. The following convenience functions take the event and return typed data.
 
 | Function                     | Description                                                |
 | ---------------------------- | ---------------------------------------------------------- |
+| `getDataOnCreated`           | Get the data from a document create event                  |
 | `getDataOnWritten`           | Get the data from a document write event                   |
 | `getDataOnUpdated`           | Get the data from a document update event                  |
 | `getBeforeAndAfterOnWritten` | Get the before and after data from a document write event  |

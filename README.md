@@ -339,6 +339,8 @@ export type FsMutableDocumentTx<T> = {
 | `getDocumentMaybeTx`        | Fetch a document that might not exist as part of a transaction            |
 | `getSpecificDocument`       | Fetch a document from an inconsistent collection                          |
 | `getSpecificDocumentTx`     | Fetch a document from an inconsistent collection as part of a transaction |
+| `addDocument`               | Add a document with an auto-generated ID                                  |
+| `addDocumentTx`             | Add a document with an auto-generated ID as part of a transaction         |
 | `setDocument`               | Create or overwrite a document                                            |
 | `setDocumentTx`             | Create or overwrite a document as part of a transaction                   |
 | `setSpecificDocument`       | Create or overwrite a specific document                                   |

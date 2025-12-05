@@ -236,3 +236,42 @@ export async function processDocumentsByChunk<
     }
   }
 }
+
+type ProcessDocumentRefsOptions = {
+  chunkSize?: number;
+  throttleSeconds?: number;
+};
+
+/**
+ * Process document references from a collection without fetching document data.
+ * Useful for operations like batch deletes or updates where data isn't needed.
+ */
+export async function processDocumentRefs<T extends DocumentData>(
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn: QueryBuilder | null,
+  handler: (
+    document: FsMutableDocument<Record<string, never>, T>
+  ) => Promise<unknown>,
+  options: ProcessDocumentRefsOptions = {}
+): Promise<void> {
+  return processDocuments(ref, queryFn, handler, { ...options, select: [] });
+}
+
+/**
+ * Process document references from a collection by chunk without fetching
+ * document data. Useful for operations like batch deletes or updates where data
+ * isn't needed.
+ */
+export async function processDocumentRefsByChunk<T extends DocumentData>(
+  ref: CollectionReference<T> | CollectionGroup<T>,
+  queryFn: QueryBuilder | null,
+  handler: (
+    documents: FsMutableDocument<Record<string, never>, T>[]
+  ) => Promise<unknown>,
+  options: ProcessDocumentRefsOptions = {}
+): Promise<void> {
+  return processDocumentsByChunk(ref, queryFn, handler, {
+    ...options,
+    select: [],
+  });
+}

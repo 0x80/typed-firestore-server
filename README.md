@@ -193,8 +193,8 @@ await processDocuments(refs.books,
  * Process an entire collection by setting the query to null. This is typically
  * useful if you need to migrate data after the document type changes.
  */
-await processDocuments(refs.userWishlist(user.id), null, {
-  handler: async (item) => {
+await processDocuments(refs.userWishlist(user.id), null,
+  async (item) => {
     /** The returned document has a typed update function */
     await item.update({
       /** Properties here will be restricted to what is available in the type */
@@ -205,6 +205,15 @@ await processDocuments(refs.userWishlist(user.id), null, {
   },
   /** Pass an empty select for efficiency if you do not use any data */
   { select: [] }
+);
+
+/**
+ * When you don't need the document data at all, use processDocumentRefs as a
+ * convenience. This is equivalent to calling processDocuments with { select: [] }.
+ */
+await processDocumentRefs(refs.books, null, async (book) => {
+  /** Only ref, id, update, updateWithPartial, and delete are available */
+  await book.delete();
 });
 
 /**
@@ -351,14 +360,16 @@ export type FsMutableDocumentTx<T> = {
 
 ### Collections and Queries
 
-| Function                  | Description                                                             |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `getDocuments`            | Fetch documents using a query                                           |
-| `getDocumentsTx`          | Fetch documents using a query as part of a transaction                  |
-| `getFirstDocument`        | Fetch the first result of a query                                       |
-| `getFirstDocumentTx`      | Fetch the first result of a query as part of a transaction              |
-| `processDocuments`        | Query a collection and process the results using a handler per document |
-| `processDocumentsByChunk` | Query a collection and process the results using a handler per chunk    |
+| Function                     | Description                                                             |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `getDocuments`               | Fetch documents using a query                                           |
+| `getDocumentsTx`             | Fetch documents using a query as part of a transaction                  |
+| `getFirstDocument`           | Fetch the first result of a query                                       |
+| `getFirstDocumentTx`         | Fetch the first result of a query as part of a transaction              |
+| `processDocuments`           | Query a collection and process the results using a handler per document |
+| `processDocumentsByChunk`    | Query a collection and process the results using a handler per chunk    |
+| `processDocumentRefs`        | Process document refs without fetching data (convenience for select:[]) |
+| `processDocumentRefsByChunk` | Process document refs by chunk without fetching data                    |
 
 These functions will also work for collection groups.
 

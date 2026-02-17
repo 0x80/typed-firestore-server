@@ -10,7 +10,7 @@ import type {
 
 export function getDataOnWritten<T>(
   _ref: CollectionReference<T> | DocumentReference<T>,
-  event: FirestoreEvent<Change<DocumentSnapshot> | undefined>
+  event: FirestoreEvent<Change<DocumentSnapshot> | undefined>,
 ): Readonly<T> | undefined {
   return event.data?.after.data() as T | undefined;
 }

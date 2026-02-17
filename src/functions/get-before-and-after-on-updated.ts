@@ -12,7 +12,7 @@ import {
 
 export function getBeforeAndAfterOnUpdated<T>(
   _ref: CollectionReference<T> | DocumentReference<T>,
-  event: FirestoreEvent<Change<DocumentSnapshot> | undefined>
+  event: FirestoreEvent<Change<DocumentSnapshot> | undefined>,
 ): readonly [T, T] {
   return [getEventDataBefore<T>(event), getEventDataAfter<T>(event)] as const;
 }

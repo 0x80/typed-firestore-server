@@ -18,7 +18,7 @@ export async function getDocumentsChunked<
   TFull extends DocumentData,
 >(
   query: Query,
-  chunkSize = DEFAULT_CHUNK_SIZE
+  chunkSize = DEFAULT_CHUNK_SIZE,
 ): Promise<FsMutableDocument<T, TFull>[]> {
   const documents: FsMutableDocument<T, TFull>[] = [];
   let startAfterSnapshot: QueryDocumentSnapshot<T> | undefined;
@@ -29,7 +29,7 @@ export async function getDocumentsChunked<
     const [chunk, lastSnapshot] = await getChunkOfDocuments<T, TFull>(
       query,
       startAfterSnapshot,
-      chunkSize
+      chunkSize,
     );
 
     documents.push(...chunk);

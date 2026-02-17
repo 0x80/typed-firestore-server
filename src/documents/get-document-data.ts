@@ -7,7 +7,7 @@ import { invariant } from "~/utils";
 
 export async function getDocumentData<T extends DocumentData>(
   ref: CollectionReference<T>,
-  documentId: string
+  documentId: string,
 ): Promise<T> {
   const doc = await ref.doc(documentId).get();
 
@@ -19,7 +19,7 @@ export async function getDocumentData<T extends DocumentData>(
 
 export async function getDocumentDataMaybe<T extends DocumentData>(
   ref: CollectionReference<T>,
-  documentId?: string | null
+  documentId?: string | null,
 ): Promise<T | undefined> {
   if (!documentId) return;
 
@@ -34,7 +34,7 @@ export async function getDocumentDataMaybe<T extends DocumentData>(
 export async function getDocumentDataTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
-  documentId: string
+  documentId: string,
 ): Promise<T> {
   const doc = await tx.get(ref.doc(documentId));
 
@@ -47,7 +47,7 @@ export async function getDocumentDataTx<T extends DocumentData>(
 export async function getDocumentDataMaybeTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
-  documentId?: string | null
+  documentId?: string | null,
 ): Promise<T | undefined> {
   if (!documentId) return;
 

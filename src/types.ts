@@ -35,7 +35,7 @@ export type FsMutableDocument<TNarrowOrFull, TFull = TNarrowOrFull> = Readonly<{
    * with FieldValue allowed for each root property.
    */
   updateWithPartial: (
-    data: PartialWithFieldValue<TFull>
+    data: PartialWithFieldValue<TFull>,
   ) => Promise<WriteResult>;
   delete: () => Promise<WriteResult>;
 }> &

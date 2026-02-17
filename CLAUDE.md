@@ -7,12 +7,11 @@ code in this repository.
 
 ### Development Commands
 
-- `pnpm lint` - Run ESLint on the source code
+- `pnpm check-lint` - Run oxlint with type-aware linting
 - `pnpm check-types` - Run TypeScript type checking without emitting files
-- `pnpm check-format` - Check code formatting with Prettier
-- `pnpm format` - Auto-format code with Prettier
-- `pnpm build` - Build the library (runs tsup-node, tsc for declarations, and
-  tsc-alias)
+- `pnpm check-format` - Check code formatting with oxfmt
+- `pnpm format` - Auto-format code with oxfmt
+- `pnpm build` - Build the library with tsdown
 - `pnpm clean` - Remove dist directory and build artifacts
 - `pnpm prepare` - Full build cycle (clean, check-types, and build)
 
@@ -32,7 +31,6 @@ organized into three main areas:
 ### Core Modules
 
 1. **Documents (`src/documents/`)** - Functions for single document operations
-
    - CRUD operations: get, set, update, delete
    - Transaction variants (suffixed with `Tx`)
    - Support for both typed collections and specific document references
@@ -41,7 +39,6 @@ organized into three main areas:
 
 2. **Collections (`src/collections/`)** - Functions for collection queries and
    batch processing
-
    - Query functions: `getDocuments`, `getFirstDocument`
    - Processing functions: `processDocuments`, `processDocumentsByChunk`
    - Internal chunking for handling large collections (paginated fetching)
@@ -69,7 +66,6 @@ organized into three main areas:
 
 4. **Mutable Documents**: The library returns `FsMutableDocument<T>` objects
    that combine:
-
    - `id`: Document ID
    - `data`: Typed document data
    - `ref`: Original Firestore reference
@@ -77,7 +73,7 @@ organized into three main areas:
    - `delete()`: Delete method
 
 5. **Path Aliases**: The codebase uses `~` as a path alias for the src directory
-   (configured via tsc-alias).
+   (configured via tsconfig paths, resolved natively by tsdown).
 
 ### Type System
 
@@ -90,10 +86,9 @@ The library provides strong typing throughout:
 
 ### Build System
 
-- Uses tsup for bundling JavaScript
-- TypeScript compiler for declaration files
-- tsc-alias for resolving path aliases in output
-- Outputs both ESM modules and TypeScript declarations
+- Uses tsdown (powered by rolldown) for bundling and declaration generation
+- Unbundled output preserving module structure
+- Outputs ESM (.mjs) and TypeScript declarations (.d.mts)
 - Separate exports for main library and functions submodule
 
 ### Code Conventions

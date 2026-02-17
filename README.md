@@ -118,7 +118,7 @@ const publishedBooks = await getDocuments(refs.books, (query) =>
   query
     .where("is_published", "==", true)
     .orderBy("published_at", "desc")
-    .limit(50)
+    .limit(50),
 );
 
 /**
@@ -136,7 +136,7 @@ const publishedBooks = await getDocuments(
    * can not type the result properly. A select statement directly on the query
    * is detected and results in an error.
    */
-  { select: ["author", "title"] }
+  { select: ["author", "title"] },
 );
 ```
 
@@ -144,11 +144,11 @@ All functions also support collection groups:
 
 ```ts
 const groupRef = db.collectionGroup(
-  "wishlist"
+  "wishlist",
 ) as CollectionGroup<WishlistItem>;
 
 const allWishlistItems = await getDocuments(groupRef, (query) =>
-  query.where("is_archived", "==", false)
+  query.where("is_archived", "==", false),
 );
 ```
 
@@ -253,7 +253,7 @@ export const handleBookUpdates = onDocumentWritten(
 
     /** Get the before and after the write event */
     const [before, after] = getBeforeAndAfterOnWritten(refs.books, event);
-  }
+  },
 );
 ```
 

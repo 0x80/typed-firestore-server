@@ -14,7 +14,7 @@ import {
 
 export function getBeforeAndAfterOnWritten<T>(
   _ref: CollectionReference<T> | DocumentReference<T>,
-  event: FirestoreEvent<Change<DocumentSnapshot> | undefined>
+  event: FirestoreEvent<Change<DocumentSnapshot> | undefined>,
 ): readonly [T | undefined, T | undefined] {
   return [
     getEventDataBeforeMaybe<T>(event),

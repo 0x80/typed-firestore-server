@@ -11,7 +11,7 @@ export async function setDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: WithFieldValue<T>,
-  options: SetOptions = {}
+  options: SetOptions = {},
 ): Promise<void> {
   await ref.doc(documentId).set(data, options);
 }
@@ -21,7 +21,7 @@ export function setDocumentTx<T extends DocumentData>(
   ref: CollectionReference<T>,
   documentId: string,
   data: WithFieldValue<T>,
-  options: SetOptions = {}
+  options: SetOptions = {},
 ): void {
   tx.set(ref.doc(documentId), data, options);
 }

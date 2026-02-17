@@ -12,7 +12,7 @@ import { getQueryInfo } from "./get-query-info";
 export function buildQuery<T extends DocumentData>(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn?: QueryBuilder | null,
-  optionsSelect?: (keyof T)[]
+  optionsSelect?: (keyof T)[],
 ): {
   query: FirebaseFirestore.Query;
   disableChunking: boolean;
@@ -23,7 +23,7 @@ export function buildQuery<T extends DocumentData>(
 
   invariant(
     !querySelect,
-    "Select is not allowed to be set on the query. Use the options instead."
+    "Select is not allowed to be set on the query. Use the options instead.",
   );
 
   /**

@@ -15,7 +15,7 @@ import {
  * document refs for each of them specifically
  */
 export async function getSpecificDocument<T extends DocumentData>(
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<FsMutableDocument<T>> {
   const doc = await ref.get();
 
@@ -25,7 +25,7 @@ export async function getSpecificDocument<T extends DocumentData>(
 }
 
 export async function getSpecificDocumentMaybe<T extends DocumentData>(
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<FsMutableDocument<T> | undefined> {
   const doc = await ref.get();
 
@@ -36,7 +36,7 @@ export async function getSpecificDocumentMaybe<T extends DocumentData>(
 
 export async function getSpecificDocumentTx<T extends DocumentData>(
   tx: Transaction,
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<FsMutableDocumentTx<T>> {
   const doc = await tx.get(ref);
 
@@ -47,7 +47,7 @@ export async function getSpecificDocumentTx<T extends DocumentData>(
 
 export async function getSpecificDocumentMaybeTx<T extends DocumentData>(
   tx: Transaction,
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<FsMutableDocumentTx<T> | undefined> {
   const doc = await tx.get(ref);
 

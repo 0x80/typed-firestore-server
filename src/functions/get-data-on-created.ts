@@ -11,7 +11,7 @@ import { invariant } from "~/utils";
 
 export function getDataOnCreated<T extends DocumentData>(
   _ref: CollectionReference<T> | DocumentReference<T>,
-  event: FirestoreEvent<QueryDocumentSnapshot | undefined>
+  event: FirestoreEvent<QueryDocumentSnapshot | undefined>,
 ): Readonly<T> {
   /**
    * Seems like a bug in cloud functions types, because how can it be undefined

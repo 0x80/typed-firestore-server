@@ -8,7 +8,7 @@ import {
 /** Add a new document to a collection with an auto-generated ID. */
 export async function addDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
-  data: WithFieldValue<T>
+  data: WithFieldValue<T>,
 ): Promise<string> {
   const docRef = await ref.add(data);
 
@@ -22,7 +22,7 @@ export async function addDocument<T extends DocumentData>(
 export function addDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
-  data: WithFieldValue<T>
+  data: WithFieldValue<T>,
 ): string {
   const docRef = ref.doc();
   tx.create(docRef, data);

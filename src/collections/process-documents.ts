@@ -48,14 +48,14 @@ export async function processDocuments<
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder | null,
   handler: (
-    document: FsMutableDocument<SelectedDocument<T, S>, T>
+    document: FsMutableDocument<SelectedDocument<T, S>, T>,
   ) => Promise<unknown>,
-  options: ProcessDocumentsOptions<T, S> = {}
+  options: ProcessDocumentsOptions<T, S> = {},
 ): Promise<void> {
   const { query, disableChunking, limit } = buildQuery(
     ref,
     queryFn,
-    options.select
+    options.select,
   );
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
@@ -66,7 +66,7 @@ export async function processDocuments<
     /** For limits <= MAX_QUERY_LIMIT, use a single query (existing behavior) */
     invariant(
       limit && limit <= MAX_QUERY_LIMIT,
-      `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`
+      `Limit ${String(limit)} is greater than the maximum query limit of ${String(MAX_QUERY_LIMIT)}`,
     );
 
     const documents = await getDocuments(ref, queryFn, options);
@@ -83,7 +83,7 @@ export async function processDocuments<
           }
         }
       },
-      { throttleSeconds, chunkSize }
+      { throttleSeconds, chunkSize },
     );
   } else {
     /** For limits > MAX_QUERY_LIMIT or no limit, use chunking */
@@ -119,7 +119,7 @@ export async function processDocuments<
             }
           }
         },
-        { throttleSeconds, chunkSize }
+        { throttleSeconds, chunkSize },
       );
 
       count += documents.length;
@@ -136,7 +136,7 @@ export async function processDocuments<
 
   if (errorCount >= MAX_STORED_ERRORS) {
     console.warn(
-      `Error logging was limited to ${String(MAX_STORED_ERRORS)} errors`
+      `Error logging was limited to ${String(MAX_STORED_ERRORS)} errors`,
     );
   }
 }
@@ -155,14 +155,14 @@ export async function processDocumentsByChunk<
     | ((collection: CollectionReference | CollectionGroup) => Query)
     | null,
   handler: (
-    documents: FsMutableDocument<SelectedDocument<T, S>, T>[]
+    documents: FsMutableDocument<SelectedDocument<T, S>, T>[],
   ) => Promise<unknown>,
-  options: ProcessDocumentsOptions<T, S> = {}
+  options: ProcessDocumentsOptions<T, S> = {},
 ): Promise<void> {
   const { query, disableChunking, limit } = buildQuery(
     ref,
     queryFn,
-    options.select
+    options.select,
   );
 
   const { throttleSeconds = 0, chunkSize = DEFAULT_CHUNK_SIZE } = options;
@@ -179,7 +179,7 @@ export async function processDocumentsByChunk<
         async (docs) => {
           await handler(docs);
         },
-        { throttleSeconds, chunkSize }
+        { throttleSeconds, chunkSize },
       );
     } catch (err) {
       errors.push(getErrorMessage(err));
@@ -212,7 +212,7 @@ export async function processDocumentsByChunk<
           async (docs) => {
             await handler(docs);
           },
-          { throttleSeconds, chunkSize }
+          { throttleSeconds, chunkSize },
         );
       } catch (err) {
         errors.push(getErrorMessage(err));
@@ -250,9 +250,9 @@ export async function processDocumentRefs<T extends DocumentData>(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder | null,
   handler: (
-    document: FsMutableDocument<Record<string, never>, T>
+    document: FsMutableDocument<Record<string, never>, T>,
   ) => Promise<unknown>,
-  options: ProcessDocumentRefsOptions = {}
+  options: ProcessDocumentRefsOptions = {},
 ): Promise<void> {
   return processDocuments(ref, queryFn, handler, { ...options, select: [] });
 }
@@ -266,9 +266,9 @@ export async function processDocumentRefsByChunk<T extends DocumentData>(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder | null,
   handler: (
-    documents: FsMutableDocument<Record<string, never>, T>[]
+    documents: FsMutableDocument<Record<string, never>, T>[],
   ) => Promise<unknown>,
-  options: ProcessDocumentRefsOptions = {}
+  options: ProcessDocumentRefsOptions = {},
 ): Promise<void> {
   return processDocumentsByChunk(ref, queryFn, handler, {
     ...options,

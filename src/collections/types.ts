@@ -10,5 +10,5 @@ export type SelectedDocument<
 > = S extends (keyof T)[] ? Pick<T, S[number]> : T;
 
 export type QueryBuilder = (
-  collection: CollectionReference | CollectionGroup
+  collection: CollectionReference | CollectionGroup,
 ) => Query;

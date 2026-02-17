@@ -11,7 +11,7 @@ export function makeMutableDocument<
   TNarrowOrFull extends DocumentData,
   TFull extends DocumentData = TNarrowOrFull,
 >(
-  doc: DocumentSnapshot<TNarrowOrFull>
+  doc: DocumentSnapshot<TNarrowOrFull>,
 ): FsMutableDocument<TNarrowOrFull, TFull> {
   const data = doc.data();
   return {
@@ -30,7 +30,7 @@ export function makeMutableDocumentTx<
   TFull extends DocumentData = TNarrowOrFull,
 >(
   tx: Transaction,
-  doc: DocumentSnapshot<TNarrowOrFull>
+  doc: DocumentSnapshot<TNarrowOrFull>,
 ): FsMutableDocumentTx<TNarrowOrFull, TFull> {
   const data = doc.data();
   return {

@@ -12,7 +12,7 @@ import {
 
 export async function getDocument<T extends DocumentData>(
   ref: CollectionReference<T>,
-  documentId: string
+  documentId: string,
 ): Promise<FsMutableDocument<T>> {
   const doc = await ref.doc(documentId).get();
 
@@ -23,7 +23,7 @@ export async function getDocument<T extends DocumentData>(
 
 export async function getDocumentMaybe<T extends DocumentData>(
   ref: CollectionReference<T>,
-  documentId?: string | null
+  documentId?: string | null,
 ): Promise<FsMutableDocument<T> | undefined> {
   if (!documentId) return;
 
@@ -37,7 +37,7 @@ export async function getDocumentMaybe<T extends DocumentData>(
 export async function getDocumentTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
-  documentId: string
+  documentId: string,
 ): Promise<FsMutableDocumentTx<T>> {
   const doc = await tx.get(ref.doc(documentId));
 
@@ -49,7 +49,7 @@ export async function getDocumentTx<T extends DocumentData>(
 export async function getDocumentMaybeTx<T extends DocumentData>(
   tx: Transaction,
   ref: CollectionReference<T>,
-  documentId?: string | null
+  documentId?: string | null,
 ): Promise<FsMutableDocumentTx<T> | undefined> {
   if (!documentId) return;
 

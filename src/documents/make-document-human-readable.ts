@@ -15,7 +15,7 @@ export type JsonObject = {
  * alphabetically.
  */
 export function makeDocumentHumanReadable(
-  documentData: FirebaseFirestore.DocumentData
+  documentData: FirebaseFirestore.DocumentData,
 ): JsonObject {
   return sortObjectKeysRecursive(convertTimestampsRecursive(documentData));
 }
@@ -36,7 +36,7 @@ function convertTimestampsRecursive(data: JsonObject): JsonObject {
 
 function sortObjectKeys(obj: JsonObject): JsonObject {
   return Object.fromEntries(
-    Object.entries(obj).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+    Object.entries(obj).sort(([keyA], [keyB]) => keyA.localeCompare(keyB)),
   ) as JsonObject;
 }
 
@@ -48,7 +48,7 @@ function sortObjectKeysRecursive(obj: JsonObject): JsonObject {
       sortedObj[key] = sortObjectKeysRecursive(value);
     } else if (Array.isArray(value)) {
       sortedObj[key] = value.map((item) =>
-        isJsonObject(item) ? sortObjectKeysRecursive(item) : item
+        isJsonObject(item) ? sortObjectKeysRecursive(item) : item,
       );
     }
   }

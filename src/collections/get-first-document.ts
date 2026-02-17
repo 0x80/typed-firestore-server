@@ -18,19 +18,19 @@ export async function getFirstDocument<
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder,
-  options: GetDocumentsOptions<T, S> = {}
+  options: GetDocumentsOptions<T, S> = {},
 ): Promise<FsMutableDocument<SelectedDocument<T, S>, T> | undefined> {
   const queryInfo = getQueryInfo(queryFn(ref));
   const { limit, select: querySelect } = queryInfo;
 
   invariant(
     !isDefined(limit),
-    `You should not set a limit when calling getFirstDocument. It returns only one document.`
+    `You should not set a limit when calling getFirstDocument. It returns only one document.`,
   );
 
   invariant(
     !querySelect,
-    "Select is not allowed to be set on the query. Use the options instead."
+    "Select is not allowed to be set on the query. Use the options instead.",
   );
 
   const query = options.select
@@ -44,7 +44,7 @@ export async function getFirstDocument<
   }
 
   return makeMutableDocument<SelectedDocument<T, S>, T>(
-    snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, S>>
+    snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, S>>,
   );
 }
 
@@ -54,7 +54,7 @@ export async function getFirstDocumentData<
 >(
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder,
-  options: GetDocumentsOptions<T, S> = {}
+  options: GetDocumentsOptions<T, S> = {},
 ): Promise<T | undefined> {
   const document = await getFirstDocument(ref, queryFn, options);
   return document?.data;
@@ -67,19 +67,19 @@ export async function getFirstDocumentTx<
   tx: Transaction,
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder,
-  options: GetDocumentsOptions<T, S> = {}
+  options: GetDocumentsOptions<T, S> = {},
 ): Promise<FsMutableDocumentTx<SelectedDocument<T, S>, T> | undefined> {
   const queryInfo = getQueryInfo(queryFn(ref));
   const { limit, select: querySelect } = queryInfo;
 
   invariant(
     !isDefined(limit),
-    `You should not set a limit when calling getFirstDocument. It returns only one document.`
+    `You should not set a limit when calling getFirstDocument. It returns only one document.`,
   );
 
   invariant(
     !querySelect,
-    "Select is not allowed to be set on the query. Use the options instead."
+    "Select is not allowed to be set on the query. Use the options instead.",
   );
 
   const query = options.select
@@ -94,7 +94,7 @@ export async function getFirstDocumentTx<
 
   return makeMutableDocumentTx<SelectedDocument<T, S>, T>(
     tx,
-    snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, S>>
+    snapshot.docs[0] as QueryDocumentSnapshot<SelectedDocument<T, S>>,
   );
 }
 
@@ -105,7 +105,7 @@ export async function getFirstDocumentDataTx<
   tx: Transaction,
   ref: CollectionReference<T> | CollectionGroup<T>,
   queryFn: QueryBuilder,
-  options: GetDocumentsOptions<T, S> = {}
+  options: GetDocumentsOptions<T, S> = {},
 ): Promise<T | undefined> {
   const document = await getFirstDocumentTx(tx, ref, queryFn, options);
   return document?.data;

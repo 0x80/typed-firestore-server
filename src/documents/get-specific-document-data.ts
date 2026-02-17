@@ -9,14 +9,14 @@ import {
 } from "./get-specific-document";
 
 export async function getSpecificDocumentData<T extends DocumentData>(
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<T> {
   const doc = await getSpecificDocument(ref);
   return doc.data;
 }
 
 export async function getSpecificDocumentDataMaybe<T extends DocumentData>(
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<T | undefined> {
   const doc = await getSpecificDocumentMaybe(ref);
   return doc?.data;
@@ -24,7 +24,7 @@ export async function getSpecificDocumentDataMaybe<T extends DocumentData>(
 
 export async function getSpecificDocumentDataMaybeTx<T extends DocumentData>(
   tx: Transaction,
-  ref: DocumentReference<T>
+  ref: DocumentReference<T>,
 ): Promise<T | undefined> {
   const doc = await tx.get(ref);
 

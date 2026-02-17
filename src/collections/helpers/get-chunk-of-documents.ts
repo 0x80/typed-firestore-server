@@ -17,7 +17,7 @@ export async function getChunkOfDocuments<
 >(
   query: Query,
   startAfterSnapshot: QueryDocumentSnapshot<T> | undefined,
-  batchSize: number
+  batchSize: number,
 ): Promise<
   [FsMutableDocument<T, TFull>[], QueryDocumentSnapshot<T> | undefined]
 > {
@@ -34,7 +34,7 @@ export async function getChunkOfDocuments<
   }
 
   const documents = snapshot.docs.map((doc) =>
-    makeMutableDocument<T, TFull>(doc as DocumentSnapshot<T>)
+    makeMutableDocument<T, TFull>(doc as DocumentSnapshot<T>),
   );
 
   /**

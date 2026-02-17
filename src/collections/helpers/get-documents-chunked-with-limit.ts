@@ -18,7 +18,7 @@ export async function getDocumentsChunkedWithLimit<
 >(
   query: Query,
   totalLimit: number,
-  chunkSize = DEFAULT_CHUNK_SIZE
+  chunkSize = DEFAULT_CHUNK_SIZE,
 ): Promise<FsMutableDocument<T, TFull>[]> {
   const documents: FsMutableDocument<T, TFull>[] = [];
   let startAfterSnapshot: QueryDocumentSnapshot<T> | undefined;
@@ -29,13 +29,13 @@ export async function getDocumentsChunkedWithLimit<
 
     const currentChunkSize = Math.min(
       remainingLimit,
-      Math.min(MAX_QUERY_LIMIT, chunkSize)
+      Math.min(MAX_QUERY_LIMIT, chunkSize),
     );
 
     const [chunk, lastSnapshot] = await getChunkOfDocuments<T, TFull>(
       query,
       startAfterSnapshot,
-      currentChunkSize
+      currentChunkSize,
     );
 
     documents.push(...chunk);

@@ -32,5 +32,5 @@
     "no-debugger": "error",
     "no-await-in-loop": "off"
   },
-  "ignorePatterns": ["*.d.ts", "*.d.mts"]
+  "ignorePatterns": ["*.d.ts", "*.d.mts", "src/__type-tests__"]
 }

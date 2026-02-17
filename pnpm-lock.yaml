@@ -19,8 +19,8 @@ importers:
         version: 1.2.1
     devDependencies:
       '@codecompose/typescript-config':
-        specifier: ^2.3.0
-        version: 2.3.0
+        specifier: ^3.0.0
+        version: 3.0.0(typescript@6.0.0-beta)
       '@types/node':
         specifier: ^25.2.3
         version: 25.2.3
@@ -66,8 +66,10 @@ packages:
     resolution: {integrity: sha512-ubmJ6TShyaD69VE9DQrlXcdkvJbmwWPB8qYj0H2kaJi29O7vJT9ajSdBd2W8CG34pwL9pYA74fi7RHC1qbLoVQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
-  '@codecompose/typescript-config@2.3.0':
-    resolution: {integrity: sha512-qjEhZFg+tSb2RG4H6XKJOBxSws18iMkeIqlFXGvOQsE5Dw4RQIcmUaZNw08ZVD32D5ovwJcVzNiw6XiM07kS3w==}
+  '@codecompose/typescript-config@3.0.0':
+    resolution: {integrity: sha512-CkMXAK8X2E4DUTVBTs90x/vPsZfULP38Y1UQNYLgzy3A+95ygpsTRHYwJrlrqcR2lElTeyAYONsvHPVxxfojcQ==}
+    peerDependencies:
+      typescript: '>=6.0.0'
 
   '@emnapi/core@1.8.1':
     resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
@@ -1604,7 +1606,9 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0-rc.2
       '@babel/helper-validator-identifier': 8.0.0-rc.1
 
-  '@codecompose/typescript-config@2.3.0': {}
+  '@codecompose/typescript-config@3.0.0(typescript@6.0.0-beta)':
+    dependencies:
+      typescript: 6.0.0-beta
 
   '@emnapi/core@1.8.1':
     dependencies:

@@ -51,7 +51,7 @@
     "process-in-chunks": "1.2.1"
   },
   "devDependencies": {
-    "@codecompose/typescript-config": "^2.3.0",
+    "@codecompose/typescript-config": "^3.0.0",
     "@types/node": "^25.2.3",
     "del-cli": "^7.0.0",
     "oxfmt": "^0.33.0",

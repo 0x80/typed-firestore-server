@@ -39,6 +39,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: checks
     runs-on: ubuntu-latest
+    # Authentication is handled via OIDC trusted publishing (id-token),
+    # so no NPM_TOKEN secret is needed.
     permissions:
       contents: write
       id-token: write

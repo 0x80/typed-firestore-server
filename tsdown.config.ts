@@ -6,7 +6,7 @@ export default defineConfig({
     "functions/index": "src/functions/index.ts",
   },
   format: ["esm"],
-  target: "node22",
+  target: "node20",
   sourcemap: true,
   treeshake: true,
   dts: true,

@@ -58,7 +58,7 @@
     "oxlint": "^1.48.0",
     "oxlint-tsgolint": "^0.14.0",
     "tsdown": "^0.20.3",
-    "typescript": "^5.9.3"
+    "typescript": "6.0.0-beta"
   },
   "peerDependencies": {
     "firebase-admin": ">=12.0",

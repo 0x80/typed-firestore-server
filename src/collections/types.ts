@@ -7,7 +7,7 @@ import type {
 export type SelectedDocument<
   T,
   S extends (keyof T)[] | undefined = undefined,
-> = S extends (keyof T)[] ? Pick<T, S[number]> : T;
+> = S extends undefined ? T : S extends (keyof T)[] ? Pick<T, S[number]> : T;
 
 export type QueryBuilder = (
   collection: CollectionReference | CollectionGroup,

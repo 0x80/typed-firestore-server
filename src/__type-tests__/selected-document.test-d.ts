@@ -9,8 +9,7 @@ import type { DocumentData } from "firebase-admin/firestore";
 import type { SelectedDocument } from "~/collections/types";
 
 /** Check that A and B are exactly the same type (in both directions). */
-type IsExact<A, B> =
-  [A] extends [B] ? ([B] extends [A] ? true : false) : false;
+type IsExact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 
 type AssertTrue<T extends true> = T;
 
@@ -29,9 +28,7 @@ type Book = {
 // Core behavior — S omitted (defaults to undefined) → full type
 // ---------------------------------------------------------------------------
 
-type _DefaultResolvesToFull = AssertTrue<
-  IsExact<SelectedDocument<Book>, Book>
->;
+type _DefaultResolvesToFull = AssertTrue<IsExact<SelectedDocument<Book>, Book>>;
 
 // ---------------------------------------------------------------------------
 // Core behavior — S explicitly undefined → full type
@@ -63,10 +60,7 @@ type _SingleKey = AssertTrue<
 
 /** All keys selected should equal the full type */
 type _AllKeys = AssertTrue<
-  IsExact<
-    SelectedDocument<Book, ["title", "author", "year", "tags"]>,
-    Book
-  >
+  IsExact<SelectedDocument<Book, ["title", "author", "year", "tags"]>, Book>
 >;
 
 /** Empty array selection results in empty object */
@@ -80,9 +74,7 @@ type _EmptyArray = AssertTrue<
 
 /** A selected subset should NOT equal the full type. */
 type _SubsetIsNotFull = IsExact<SelectedDocument<Book, ["title"]>, Book>;
-type _SubsetIsNotFullCheck = AssertTrue<
-  IsExact<_SubsetIsNotFull, false>
->;
+type _SubsetIsNotFullCheck = AssertTrue<IsExact<_SubsetIsNotFull, false>>;
 
 /**
  * Invalid keys should be rejected by the constraint. The second type parameter

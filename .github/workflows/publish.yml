@@ -36,6 +36,7 @@ jobs:
     uses: ./.github/workflows/checks.yml
 
   publish:
+    if: github.ref == 'refs/heads/main'
     needs: checks
     runs-on: ubuntu-latest
     permissions:
